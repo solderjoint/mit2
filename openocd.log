@@ -1,0 +1,24 @@
+adapter speed: 500 kHz
+adapter speed: 2000 kHz
+Info : No device selected, using first device.
+Info : J-Link ARM V8 compiled Nov 28 2014 13:44:46
+Info : Hardware version: 8.00
+Info : VTarget = 3.325 V
+Info : clock speed 2000 kHz
+Info : SWD DPIDR 0x2ba01477
+Info : lm3s.cpu: hardware has 6 breakpoints, 4 watchpoints
+adapter speed: 500 kHz
+cortex_m reset_config sysresetreq
+target halted due to debug-request, current mode: Thread 
+xPSR: 0x01000000 pc: 0x00001474 msp: 0x200048a4
+** Programming Started **
+auto erase enabled
+wrote 17408 bytes from file build/mit.elf in 2.663533s (6.383 KiB/s)
+** Programming Finished **
+** Verify Started **
+verified 16848 bytes in 1.577371s (10.431 KiB/s)
+** Verified OK **
+** Resetting Target **
+adapter speed: 500 kHz
+cortex_m reset_config sysresetreq
+shutdown command invoked

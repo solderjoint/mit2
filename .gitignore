@@ -1,0 +1,23 @@
+
+# binary object
+*.o
+*.elf
+*.hex
+*.bin
+*.map
+*.swp
+
+# system junk
+/build/
+/build/**
+/device/
+/device/**
+/example/
+/example/**
+/docs/
+/docs/**
+/_old
+/_old/**
+*.autosave
+*.d
+ 
