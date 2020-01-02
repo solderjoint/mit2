@@ -97,9 +97,6 @@ void setup(void) {
 	// watchdog and main timers
 	ConfigStartup();
 
-	TimerClockInit();
-	TimerClockAttachInterrupt(TimerClockIntHandler);
-
 	TimerSemaphoreInit(100); // set 100 Hz frequency
 	TimerSemaphoreAttachInterrupt(TimerMutexHandler);
 
@@ -113,10 +110,7 @@ void setup(void) {
 	UsartConsoleInit(CONSOLE_RATE);
 	CanTransmissionInit(CAN_RATE);
 
-	CrashVarsReset();
-	DomainVarsReset();
-	SamplingVarsReset();
-	CheckLineVarsReset();
+	CrashVarsInit();
 }
 
 /* **************************************************** *
@@ -128,9 +122,4 @@ void TimerMutexHandler (void) {
 	if (counter % PERIOD_CHECK_COMM == 0) gMutex.comm = 1;
 	if (counter % PERIOD_RENEW_VOLT == 0) gMutex.volt = 1;
 	TimerSemaphoreCounterIncrement();
-}
-
-void TimerClockIntHandler (void) {
-	GpioLedsSet(1, -1); // xor the led
-	WatchdogReset();
 }

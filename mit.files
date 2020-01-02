@@ -6,6 +6,9 @@ src/logic/config.c
 src/logic/crash.c
 inc/logic/crash.h
 
+src/logic/data/db.c
+inc/logic/data/db.h
+
 src/comm/smolin.c
 inc/comm/smolin.h
 
@@ -26,6 +29,8 @@ src/periph/can.c
 inc/periph/can.h
 src/periph/gpio.c
 inc/periph/gpio.h
+src/periph/rom.c
+inc/periph/rom.h
 src/periph/spi.c
 inc/periph/spi.h
 src/periph/timer.c
@@ -71,6 +76,8 @@ src/vars/linestatus.c
 inc/vars/linestatus.h
 src/vars/voltageconsts.c
 inc/vars/voltageconsts.h
+src/vars/peripheral.c
+inc/vars/peripheral.h
 
 ###############################
 ##        ENTRY POINT        ##

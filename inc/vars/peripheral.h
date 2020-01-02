@@ -1,21 +1,23 @@
-#ifndef __CRASHROUTINE_H
-#define __CRASHROUTINE_H
+/*
+ * Header for peripheral communication rate set
+ */
+
+#ifndef __VAR_PERIPHERAL_H
+#define __VAR_PERIPHERAL_H
 
 #include "util/typedefs.h"
 
 /* **************************************************** *
- *                HEADER SPECIFIC MACROS
+ *                  SYSTEM-WIDE MACROS
  * **************************************************** */
 
 /* **************************************************** *
- *                 FUNCTION PROTOTYPES
+ *             SECURE LINE STATUS VARIABLE
  * **************************************************** */
-int32 CrashCheck (void);
-
-void CrashUpdateNormalVoltage (void);
-void CrashVarsInit (void);
+int32 PeripheralCanRateGet (void);
+int32 PeripheralCanRateSet (void);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION
  * **************************************************** */
-#endif //__CRASHROUTINE_H
+#endif //__VAR_PERIPHERAL_H

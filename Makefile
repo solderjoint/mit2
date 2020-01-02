@@ -26,8 +26,8 @@ OBJ        = $(CSRC:.c=.o) $(CPPSRC:.cpp=.o) $(ASRC:.S=.o)
 
 # ####################################################### #
 TIVADIR    = libs/tivaware
-#LIBLIST    =  -lm -lnosys -lc -lc_nano  -ldriver
-LIBLIST    = -lgcc -lm -ldriver
+#LIBLIST    = -lgcc -lm -lc -lc_nano -ldriver
+LIBLIST    = -lgcc -lm -lc -ldriver
 
 CINC       = -I$(TIVADIR)/driverlib  -I$(TIVADIR)/inc
 CINC      += -I$(INCDIR)  -I$(LIBDIR)  -I$(SRCDIR)
@@ -35,7 +35,7 @@ CINC      += -I./newlib-1.18.0/newlib/libc/include
 
 # ####################################################### #
 CFLAGS     = -fdata-sections -ffunction-sections -g2 -Os -w
-CFLAGS    += -fno-common -fverbose-asm -fmax-errors=100
+CFLAGS    += -fno-common -fverbose-asm -fmax-errors=16
 CFLAGS    += -W -Wall -Wextra -Wshadow -Wcast-align
 CFLAGS    += -Werror=implicit-function-declaration
 CFLAGS    += -mcpu=cortex-m4 -mlittle-endian -mthumb
@@ -77,15 +77,5 @@ init: $(TARGET).elf
 
 debug:
 	$(GDB) -ex "target remote localhost:3333" $(BINDIR)/$(TARGET).elf
-
-# ####################################################### #
-#$(LIBOPENCM3):
-#	$(MAKE) -C libopencm3 TARGETS=stm32/f1 $(MAKEFLAGS)
-
-#%.o: %.c $(LIBOPENCM3)
-#	$(CC) -MMD -c $(CFLAGS) $< -o $@
-
-#%.o: %.s $(LIBOPENCM3)
-#	$(CC) -MMD -c $(ASMFLAGS) $< -o $@
 
 -include $(SRCDIR)/*.d

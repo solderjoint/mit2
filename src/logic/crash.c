@@ -108,8 +108,11 @@ void CrashUpdateNormalVoltage (void) {
 	CheckLineVoltageNormalUpdate();
 }
 
-void CrashVarsReset (void) {
+void CrashVarsInit (void) {
 	LineStatusSet(STATUS_OK);
+	DomainVarsReset();
+	SamplingVarsReset();
+	CheckLineVarsReset();
 }
 
 /* **************************************************** *
@@ -124,4 +127,5 @@ int32 CrashCheck (void) {
 	} else if (status == STATUS_SIGNALLOST) {
 		CrashTriggerSet();
 	}
+	return 0;
 }
