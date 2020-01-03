@@ -12,10 +12,16 @@
  * **************************************************** */
 
 /* **************************************************** *
- *             SECURE LINE STATUS VARIABLE
+ *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 PeripheralCanRateGet (void);
-int32 PeripheralCanRateSet (const int32 val);
+int32 PeripheralCanRateSet (const uint32 val);
+
+int32 PeripheralSpiRateGet (void);
+int32 PeripheralSpiRateSet (const uint32 val);
+
+int32 PeripheralUsartRateGet (void);
+int32 PeripheralUsartRateSet (const uint32 val);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

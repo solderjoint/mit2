@@ -19,7 +19,7 @@
  * **************************************************** */
 #define CAN_RATE        (100000)  // can baudrate
 #define SPI_RATE        (800000)  // external spi baudrate
-#define CONSOLE_RATE    (115200)  // uart console baudrate
+#define USART_RATE      (115200)  // uart console baudrate
 
 #define FOURIER_RATE    (12800)   // fft sampling rate
 

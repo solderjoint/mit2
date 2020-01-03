@@ -23,6 +23,7 @@ enum StartupErrorEnum {
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 ConfigStartup (void);
+int32 ConfigMutexStart (const uint32 rate, void (*fun) (void));
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

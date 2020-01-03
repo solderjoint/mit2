@@ -14,11 +14,8 @@
 /* **************************************************** *
  *                COMMON HEADERS SECTION
  * **************************************************** */
-#define  __USE_ISOC99
-
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define  TM4C1231H6PZ
 #define  PART_TM4C1231H6PZ
@@ -33,16 +30,6 @@
 #include "logic/crash.h"
 #include "logic/config.h"
 
-#include "periph/can.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
-#include "periph/timer.h"
-#include "periph/usart.h"
-#include "periph/watchdog.h"
-
-#include "system/diagnostic.h"
-
-//#include "util/debug.h"
 #include "util/print.h"
 #include "util/typedefs.h"
 #include "util/util.h"
@@ -61,16 +48,15 @@ static struct _mutex_t gMutex;
 /* **************************************************** *
  *             FUNCTION PROTOTYPES SECTION
  * **************************************************** */
-void TimerClockIntHandler (void);
-void TimerMutexHandler (void);
-
-void setup(void);
+void mutex_handler (void);
 
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
 int main(void) {
-	setup();
+	ConfigStartup();
+	ConfigMutexStart (100, mutex_handler);
+	CrashVarsInit();
 
 	while (1) {
 		GpioLedsSet(2, -1); // cpu free time output
@@ -91,32 +77,9 @@ int main(void) {
 }
 
 /* **************************************************** *
- *                INITIALIZATION ROUTINE
- * **************************************************** */
-void setup(void) {
-	// watchdog and main timers
-	ConfigStartup();
-
-	TimerSemaphoreInit(100); // set 100 Hz frequency
-	TimerSemaphoreAttachInterrupt(TimerMutexHandler);
-
-//	GpioModuleCodenameInit();
-//	GpioModuleAdressInit();
-//	GpioTriggerInit();
-//	GpioButtonInit();
-//	GpioLedsInit();
-
-//	SpiExternalAdcInit(SPI_RATE);
-//	UsartConsoleInit(CONSOLE_RATE);
-//	CanTransmissionInit(CAN_RATE);
-
-	CrashVarsInit();
-}
-
-/* **************************************************** *
  *        ADDITIONAL INTERRUPT ROUTINE HANDLERS
  * **************************************************** */
-void TimerMutexHandler (void) {
+void mutex_handler (void) {
 	const uint32 counter = TimerSemaphoreCounterGet();
 	if (counter % PERIOD_CHECK_LINE == 0) gMutex.line = 1;
 	if (counter % PERIOD_CHECK_COMM == 0) gMutex.comm = 1;

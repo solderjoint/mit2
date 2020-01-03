@@ -1,7 +1,8 @@
 
 #include "logic/config.h"
 
-#include <logic/data/db.h>
+#include "logic/crash.h"
+#include "logic/data/db.h"
 
 #include "periph/can.h"
 #include "periph/gpio.h"
@@ -13,19 +14,14 @@
 
 #include "vars/fourierconsts.h"
 #include "vars/peripheral.h"
-#include "project.h"
 
 #include "util/print.h"
-#include "util/crc.h"
+//#include "util/crc.h"
 
-/* **************************************************** */
-void print_hello (void) {
-	_puts("sys>boot\n");
-}
 
-// TODO: peripherial rate vars in rom
-
-/* **************************************************** */
+/* **************************************************** *
+ *               WATCHDOG RESET PROVIDER
+ * **************************************************** */
 void TimerClockIntHandler (void) {
 	GpioLedsSet(1, -1); // xor the led
 	WatchdogReset();
@@ -34,47 +30,51 @@ void TimerClockIntHandler (void) {
 /* **************************************************** *
  *        SAMPLING DEFAULT LOCAL VARIABLES INIT
  * **************************************************** */
-int32 ConfigPeripheralInit (void) {
+static void periph_system (void) {
 	WatchdogInit();
 	RomInit();
 	TimerClockInit();
-	TimerClockAttachInterrupt(TimerClockIntHandler);
+}
 
-	const uint32 res = PeripheralCanRateGet();
+static void periph_comm (void) {
+	int32 rate = PeripheralSpiRateGet();
+	SpiExternalAdcInit(rate);
+	rate = PeripheralUsartRateGet();
+	UsartConsoleInit(rate);
+	rate = PeripheralCanRateGet();
+	CanTransmissionInit(rate);
+}
+
+static void periph_gpio (void) {
 	GpioModuleCodenameInit();
 	GpioModuleAdressInit();
 	GpioTriggerInit();
 	GpioButtonInit();
 	GpioLedsInit();
-
-	int32 rate;
-	SpiExternalAdcInit(SPI_RATE);
-	UsartConsoleInit(CONSOLE_RATE);
-	rate = PeripheralCanRateGet();
-	CanTransmissionInit(rate);
 }
 
-static int32 ConfigVariablesInit (void) {
-//	CrashVarsReset();
-
+static void periph_other (void) {
+	// let watchdog be the last to be updated
+	TimerClockAttachInterrupt(TimerClockIntHandler);
 }
 
 /* **************************************************** *
- *              CONFIGURATION VALUE SETTER
+ *               TIMER SEMAPHORE WRAPPER
  * **************************************************** */
-int32 ConfigValueInt32Set (const uint32 hash, const int32 val) {
-}
-
-int32 ConfigValueFloatSet (const uint32 hash, const float val) {
+int32 ConfigMutexStart (const uint32 rate, void (*fun) (void)) {
+	const uint32 r = ((rate > 10) && (rate < kil(1)))? rate : 100;
+	TimerSemaphoreInit(r);
+	TimerSemaphoreAttachInterrupt(fun);
 }
 
 /* **************************************************** *
  *                INITIALIZATION SECTION
  * **************************************************** */
 int32 ConfigStartup (void) {
-	ConfigPeripheralInit();
-	ConfigVariablesInit();
-	DatabaseFind(0xdeadbeef);
+	periph_system();
+	periph_comm();
+	periph_gpio();
+	periph_other();
 
 	return 0;
 }
