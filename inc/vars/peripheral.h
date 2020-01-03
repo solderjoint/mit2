@@ -15,7 +15,7 @@
  *             SECURE LINE STATUS VARIABLE
  * **************************************************** */
 int32 PeripheralCanRateGet (void);
-int32 PeripheralCanRateSet (void);
+int32 PeripheralCanRateSet (const int32 val);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

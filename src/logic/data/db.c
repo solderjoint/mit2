@@ -1,11 +1,13 @@
 
 #include "logic/data/db.h"
 
+#include <stddef.h> // for NULL reference
 #include <stdlib.h>
+#include <string.h>
 
 #include "periph/rom.h"
 //#include "util/print.h"
-//#include "util/crc.h"
+#include "util/crc.h"
 
 /* **************************************************** *
  *                  DATABASE UTILITIES
@@ -38,6 +40,15 @@ static int32 find_free_pos (const int32 prev_pos) {
 		if (buf == 0) return i;
 	}
 	return DATABASE_NOEMPTYSPACE;
+}
+
+/* **************************************************** *
+ *            CRC32 HASH CALCULATION WRAPPER
+ * **************************************************** */
+inline uint32 DatabaseHashGet (const char stringified[80]) {
+	if (stringified == NULL) return 0;
+	const int32 len = strnlen(stringified, 80);
+	return CRC32Calculate(stringified, len);
 }
 
 /* **************************************************** *

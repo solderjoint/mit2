@@ -47,9 +47,11 @@ int32 ConfigPeripheralInit (void) {
 	GpioButtonInit();
 	GpioLedsInit();
 
+	int32 rate;
 	SpiExternalAdcInit(SPI_RATE);
 	UsartConsoleInit(CONSOLE_RATE);
-	CanTransmissionInit(CAN_RATE);
+	rate = PeripheralCanRateGet();
+	CanTransmissionInit(rate);
 }
 
 static int32 ConfigVariablesInit (void) {
@@ -73,5 +75,6 @@ int32 ConfigStartup (void) {
 	ConfigPeripheralInit();
 	ConfigVariablesInit();
 	DatabaseFind(0xdeadbeef);
+
 	return 0;
 }

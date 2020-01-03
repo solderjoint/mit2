@@ -4,16 +4,27 @@
 #include <string.h>
 
 #include "logic/data/db.h"
-#include "util/crc.h"
 #include "util/util.h"
+#include "project.h"
 
 /* **************************************************** *
- *           PERIPHERAL COMMINCATION SET/GETS
+ *                CAN PERIPHERAL WRAPPER
  * **************************************************** */
 int32 PeripheralCanRateGet (void) {
-	const uint8 buf[] = stringify(PeripheralCanRateGet);
-	const uint32 size = strnlen(buf, 255);
-	const uint32 hash = CRC32Calculate(buf, size);
-	return DatabaseFind(hash);
+	const char buf[] = stringify(PeripheralCanRate);
+	const uint32 hash = DatabaseHashGet(buf);
+	const int32 val = DatabaseValueGet(hash);
+	return ((val < kil(2)) || (val > mil(2)))? CAN_RATE : val;
 }
-int32 PeripheralCanRateSet (void) {}
+
+int32 PeripheralCanRateSet (const int32 val) {
+	const uint32 rate = ((val < kil(2)) || (val > mil(2)))? CAN_RATE : val;
+	const char buf[] = stringify(PeripheralCanRate);
+	const uint32 hash = DatabaseHashGet(buf);
+	return DatabaseValueSet(hash, rate);
+}
+
+/* **************************************************** *
+ *               USART PERIPHERAL WRAPPER
+ * **************************************************** */
+//int32 PeripheralUsartRateGet (void) {

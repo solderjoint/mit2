@@ -9,6 +9,7 @@
 #include "logic/math/sampling.h"
 
 #include "periph/gpio.h"
+
 #include "util/print.h"
 #include "util/util.h"
 
