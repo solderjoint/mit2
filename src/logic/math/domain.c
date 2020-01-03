@@ -1,5 +1,5 @@
 
-#include "logic/domain.h"
+#include "logic/math/domain.h"
 
 #include <math.h>
 #include <stddef.h>

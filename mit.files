@@ -12,15 +12,14 @@ inc/logic/data/db.h
 src/comm/smolin.c
 inc/comm/smolin.h
 
-src/logic/domain.c
-inc/logic/domain.h
-src/logic/fft1024.c
-inc/logic/fft1024.h
-
-src/logic/linecheck.c
-inc/logic/linecheck.h
-src/logic/sampling.c
-inc/logic/sampling.h
+src/logic/math/domain.c
+inc/logic/math/domain.h
+src/logic/math/fft1024.c
+inc/logic/math/fft1024.h
+src/logic/math/linecheck.c
+inc/logic/math/linecheck.h
+src/logic/math/sampling.c
+inc/logic/math/sampling.h
 
 ###############################
 ##     PERIPHERIAL USAGE     ##

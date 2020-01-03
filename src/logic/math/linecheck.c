@@ -1,5 +1,5 @@
 
-#include "logic/linecheck.h"
+#include "logic/math/linecheck.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"

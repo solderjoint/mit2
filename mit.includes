@@ -8,7 +8,8 @@ libs/tivaware/driverlib
 inc/
 inc/comm
 inc/logic
-inc/logic/vars
+inc/logic/data
+inc/logic/math
 inc/periph
 inc/system
 inc/util
@@ -17,7 +18,8 @@ inc/vars
 src/
 src/comm
 src/logic
-src/logic/vars
+src/logic/data
+src/logic/math
 src/periph
 src/system
 src/util

@@ -1,5 +1,5 @@
 
-#include "logic/sampling.h"
+#include "logic/math/sampling.h"
 
 #include "periph/spi.h"
 #include "periph/timer.h"

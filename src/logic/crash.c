@@ -3,10 +3,10 @@
 
 #include "vars/linestatus.h"
 
-#include "logic/domain.h"
-#include "logic/fft1024.h"
-#include "logic/linecheck.h"
-#include "logic/sampling.h"
+#include "logic/math/domain.h"
+#include "logic/math/fft1024.h"
+#include "logic/math/linecheck.h"
+#include "logic/math/sampling.h"
 
 #include "periph/gpio.h"
 #include "util/print.h"

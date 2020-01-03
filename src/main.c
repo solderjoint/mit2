@@ -100,15 +100,15 @@ void setup(void) {
 	TimerSemaphoreInit(100); // set 100 Hz frequency
 	TimerSemaphoreAttachInterrupt(TimerMutexHandler);
 
-	GpioModuleCodenameInit();
-	GpioModuleAdressInit();
-	GpioTriggerInit();
-	GpioButtonInit();
-	GpioLedsInit();
+//	GpioModuleCodenameInit();
+//	GpioModuleAdressInit();
+//	GpioTriggerInit();
+//	GpioButtonInit();
+//	GpioLedsInit();
 
-	SpiExternalAdcInit(SPI_RATE);
-	UsartConsoleInit(CONSOLE_RATE);
-	CanTransmissionInit(CAN_RATE);
+//	SpiExternalAdcInit(SPI_RATE);
+//	UsartConsoleInit(CONSOLE_RATE);
+//	CanTransmissionInit(CAN_RATE);
 
 	CrashVarsInit();
 }

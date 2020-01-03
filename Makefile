@@ -1,7 +1,7 @@
 # ####################################################### #
 TARGET     = mit
 # ####################################################### #
-MAKE       = remake
+MAKE      ?= remake
 RM         = rm
 
 GDB        = gdb-multiarch
@@ -19,8 +19,8 @@ BINDIR    ?= build
 INCDIR    ?= inc
 LIBDIR    ?= libs
 SRCDIR    ?= src
-CSRC       = $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*/*.c)
-#CPPSRC     = $(wildcard $(SRCDIR)/*.cpp $(SRCDIR)/*/*.cpp)
+CSRC       = $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*/*.c $(SRCDIR)/*/*/*.c)
+CPPSRC     = $(wildcard $(SRCDIR)/*.cpp $(SRCDIR)/*/*.cpp)
 ASRC       = $(wildcard $(SRCDIR)/*/*.S $(SRCDIR)/*/*.asm)
 OBJ        = $(CSRC:.c=.o) $(CPPSRC:.cpp=.o) $(ASRC:.S=.o)
 
@@ -31,17 +31,18 @@ LIBLIST    = -lgcc -lm -lc -ldriver
 
 CINC       = -I$(TIVADIR)/driverlib  -I$(TIVADIR)/inc
 CINC      += -I$(INCDIR)  -I$(LIBDIR)  -I$(SRCDIR)
+CINC      += -I$(INCDIR)/*/*
 CINC      += -I./newlib-1.18.0/newlib/libc/include
 
 # ####################################################### #
-CFLAGS     = -fdata-sections -ffunction-sections -g2 -Os -w
+CFLAGS     = -funroll-loops  -g3 -Os -w
+CFLAGS    += -fdata-sections -ffunction-sections
 CFLAGS    += -fno-common -fverbose-asm -fmax-errors=16
 CFLAGS    += -W -Wall -Wextra -Wshadow -Wcast-align
 CFLAGS    += -Werror=implicit-function-declaration
 CFLAGS    += -mcpu=cortex-m4 -mlittle-endian -mthumb
 CFLAGS    += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-CFLAGS    += $(CINC)
-CFLAGS    += -D $(DEVICE)
+CFLAGS    += $(CINC)  -D $(DEVICE)
 
 ASMFLAGS   = $(CFLAGS)
 

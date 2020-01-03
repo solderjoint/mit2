@@ -1,5 +1,5 @@
 
-#include "logic/fft1024.h"
+#include "logic/math/fft1024.h"
 
 #include "vars/fourierconsts.h"
 
@@ -60,7 +60,6 @@ static void FourierTransform
  *                   MAIN INPUT POINT
  * **************************************************** */
 int FourierProcess (cf32_t input[]) {
-
 	const int32 size = FourierBufferLengthGet();
 	if (_ispowerof2(size) == 0) FourierAppendZeroes(input, size, FOURIER_POINTS);
 	// copy values from input to power buffer

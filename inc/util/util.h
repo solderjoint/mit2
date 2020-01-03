@@ -18,8 +18,7 @@
  *               ADDITIONAL USEFUL MACROS
  * **************************************************** */
 #define cast(T, X)     ((T) (X))
-//#define min(a, b)        ((a) < (b) ? (a) : (b))
-//#define max(a, b)        ((a) > (b) ? (a) : (b))
+#define stringify(V)   (#V)
 
 /* **************************************************** *
  *              BITWISE OPERATION MACROS

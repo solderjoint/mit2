@@ -11,7 +11,8 @@
 #include "periph/usart.h"
 #include "periph/watchdog.h"
 
-//#include "vars/fourierconsts.h"
+#include "vars/fourierconsts.h"
+#include "vars/peripheral.h"
 #include "project.h"
 
 #include "util/print.h"
@@ -39,7 +40,7 @@ int32 ConfigPeripheralInit (void) {
 	TimerClockInit();
 	TimerClockAttachInterrupt(TimerClockIntHandler);
 
-
+	const uint32 res = PeripheralCanRateGet();
 	GpioModuleCodenameInit();
 	GpioModuleAdressInit();
 	GpioTriggerInit();
@@ -71,7 +72,6 @@ int32 ConfigValueFloatSet (const uint32 hash, const float val) {
 int32 ConfigStartup (void) {
 	ConfigPeripheralInit();
 	ConfigVariablesInit();
-//	DatabaseFind(0xdeadbeef);
-	DatabaseValueUpdateFloat(0xabcdef, 7);
+	DatabaseFind(0xdeadbeef);
 	return 0;
 }
