@@ -29,10 +29,11 @@
 
 #include "logic/crash.h"
 #include "logic/config.h"
-
+#include "periph/gpio.h"
+#include "periph/timer.h"
 #include "util/print.h"
 #include "util/typedefs.h"
-#include "util/util.h"
+//#include "util/util.h"
 
 /* **************************************************** *
  *               GLOBAL VARIABLES SECTION
@@ -55,7 +56,7 @@ void mutex_handler (void);
  * **************************************************** */
 int main(void) {
 	ConfigStartup();
-	ConfigMutexStart (100, mutex_handler);
+	TimerSemaphoreAttachInterrupt(mutex_handler);
 	CrashVarsInit();
 
 	while (1) {
@@ -79,6 +80,7 @@ int main(void) {
 /* **************************************************** *
  *        ADDITIONAL INTERRUPT ROUTINE HANDLERS
  * **************************************************** */
+// TODO: make periods configurable through variables
 void mutex_handler (void) {
 	const uint32 counter = TimerSemaphoreCounterGet();
 	if (counter % PERIOD_CHECK_LINE == 0) gMutex.line = 1;

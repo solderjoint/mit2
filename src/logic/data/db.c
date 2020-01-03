@@ -45,9 +45,9 @@ static int32 find_free_pos (const int32 prev_pos) {
 /* **************************************************** *
  *            CRC32 HASH CALCULATION WRAPPER
  * **************************************************** */
-inline uint32 DatabaseHashGet (const char stringified[80]) {
+inline uint32 DatabaseHashGet (const char stringified[64]) {
 	if (stringified == NULL) return 0;
-	const int32 len = strnlen(stringified, 80);
+	const int32 len = strnlen(stringified, 63);
 	return CRC32Calculate(stringified, len);
 }
 

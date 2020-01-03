@@ -26,7 +26,7 @@ enum databaseEnum {
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 DatabaseFind (const uint32 hash);
-uint32 DatabaseHashGet (const char stringified[]);
+uint32 DatabaseHashGet (const char stringified[64]);
 
 int32 DatabaseValueGet (const uint32 hash);
 float DatabaseValueGetFloat (const uint32 hash);

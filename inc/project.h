@@ -23,6 +23,7 @@
 
 #define FOURIER_RATE    (12800)   // fft sampling rate
 
+#define PERIOD_TIMER_FREQ  (100)  // default semaphore value
 #define PERIOD_CHECK_LINE  (2)    // check every Nx10ms
 #define PERIOD_CHECK_COMM  (20)   // check can messages
 #define PERIOD_RENEW_VOLT  (1000) // update normal voltage

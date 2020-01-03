@@ -5,10 +5,8 @@
 
 # todos
 * implement lowest priority usart interrupt
-* check maximum can message delay for smolin protocol
+* implement can header reading/writing according to datasheet
 * create logic for variable config changing
 * rethink on quick data logic
-* mkdir data: database, config, quick-data wrappers
-* implement can header reading/writing according to datasheet
 
 # changelog

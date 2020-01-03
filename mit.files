@@ -75,6 +75,8 @@ src/vars/linestatus.c
 inc/vars/linestatus.h
 src/vars/voltageconsts.c
 inc/vars/voltageconsts.h
+src/vars/period.c
+inc/vars/period.h
 src/vars/peripheral.c
 inc/vars/peripheral.h
 

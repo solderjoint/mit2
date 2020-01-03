@@ -13,6 +13,7 @@
 #include "periph/watchdog.h"
 
 #include "vars/fourierconsts.h"
+#include "vars/period.h"
 #include "vars/peripheral.h"
 
 #include "util/print.h"
@@ -54,18 +55,11 @@ static void periph_gpio (void) {
 }
 
 static void periph_other (void) {
-	// let watchdog be the last to be updated
 	TimerClockAttachInterrupt(TimerClockIntHandler);
+	const int32 rate = PeriodSemaphoreFreqGet();
+	TimerSemaphoreInit(rate);
 }
-
-/* **************************************************** *
- *               TIMER SEMAPHORE WRAPPER
- * **************************************************** */
-int32 ConfigMutexStart (const uint32 rate, void (*fun) (void)) {
-	const uint32 r = ((rate > 10) && (rate < kil(1)))? rate : 100;
-	TimerSemaphoreInit(r);
-	TimerSemaphoreAttachInterrupt(fun);
-}
+// TODO: make variables initialization somewhere
 
 /* **************************************************** *
  *                INITIALIZATION SECTION
