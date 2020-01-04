@@ -62,6 +62,17 @@ static void periph_other (void) {
 // TODO: make variables initialization somewhere
 
 /* **************************************************** *
+ *        CONFIGURABLE VARIABLES INITIALIZATION
+ * **************************************************** */
+int32 ConfigInitVariables (void) {
+	PeriodLineVoltCheckInit();
+	PeriodLineVoltUpdateInit();
+	PeriodCommCheckInit();
+
+	CrashVarsInit();
+}
+
+/* **************************************************** *
  *                INITIALIZATION SECTION
  * **************************************************** */
 int32 ConfigStartup (void) {

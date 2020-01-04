@@ -22,6 +22,7 @@ enum StartupErrorEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
+int32 ConfigInitVariables (void);
 int32 ConfigStartup (void);
 
 /* **************************************************** *

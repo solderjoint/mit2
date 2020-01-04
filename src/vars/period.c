@@ -13,6 +13,14 @@
 static char var_name[64];
 
 /* **************************************************** *
+ *              SEMAPHORE COUNTER WRAPPER
+ * **************************************************** */
+static uint32 period_counter;
+
+void PeriodCounterIncrement (void) { period_counter++; }
+uint32 PeriodCounterGet (void) { return period_counter; }
+
+/* **************************************************** *
  *          TIMER SEMAPHORE FREQUENCY VARIABLE
  * **************************************************** */
 int32 PeriodSemaphoreFreqGet (void) {
@@ -32,23 +40,18 @@ int32 PeriodSemaphoreFreqSet (const uint32 val) {
 /* **************************************************** *
  *              LINE VOLTAGE CHECK PERIOD
  * **************************************************** */
-static int32 period_volt_check;
+static int32 volt_check;
 
 void PeriodLineVoltCheckInit (void) {
 	*var_name = stringify(PeriodLineVoltCheck);
 	const uint32 hash = DatabaseHashGet(var_name);
 	const int32 val = DatabaseValueGet(hash);
-	period_volt_check = (val > 100)? PERIOD_CHECK_LINE : val;
+	volt_check = (val > 100)? PERIOD_CHECK_LINE : val;
 }
 
 int32 PeriodLineVoltCheckGet (void) {
-	const int32 res = period_volt_check;
-	if ((res >= 1) && (res < 100)) {
-		return res;
-	} else {
-		PeriodLineVoltCheckInit();
-		return period_volt_check;
-	}
+	const int32 val = volt_check;
+	return ((val < 1) || (val > 100))? PERIOD_CHECK_LINE : val;
 }
 
 int32 PeriodLineVoltCheckSet (const uint32 val) {
@@ -61,24 +64,19 @@ int32 PeriodLineVoltCheckSet (const uint32 val) {
 /* **************************************************** *
  *          LINE VOLTAGE NORMAL UPDATE PERIOD
  * **************************************************** */
-static int32 period_volt_update;
+static int32 volt_update;
 
 void PeriodLineVoltUpdateInit (void) {
 	*var_name = stringify(PeriodLineVoltUpdate);
 	const uint32 hash = DatabaseHashGet(var_name);
 	const int32 val = DatabaseValueGet(hash);
-	period_volt_update = ((val < 1000) || (val > kil(100)))
+	volt_update = ((val < 1000) || (val > kil(100)))
 						 ? PERIOD_RENEW_VOLT : val;
 }
 
 int32 PeriodLineVoltUpdateGet (void) {
-	const int32 res = period_volt_update;
-	if ((res >= kil(1)) && (res <= kil(100))) {
-		return res;
-	} else {
-		PeriodLineVoltUpdateInit();
-		return period_volt_update;
-	}
+	const int32 val = volt_update;
+	return ((val < 1) || (val > 100))? PERIOD_RENEW_VOLT : val;
 }
 
 int32 PeriodLineVoltUpdateSet (const uint32 val) {
@@ -90,5 +88,28 @@ int32 PeriodLineVoltUpdateSet (const uint32 val) {
 }
 
 /* **************************************************** *
- *               USART PERIPHERAL WRAPPER
+ *         COMMUNICATION UPDATE PERIOD WRAPPER
  * **************************************************** */
+static int32 comm_check;
+
+void PeriodCommCheckInit (void) {
+	*var_name = stringify(PeriodCommCheck);
+	const uint32 hash = DatabaseHashGet(var_name);
+	const int32 val = DatabaseValueGet(hash);
+	comm_check = ((val < 1000) || (val > kil(100)))
+						 ? PERIOD_CHECK_COMM : val;
+}
+
+int32 PeriodCommCheckGet (void) {
+	const int32 val = comm_check;
+	return ((val < 1) || (val > 100))? PERIOD_CHECK_COMM : val;
+}
+
+int32 PeriodCommCheckSet (const uint32 val) {
+	const uint32 rate = ((val >= kil(1)) && (val <= kil(100)))
+						? PERIOD_RENEW_VOLT : val;
+	const char buf[] = stringify(PeriodCommCheck);
+	const uint32 hash = DatabaseHashGet(buf);
+	return DatabaseValueSet(hash, rate);
+}
+

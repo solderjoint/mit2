@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "comm/data/quick.h"
 #include "util/print.h"
 
 /* **************************************************** *
@@ -33,10 +34,6 @@ static uint8 HeaderRequestBitGet (void) { return _header.request; }
 static uint8 HeaderTextPositionGet (void) { return _header.text_pos; }
 
 /* **************************************************** *
- *                CAN INTERRUPT HANDLER
- * **************************************************** */
-
-/* **************************************************** *
  *                  CAN INITIALIZATION
  * **************************************************** */
 static void SmolinQuickDataProcess (void) {
@@ -47,11 +44,11 @@ static void SmolinQuickDataProcess (void) {
  *           SMOLIN PROTOCOL MAIN ENTRY POINT
  * **************************************************** */
 inline int32 SmolinProtocolProcess
-(const uint32 header, const uint32 length, const uint8 msg[8]) {
+(const uint32 header, const uint32 length, uint8 msg[8]) {
 	if (length > 8) return -1;
 
 	HeaderSet(header);
-	_putchar('.');
+//	_putchar('.');
 //	if ((HeaderReceiverGet() >= 0x20) && (HeaderReceiverGet() >= 0x27)) {
 	if (HeaderReceiverGet() >= 0) {
 		_printf("info>\t0x");

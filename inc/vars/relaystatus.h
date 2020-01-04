@@ -2,32 +2,23 @@
  * Header for line status variable manipulation
  */
 
-#ifndef __VAR_LINESTATUS_H
-#define __VAR_LINESTATUS_H
+#ifndef __VAR_RELAYSTATUS_H
+#define __VAR_RELAYSTATUS_H
 
 #include "util/typedefs.h"
 
 /* **************************************************** *
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
-enum lineStatusEnum {
-	STATUS_OK = 0,
-	STATUS_VOLTSPIKE = 1,
-	STATUS_SAMPLING,
-	STATUS_PROCESSING,
-	STATUS_SIGNALLOST = 8,
-	STATUS_UNDERFLOW = 16,
-	STATUS_OVERFLOW = 32,
-	STATUS_BUZZERFOUND = 64,
-};
 
 /* **************************************************** *
  *             SECURE LINE STATUS VARIABLE
  * **************************************************** */
-int32 LineStatusSet (enum lineStatusEnum val);
-int32 LineStatusGet (void) ;
-// TODO: add line voltage?
+int32 RelayStatusSet (void);
+int32 RelayStatusReset (void);
+int32 RelayStatusGet (void) ;
+
 /* **************************************************** *
  *              END OF HEADER DECLARATION
  * **************************************************** */
-#endif //__VAR_LINESTATUS_H
+#endif //__VAR_RELAYSTATUS_H

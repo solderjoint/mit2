@@ -133,14 +133,6 @@ void TimerSamplingDestroy (void) {
 }
 
 /* **************************************************** *
- *          SEMAPHORE TIMER INTERNAL VARIABLE
- * **************************************************** */
-static uint32 timerSemaphoreCounter;
-
-void TimerSemaphoreCounterIncrement (void) { timerSemaphoreCounter++; }
-uint32 TimerSemaphoreCounterGet (void) { return timerSemaphoreCounter; }
-
-/* **************************************************** *
  *          SEMAPHORE TIMER INTERRUPT HANDLER
  * **************************************************** */
 static void (*timerSemaphoreInterruptAttachment) (void) = NULL;
