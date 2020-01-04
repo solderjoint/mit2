@@ -12,19 +12,6 @@
  * **************************************************** */
 
 /* **************************************************** *
- *               GLOBAL VARIABLE SECTION
- * **************************************************** */
-struct smolin_header_t {
-	uint32 _reserved:8;
-	uint32 receiver:8;
-	uint32 sender:8;
-	uint32 text_end:1;
-	uint32 quickdata:1;
-	uint32 request:1;
-	uint32 text_pos:4;
-};
-
-/* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 SmolinProtocolProcess

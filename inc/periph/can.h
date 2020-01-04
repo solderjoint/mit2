@@ -6,6 +6,7 @@
 /* **************************************************** *
  *                  HEADER SPECIFIC MACROS
  * **************************************************** */
+#define CAN_OBJECT_ID      (1)
 #define CAN_MSGBUF_SIZEX   (16)
 #define CAN_MSGBUF_SIZEY   (8)
 
