@@ -6,21 +6,17 @@
 /* **************************************************** *
  *                  HEADER SPECIFIC MACROS
  * **************************************************** */
-#define CAN_OBJECT_ID      (1)
-#define CAN_MSGBUF_SIZEX   (16)
-#define CAN_MSGBUF_SIZEY   (8)
-
-/* **************************************************** *
- *               GLOBAL VARIABLE SECTION
- * **************************************************** */
-struct can_buf_t {
-	uint8 msg[8];
-} ;
+enum _canEnum {
+	CAN_OBJECT_ID    = 1,   // default object mesage id
+	CAN_INT_PRIORITY = 5,   // medium-low int priority
+	CAN_MSGBUF_LEN   = 8,   // standard maximum message length
+};
 
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 void CanTransmissionInit (const uint32_t rate);
+void CanTransmissionAttachInterrupt (void (*foo) (void));
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

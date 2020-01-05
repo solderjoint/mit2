@@ -2,6 +2,7 @@
 #include "periph/can.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <tivaware/inc/hw_can.h>
@@ -15,7 +16,7 @@
 #include <tivaware/driverlib/sysctl.h>
 
 #include "util/print.h"
-#include "util/debug.h"
+#include "util/util.h"
 
 /* **************************************************** *
  *                 CAN LOCAL VARIABLES
@@ -31,13 +32,11 @@ uint32 object_id_get (void) { return can_obj_id; }
 /* **************************************************** *
  *           CAN MESSAGE BUFFER MANIPULATION
  * **************************************************** */
-static volatile uint8 msg_buffer[8];
+static volatile uint8 msg_buffer[CAN_MSGBUF_LEN];
 
 static void msg_buf_update (void) {
 	msg_struct.pui8MsgData = msg_buffer;
 	CANMessageGet(CAN0_BASE, object_id_get(), &msg_struct, 0);
-
-	// check if a message was lost
 	if (msg_struct.ui32Flags & MSG_OBJ_DATA_LOST) {
 		_println("info>\tcan msg loss");
 	}
@@ -55,8 +54,10 @@ static void msg_buf_init (void) {
 }
 
 /* **************************************************** *
- *                CAN INTERRUPT HANDLER
+ *                   CAN TEST ROUTINE
  * **************************************************** */
+void _test (void);
+
 void _test (void) {
 	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
 	msg_buf_update();
@@ -68,25 +69,35 @@ void _test (void) {
 	_println("id>\t[0x%4X]::[0x%8X]", status, msg_struct.ui32MsgID);
 	_println("dir>\t%4X+%4X\t[0x%8X]", id1, id2, (id2 << 13) | id1);
 
-	for (int i = 0; i < 8; i++) _printf("%2X", msg_buffer[i]);
-	_puts("<");
+//	for (int i = 0; i < 8; i++) _printf("%2X", msg_buffer[i]);
+//	_puts("<");
 
 	CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
+}
+
+/* **************************************************** *
+ *                CAN INTERRUPT HANDLER
+ * **************************************************** */
+static void (*canTransmissionInterruptAttachment) (void) = NULL;
+
+void CanTransmissionAttachInterrupt (void (*foo) (void)) {
+	canTransmissionInterruptAttachment = foo;
+}
+void CanTransmissionInterruptAttachmentCall (void) {
+	if ((*canTransmissionInterruptAttachment) != NULL)
+		canTransmissionInterruptAttachment();
 }
 
 void CanInterruptHandler (void) {
 	const uint32 object = object_id_get();
 	const uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
-
-	// main interrupt entry point
 	if (status == CAN_INT_INTID_STATUS) {
 		_test();
+//		CanTransmissionInterruptAttachmentCall();
 	} else if (status == object) {
 		_putchar('*');  // debug check
-	} else {
-//		_println("info>\tcan error[-%i]", __LINE__);
 	}
-	CANIntClear(CAN0_BASE, 1);
+	CANIntClear(CAN0_BASE, object);
 }
 
 /* **************************************************** *
@@ -94,7 +105,7 @@ void CanInterruptHandler (void) {
  * **************************************************** */
 void CanTransmissionInit (const uint32_t rate) {
 	const uint32 sys_clock = SysCtlClockGet();
-	_check ((rate >= 800) && (rate <= sys_clock / 32));
+	_check (rate <= sys_clock / 32);
 
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_CAN0);
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_CAN0));
@@ -111,8 +122,9 @@ void CanTransmissionInit (const uint32_t rate) {
 	CANIntRegister(CAN0_BASE, CanInterruptHandler);
 	CANIntEnable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
 	IntEnable(INT_CAN0);
-	IntPrioritySet(INT_CAN0, 80); // set low interrupt priority
+	IntPrioritySet(INT_CAN0, (CAN_INT_PRIORITY << 5));
 	CANEnable(CAN0_BASE);
+	SysCtlDelay(100);
 
 	msg_buf_init();
 }

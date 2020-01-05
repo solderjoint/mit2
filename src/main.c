@@ -11,23 +11,22 @@
  * - implements a bootloader with firmware update ability
  */
 
-/* **************************************************** *
- *                COMMON HEADERS SECTION
- * **************************************************** */
-#include <stdbool.h>
-#include <stddef.h>
-
-#define  ARM_MATH_CM4
-#define  __FPU_PRESENT  (1)
+#ifdef   __cplusplus
+#	undef   __cplusplus
+#endif
 
 /* **************************************************** *
  *               PROJECT INCLUDE SECTION
  * **************************************************** */
 #include "logic/crash.h"
 #include "logic/config.h"
+
 #include "periph/gpio.h"
+#include "periph/timer.h"
+
 #include "util/print.h"
 #include "util/typedefs.h"
+
 #include "vars/period.h"
 
 /* **************************************************** *
@@ -42,9 +41,19 @@ struct _mutex_t {
 static struct _mutex_t gMutex;
 
 /* **************************************************** *
- *             FUNCTION PROTOTYPES SECTION
+ *           MUTEX INTERRUPT ROUTINE HANDLER
  * **************************************************** */
-void mutex_handler (void);
+void mutex_handler (void) {
+	const uint32 timer = PeriodCounterGet();
+	const uint32 line = PeriodLineVoltCheckGet();
+	const uint32 volt = PeriodLineVoltUpdateGet();
+	const uint32 comm = PeriodCommCheckGet();
+
+	if (timer % line == 0) gMutex.line = 1;
+	if (timer % comm == 0) gMutex.comm = 1;
+	if (timer % volt == 0) gMutex.volt = 1;
+	PeriodCounterIncrement();
+}
 
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
@@ -70,19 +79,4 @@ int main(void) {
 		GpioLedsSet(2, -1); // cpu free time output
 	}
 	return 0;
-}
-
-/* **************************************************** *
- *           MUTEX INTERRUPT ROUTINE HANDLER
- * **************************************************** */
-void mutex_handler (void) {
-	const uint32 timer = PeriodCounterGet();
-	const uint32 line = PeriodLineVoltCheckGet();
-	const uint32 volt = PeriodLineVoltUpdateGet();
-	const uint32 comm = PeriodCommCheckGet();
-
-	if (timer % line == 0) gMutex.line = 1;
-	if (timer % comm == 0) gMutex.comm = 1;
-	if (timer % volt == 0) gMutex.volt = 1;
-	PeriodCounterIncrement();
 }

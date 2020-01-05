@@ -13,6 +13,8 @@
 #include <tivaware/driverlib/sysctl.h>
 #include <tivaware/driverlib/uart.h>
 
+#include "util/util.h"
+
 /* **************************************************** *
  *          USART CONSOLE RING BUFFER VARIABLE
  * **************************************************** */
@@ -46,7 +48,7 @@ void UsartConsoleBufferSet (uint8 symbol) {
 }
 
 /* **************************************************** *
- *          USART CONSOLE WRITE/READ WRAPPERS
+ *           USART CONSOLE INTERRUPT HANDLER
  * **************************************************** */
 void UsartConsoleInterrupt (void) {
 	if (UARTIntStatus(UART0_BASE, true) == UART_INT_TX) {
@@ -56,6 +58,9 @@ void UsartConsoleInterrupt (void) {
 	}
 }
 
+/* **************************************************** *
+ *         USART CONSOLE NON-BLOCKING WRAPPERS
+ * **************************************************** */
 inline int32 UsartConsoleSendCharNonBlocking (uint8 tx) {
 	UsartConsoleBufferSet(tx);
 }
@@ -106,19 +111,19 @@ void UsartConsoleInit (const uint32 rate) {
 	GPIOPinConfigure(GPIO_PA0_U0RX);
 	GPIOPinConfigure(GPIO_PA1_U0TX);
 	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-	SysCtlDelay(100);
 
 	// config 8N1
-	const uint32 cpuclk = SysCtlClockGet();
 	const uint32 irate = (rate < USART_BAUDRATE_MAX)? rate:USART_BAUDRATE_MAX;
-	UARTConfigSetExpClk(UART0_BASE, cpuclk, irate, UART_CONFIG_WLEN_8);
-	SysCtlDelay(100);
+	UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), \
+						irate, (UART_CONFIG_WLEN_8 | \
+						UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE));
 
-//	UARTIntRegister(UART0_BASE, UsartConsoleInterrupt);
-//	IntPrioritySet(INT_UART0, 0xE0);
-//	UARTIntEnable(UART0_BASE, UART_INT_TX);
+	// TODO: catch a fucking interrupt destabilizer
+	UARTIntRegister(UART0_BASE, UsartConsoleInterrupt);
+	UARTIntEnable(UART0_BASE, UART_INT_TX);
+	IntEnable(INT_UART0);
+	IntPrioritySet(INT_UART0, (USART_INT_PRIORITY << 5));
 //	UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
-
 	UARTEnable(UART0_BASE);
 	SysCtlDelay(100);
 }

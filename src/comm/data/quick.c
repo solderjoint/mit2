@@ -11,7 +11,7 @@ void QuickInputProcess (const uint8 buf[8]) {
 	// line state (0 ok, >1 error)
 	if (buf[0] != LineStatusGet()) LineStatusSet(buf[0]);
 	// relay state (1 on, 0 off, -1 broken)
-	(buf[1] > 0)? RelayStatusReset() : RelayStatusSet();
+	(buf[1] > 0)? RelayStatusSet() : RelayStatusReset();
 	// ..
 	// ..
 	// line reaction time delay (ms)

@@ -5,7 +5,9 @@
 #include <string.h>
 
 #include "comm/data/quick.h"
+
 #include "util/print.h"
+#include "util/util.h"
 
 /* **************************************************** *
  *         SMOLIN PROTOCOL HEADER MANIPULATION
@@ -64,7 +66,7 @@ static uint8 HeaderTextPositionGet (void) { return header_struct.text_pos; }
 /* **************************************************** *
  *                SMOLIN DATA PROCESSING
  * **************************************************** */
-static void SmolinDataProcess (void) {
+static void SmolinDataProcess (uint8 msg[8]) {
 	_println("%u\t", HeaderReceiverGet());
 }
 
@@ -73,14 +75,14 @@ static void SmolinDataProcess (void) {
  * **************************************************** */
 int32 SmolinProtocolProcess
 (const uint32 header, const uint32 length, uint8 msg[8]) {
-	if (length > 8) return -1;
+	_check(length <= 8);
 
 	HeaderSet(header);
 	// check that we got our id
 //	const uint32 add_low = 0x20, add_high = 0x27;
 //	if (HeaderReceiverGet() == address)
 	if (HeaderGet() >= 0) {
-		SmolinDataProcess();
+		SmolinDataProcess(msg);
 	} else {
 		// append to received table
 	}
