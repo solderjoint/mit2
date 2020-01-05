@@ -34,7 +34,9 @@ int32 PeriodSemaphoreFreqSet (const uint32 val) {
 	const uint32 rate = ((val < 10) || (val > 1000))? PERIOD_TIMER_FREQ : val;
 	const char buf[] = stringify(VarSemaphoreFreq);
 	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+	const int32 res = DatabaseValueSet(hash, rate);
+	if (res == 0) period_counter = 0; // clear counter
+	return res;
 }
 
 /* **************************************************** *
@@ -49,7 +51,7 @@ void PeriodLineVoltCheckInit (void) {
 	volt_check = (val > 100)? PERIOD_CHECK_LINE : val;
 }
 
-int32 PeriodLineVoltCheckGet (void) {
+inline int32 PeriodLineVoltCheckGet (void) {
 	const int32 val = volt_check;
 	return ((val < 1) || (val > 100))? PERIOD_CHECK_LINE : val;
 }
@@ -74,7 +76,7 @@ void PeriodLineVoltUpdateInit (void) {
 						 ? PERIOD_RENEW_VOLT : val;
 }
 
-int32 PeriodLineVoltUpdateGet (void) {
+inline int32 PeriodLineVoltUpdateGet (void) {
 	const int32 val = volt_update;
 	return ((val < 1) || (val > 100))? PERIOD_RENEW_VOLT : val;
 }
@@ -100,7 +102,7 @@ void PeriodCommCheckInit (void) {
 						 ? PERIOD_CHECK_COMM : val;
 }
 
-int32 PeriodCommCheckGet (void) {
+inline int32 PeriodCommCheckGet (void) {
 	const int32 val = comm_check;
 	return ((val < 1) || (val > 100))? PERIOD_CHECK_COMM : val;
 }

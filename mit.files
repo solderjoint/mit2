@@ -81,12 +81,15 @@ inc/vars/voltageconsts.h
 
 src/vars/linestatus.c
 inc/vars/linestatus.h
+src/vars/relaystatus.c
+inc/vars/relaystatus.h
+
+src/vars/mutex.c
+inc/vars/mutex.h
 src/vars/period.c
 inc/vars/period.h
 src/vars/peripheral.c
 inc/vars/peripheral.h
-src/vars/relaystatus.c
-inc/vars/relaystatus.h
 
 ###############################
 ##        ENTRY POINT        ##

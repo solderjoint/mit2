@@ -13,6 +13,7 @@
 #include "periph/watchdog.h"
 
 #include "vars/fourierconsts.h"
+#include "vars/mutex.h"
 #include "vars/period.h"
 #include "vars/peripheral.h"
 
@@ -68,6 +69,8 @@ int32 ConfigInitVariables (void) {
 	PeriodLineVoltCheckInit();
 	PeriodLineVoltUpdateInit();
 	PeriodCommCheckInit();
+
+	MutexInit();
 
 	CrashVarsInit();
 }
