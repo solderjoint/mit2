@@ -35,7 +35,7 @@ static uint32 TimeStampGet (void) {
  *              FOURIER WRAPPER FUNCTIONS
  * **************************************************** */
 int32 CrashFourierCapture (void) {
-	_puts("info>capturing.");
+	_puts("info>capturing");
 
 	TimeStampSet();
 	SamplingInit(fftInputBuf);
@@ -44,13 +44,12 @@ int32 CrashFourierCapture (void) {
 
 int32 CrashFourierProcess (void) {
 	_println(" in %i ms", TimeStampGet());
-//	_putchar('\n'); // newline
 	_puts("info>processing");
 
 	TimeStampSet();
-	SamplingFinish();             _putchar('.');
-	FourierProcess(fftInputBuf);  _putchar('.');
-	DomainProcess(fftInputBuf);   _putchar('.');
+	SamplingFinish();
+	FourierProcess(fftInputBuf, FOURIER_POINTS);
+	DomainProcess(fftInputBuf);
 	_println(" in %i ms", TimeStampGet());
 	return 0;
 }

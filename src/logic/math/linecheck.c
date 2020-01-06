@@ -30,8 +30,7 @@ void EndpointSignalSet (uint8 x) {
 void EndpointSignalRenew (void) {
 	const uint8 pin = 1;
 //	const uint8 pin = GpioTriggerGet();
-	const uint8 res = (pin > 0)? 0 : 1;
-	EndpointSignalSet(res);
+	EndpointSignalSet((pin > 0)? 0 : 1);
 }
 
 /* **************************************************** *

@@ -15,12 +15,15 @@
  *                HEADER SPECIFIC MACROS
  * **************************************************** */
 typedef float complex cf32_t;
-#define FOURIER_POINTS  (1024)   // set fft points len
+
+enum fft1024Enum {
+	FOURIER_POINTS  = 1024,   // set fft points len
+};
 
 /* **************************************************** *
  *             FOURIER FUNCTION PROTOTYPES
  * **************************************************** */
-int FourierProcess (cf32_t input[]);
+int FourierProcess (cf32_t input[FOURIER_POINTS], const int size);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

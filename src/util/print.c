@@ -7,9 +7,11 @@
 #include "periph/usart.h"
 
 /* **************************************************** *
- *                OUTPUT STREAM POINTER
+ *                    LOCAL DEFINES
  * **************************************************** */
-//static void (*_out_stream) (uint8) = UsartConsolePutchar;
+#define PRINT_GETS_ECHO   // echo back get characters
+#define PRINT_NEWLINE_WIN // output CRLF on newline
+//#define PRINT_NONBLOCKING // non-blocking function call
 
 /* **************************************************** *
  *             PRINTOUT FUNCTION PROTOTYPES
@@ -29,8 +31,12 @@ inline void _putchar (uint8 c) {
 #ifdef PRINT_NEWLINE_WIN
 	if (c == '\n') _putchar('\r');
 #endif
+
+#ifdef PRINT_NONBLOCKING
+	UsartConsoleSendCharNonBlocking (c);
+#else
 	UsartConsolePutchar(c);
-//	UsartConsoleSendCharNonBlocking (c);
+#endif
 }
 
 int32 _print (const uint8 buf[]) {

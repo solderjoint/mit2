@@ -19,9 +19,9 @@
  *          USART CONSOLE RING BUFFER VARIABLE
  * **************************************************** */
 static struct {
-	volatile uint16 end;
-	volatile uint16 size;
-	volatile uint16 start;
+	volatile uint32 end;
+	volatile uint32 size;
+	volatile uint32 start;
 	uint8 buf[USART_BUFLEN_MAX];
 } usartConsoleBuffer;
 
@@ -53,7 +53,8 @@ void UsartConsoleBufferSet (uint8 symbol) {
 void UsartConsoleInterrupt (void) {
 	if (UARTIntStatus(UART0_BASE, true) == UART_INT_TX) {
 		const uint8 tx = UsartConsoleBufferGet();
-		if (tx) UARTCharPut(UART0_BASE, tx);
+//		if (tx) UARTCharPut(UART0_BASE, tx);
+		if (tx > 0) UARTCharPutNonBlocking(UART0_BASE, tx);
 		UARTIntClear(UART0_BASE, UART_INT_TX);
 	}
 }
@@ -119,10 +120,10 @@ void UsartConsoleInit (const uint32 rate) {
 						UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE));
 
 	// TODO: catch a fucking interrupt destabilizer
-	UARTIntRegister(UART0_BASE, UsartConsoleInterrupt);
-	UARTIntEnable(UART0_BASE, UART_INT_TX);
-	IntEnable(INT_UART0);
-	IntPrioritySet(INT_UART0, (USART_INT_PRIORITY << 5));
+//	UARTIntRegister(UART0_BASE, UsartConsoleInterrupt);
+//	UARTIntEnable(UART0_BASE, UART_INT_TX);
+//	IntEnable(INT_UART0);
+//	IntPrioritySet(INT_UART0, (USART_INT_PRIORITY << 5));
 //	UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
 	UARTEnable(UART0_BASE);
 	SysCtlDelay(100);

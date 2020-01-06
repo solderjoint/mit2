@@ -22,55 +22,50 @@
  *                 CAN LOCAL VARIABLES
  * **************************************************** */
 // main can object variable
-static tCANMsgObject msg_struct;
+static volatile tCANMsgObject msg_struct;
 
-static uint32 can_obj_id;  // can msg obj id [1..31]
+static uint32 can_obj_id;  // can msg obj id [1..32]
 void object_id_set (const uint32 x) { can_obj_id = x & 0x1F; }
 uint32 object_id_get (void) { return can_obj_id; }
-
 
 /* **************************************************** *
  *           CAN MESSAGE BUFFER MANIPULATION
  * **************************************************** */
 static volatile uint8 msg_buffer[CAN_MSGBUF_LEN];
 
-static void msg_buf_update (void) {
-	msg_struct.pui8MsgData = msg_buffer;
-	CANMessageGet(CAN0_BASE, object_id_get(), &msg_struct, 0);
-	if (msg_struct.ui32Flags & MSG_OBJ_DATA_LOST) {
-		_println("info>\tcan msg loss");
-	}
+inline static void msg_buf_update (const int32 obj_id) {
+	CANMessageGet(CAN0_BASE, obj_id, &msg_struct, true);
 }
 
 static void msg_buf_init (void) {
+	msg_struct.pui8MsgData = msg_buffer;
 	msg_struct.ui32MsgID = 0xFFFF; // workaround for 29-bits wide id
 	msg_struct.ui32MsgIDMask = 0;  // empty mask receives everything
-	msg_struct.ui32Flags = MSG_OBJ_RX_INT_ENABLE;  // only on receive
-	msg_struct.ui32MsgLen = 8;     // fixed message length 8 bytes
+	msg_struct.ui32Flags = MSG_OBJ_RX_INT_ENABLE \
+						 | MSG_OBJ_EXTENDED_ID;
+	msg_struct.ui32MsgLen = CAN_MSGBUF_LEN;
 
 	object_id_set(CAN_OBJECT_ID);
-	const uint32 obj = object_id_get();
-	CANMessageSet(CAN0_BASE, obj, &msg_struct, MSG_OBJ_TYPE_RX);
 }
 
 /* **************************************************** *
  *                   CAN TEST ROUTINE
  * **************************************************** */
-void _test (void);
-
 void _test (void) {
 	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-	msg_buf_update();
+	int32 i;
 
-	const uint32 *ptr = (CAN0_BASE + CAN_O_IF1ARB1);
-	const uint32 id1 = *ptr & CAN_IF1ARB1_ID_M; // bigger part
-	const uint32 id2 = *ptr & CAN_IF1ARB2_ID_M; // smaller part
+	for (i = 1; i <= 32; i++) {
+		msg_buf_update(i);
+		if (msg_struct.ui32MsgLen > 0) continue;
+	}
 
-	_println("id>\t[0x%4X]::[0x%8X]", status, msg_struct.ui32MsgID);
-	_println("dir>\t%4X+%4X\t[0x%8X]", id1, id2, (id2 << 13) | id1);
-
-//	for (int i = 0; i < 8; i++) _printf("%2X", msg_buffer[i]);
-//	_puts("<");
+	_println("num>\t%i", i);
+	_println("can>\t0x%X", status);
+	_println("len>\t0x%X", msg_struct.ui32MsgLen);
+	_println("canid>\t0x%X", msg_struct.ui32MsgID);
+	_println("flags>\t0x%X", msg_struct.ui32Flags);
+	_println("objid>\t0x%X", object_id_get());
 
 	CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
 }
@@ -95,7 +90,9 @@ void CanInterruptHandler (void) {
 		_test();
 //		CanTransmissionInterruptAttachmentCall();
 	} else if (status == object) {
-		_putchar('*');  // debug check
+		_println("can>\tobj hit");
+	} else {
+		_println("can>\tstatus int 0x%X", status);
 	}
 	CANIntClear(CAN0_BASE, object);
 }

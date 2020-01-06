@@ -3,7 +3,7 @@
 
 #include "vars/fourierconsts.h"
 
-static cf32_t temp_buf[1024];
+static cf32_t temp_buf[FOURIER_POINTS];
 
 /* **************************************************** *
  *                FFT UTILITY FUNCTIONS
@@ -29,7 +29,7 @@ static void FourierAppendZeroes
 	if (size >= wanted) return;
 	const int off = (wanted - size) / 2;
 	for (int i = size + off; i > off; i--) {
-	input[i] = input[i - off]; // right shift values
+		input[i] = input[i - off]; // right shift values
 	}
 	// then fill borders with zeroes
 	for (int i = 0; i < off; i++) input[i] = 0;
@@ -59,13 +59,17 @@ static void FourierTransform
 /* **************************************************** *
  *                   MAIN INPUT POINT
  * **************************************************** */
-int FourierProcess (cf32_t input[]) {
-	const int32 size = FourierBufferLengthGet();
-	if (_ispowerof2(size) == 0) FourierAppendZeroes(input, size, FOURIER_POINTS);
+int FourierProcess (cf32_t input[FOURIER_POINTS], const int size) {
+	// check if input size is not a power of 2
+//	const int size = FourierBufferLengthGet(); // useless check
+	const int int_size = (size <= FOURIER_POINTS)? size : FOURIER_POINTS;
+	if (_ispowerof2(int_size) == 0) {
+		FourierAppendZeroes(input, int_size, FOURIER_POINTS);
+	}
 	// copy values from input to power buffer
-	cbuf_copy(input, temp_buf, size);
+	cbuf_copy(input, temp_buf, int_size);
 
-	const int32 step = 1;
-	FourierTransform(input, temp_buf, size, step);
+	const int step = 1;
+	FourierTransform(input, temp_buf, int_size, step);
 	return 0;
 }

@@ -16,12 +16,10 @@
 /* **************************************************** *
  *                  DEFINITION MACROS
  * **************************************************** */
-#define PRINT_BUFLEN_MAX  (512) // maximum output buffer size
-#define PRINT_INT_BUFLEN  (64)  // output integer bufer size
-
-#define PRINT_NEWLINE_WIN // output CRLF on newline
-//#define PRINT_NEWLINE_MAC // output LF on newline
-#define PRINT_GETS_ECHO   // echo back get characters
+enum _printEnum {
+	PRINT_BUFLEN_MAX  = 512, // maximum output buffer size
+	PRINT_INT_BUFLEN  = 64,  // output integer bufer size
+};
 
 /* **************************************************** *
  *             PRINTOUT FUNCTION PROTOTYPES
