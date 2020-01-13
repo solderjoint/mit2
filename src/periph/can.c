@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+//#include <stdint.h>
 
 #include <tivaware/inc/hw_can.h>
 #include <tivaware/inc/hw_ints.h>
@@ -53,21 +53,19 @@ static void msg_buf_init (void) {
  * **************************************************** */
 void _test (void) {
 	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-	int32 i;
+	const uint32 obj_id = object_id_get();
 
-	for (i = 1; i <= 32; i++) {
-		msg_buf_update(i);
-		if (msg_struct.ui32MsgLen > 0) continue;
+	msg_buf_update(obj_id);
+
+	_println("S[0x%X]", status);
+	if (status >= CAN_STATUS_TXOK) {
+		_println("[%i]:[%i]:[%i]:[%i]", \
+				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
+				msg_struct.ui32Flags, obj_id);
+		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
+		// still getting bit stuffing errors
+		// can rate is set incorrectly?
 	}
-
-	_println("num>\t%i", i);
-	_println("can>\t0x%X", status);
-	_println("len>\t0x%X", msg_struct.ui32MsgLen);
-	_println("canid>\t0x%X", msg_struct.ui32MsgID);
-	_println("flags>\t0x%X", msg_struct.ui32Flags);
-	_println("objid>\t0x%X", object_id_get());
-
-	CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
 }
 
 /* **************************************************** *
@@ -83,16 +81,21 @@ void CanTransmissionInterruptAttachmentCall (void) {
 		canTransmissionInterruptAttachment();
 }
 
+#include "periph/gpio.h"  // debug led checking
 void CanInterruptHandler (void) {
 	const uint32 object = object_id_get();
 	const uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
 	if (status == CAN_INT_INTID_STATUS) {
-		_test();
 //		CanTransmissionInterruptAttachmentCall();
+		GpioLedsSet(3, -1);
+		_test();
 	} else if (status == object) {
-		_println("can>\tobj hit");
+		GpioLedsSet(2, -1);
+		_test();
+//		_println("can>\tobj hit");
 	} else {
-		_println("can>\tstatus int 0x%X", status);
+		GpioLedsSet(2, -1);
+//		_println("can>\tstatus int 0x%X", status);
 	}
 	CANIntClear(CAN0_BASE, object);
 }
@@ -121,7 +124,7 @@ void CanTransmissionInit (const uint32_t rate) {
 	IntEnable(INT_CAN0);
 	IntPrioritySet(INT_CAN0, (CAN_INT_PRIORITY << 5));
 	CANEnable(CAN0_BASE);
-	SysCtlDelay(100);
+//	SysCtlDelay(100);
 
 	msg_buf_init();
 }

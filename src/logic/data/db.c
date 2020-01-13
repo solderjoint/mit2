@@ -12,17 +12,6 @@
 /* **************************************************** *
  *                  DATABASE UTILITIES
  * **************************************************** */
-int32 DatabaseFind (const uint32 hash) {
-	// return the position of a hash if something is found
-	const int32 step = 2 * sizeof(uint32);
-	for (int i = 0; i < (DATABASE_SIZE * step); i += step) {
-		uint32 buf;
-		RomDataRead(i, &buf, sizeof(uint32));
-		if (buf == hash) return i;
-	}
-	return DATABASE_HASH_NOTFOUND;
-}
-
 static int32 find_free_pos (const int32 prev_pos) {
 	// tries to find next free position in hashtable
 	const int32 step = 2 * sizeof(uint32);
@@ -43,7 +32,7 @@ static int32 find_free_pos (const int32 prev_pos) {
 }
 
 /* **************************************************** *
- *            CRC32 HASH CALCULATION WRAPPER
+ *      CRC32 HASH CALCULATION AND FINDER UTILITY
  * **************************************************** */
 inline uint32 DatabaseHashGet (const char stringified[64]) {
 	if (stringified == NULL) return 0;
@@ -51,11 +40,22 @@ inline uint32 DatabaseHashGet (const char stringified[64]) {
 	return CRC32Calculate(stringified, len);
 }
 
+inline int32 DatabaseHashFind (const uint32 hash) {
+	// return the position of a hash if something is found
+	const int32 step = 2 * sizeof(uint32);
+	for (int i = 0; i < (DATABASE_SIZE * step); i += step) {
+		uint32 buf;
+		RomDataRead(i, &buf, sizeof(uint32));
+		if (buf == hash) return i;
+	}
+	return DATABASE_HASH_NOTFOUND;
+}
+
 /* **************************************************** *
  *                DATABASE WRITE WRAPPER
  * **************************************************** */
 int32 DatabaseValueGet (const uint32 hash) {
-	const int32 pos = DatabaseFind(hash);
+	const int32 pos = DatabaseHashFind(hash);
 	if (pos >= 0) {
 		uint32 buf;
 		const int32 val_size = sizeof(uint32);
@@ -76,7 +76,7 @@ float DatabaseValueGetFloat (const uint32 hash) {
  * **************************************************** */
 int32 DatabaseValueSet (const uint32 hash, const uint32 val) {
 	// find previous hash position
-	const int32 prev = DatabaseFind(hash);
+	const int32 prev = DatabaseHashFind(hash);
 	const uint32 wlen = sizeof(uint32);
 	const uint32 buf[2] = {hash, val};
 	if (prev >= 0) {

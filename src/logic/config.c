@@ -39,12 +39,11 @@ static void periph_system (void) {
 }
 
 static void periph_comm (void) {
-	int32 rate = PeripheralSpiRateGet();
-	SpiExternalAdcInit(rate);
-	rate = PeripheralUsartRateGet();
-	UsartConsoleInit(rate);
-	rate = PeripheralCanRateGet();
-	CanTransmissionInit(rate);
+	SpiExternalAdcInit(PeripheralSpiRateGet());
+	UsartConsoleInit(PeripheralUsartRateGet());
+	_println("console> ready");
+//	CanTransmissionInit(PeripheralCanRateGet());
+	CanTransmissionInit(200 * 1000);
 }
 
 static void periph_gpio (void) {
