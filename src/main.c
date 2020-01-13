@@ -47,6 +47,7 @@ int main(void) {
 			}
 		}
 		GpioLedsSet(2, -1); // cpu free time output
+		// 333.3K switches == 1.5usec for whole cycle
 	}
 	return 0;
 }

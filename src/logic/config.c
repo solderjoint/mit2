@@ -1,6 +1,8 @@
 
 #include "logic/config.h"
 
+#include "comm/smolin.h"
+
 #include "logic/crash.h"
 #include "logic/data/db.h"
 
@@ -41,9 +43,9 @@ static void periph_system (void) {
 static void periph_comm (void) {
 	SpiExternalAdcInit(PeripheralSpiRateGet());
 	UsartConsoleInit(PeripheralUsartRateGet());
-	_println("console> ready");
-//	CanTransmissionInit(PeripheralCanRateGet());
-	CanTransmissionInit(200 * 1000);
+//	_println("console> ready");
+	CanTransmissionInit(PeripheralCanRateGet());
+//	CanTransmissionAttachInterrupt();
 }
 
 static void periph_gpio (void) {

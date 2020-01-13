@@ -51,20 +51,19 @@ static void msg_buf_init (void) {
 /* **************************************************** *
  *                   CAN TEST ROUTINE
  * **************************************************** */
+#include "periph/gpio.h"  // debug led checking
 void _test (void) {
 	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
 	const uint32 obj_id = object_id_get();
 
-	msg_buf_update(obj_id);
-
-	_println("S[0x%X]", status);
-	if (status >= CAN_STATUS_TXOK) {
-		_println("[%i]:[%i]:[%i]:[%i]", \
-				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
-				msg_struct.ui32Flags, obj_id);
-		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
-		// still getting bit stuffing errors
-		// can rate is set incorrectly?
+//	_println("S[0x%X]", status);
+	if (status == CAN_STATUS_RXOK) {
+		msg_buf_update(obj_id);
+//		_println("[%i]:[%i]:[%i]:[%i]", \
+//				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
+//				msg_struct.ui32Flags, obj_id);
+//		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
+//		GpioLedsSet(3, -1);
 	}
 }
 
@@ -81,21 +80,19 @@ void CanTransmissionInterruptAttachmentCall (void) {
 		canTransmissionInterruptAttachment();
 }
 
-#include "periph/gpio.h"  // debug led checking
 void CanInterruptHandler (void) {
+	const uint32 int_cause = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
 	const uint32 object = object_id_get();
-	const uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
-	if (status == CAN_INT_INTID_STATUS) {
-//		CanTransmissionInterruptAttachmentCall();
-		GpioLedsSet(3, -1);
-		_test();
-	} else if (status == object) {
-		GpioLedsSet(2, -1);
-		_test();
-//		_println("can>\tobj hit");
+
+	if (int_cause == CAN_INT_INTID_STATUS) {
+		const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
+		if (status == CAN_STATUS_RXOK) {
+			msg_buf_update(object);
+//			CanTransmissionInterruptAttachmentCall();
+//			_test();
+		}
 	} else {
-		GpioLedsSet(2, -1);
-//		_println("can>\tstatus int 0x%X", status);
+		GpioLedsSet(3, -1);
 	}
 	CANIntClear(CAN0_BASE, object);
 }
