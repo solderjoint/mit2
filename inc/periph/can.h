@@ -7,7 +7,8 @@
  *                  HEADER SPECIFIC MACROS
  * **************************************************** */
 enum _canEnum {
-	CAN_OBJECT_ID    = 1,   // default object mesage id
+	CAN_RECV_OBJ_ID  = 1,   // default object mesage id
+	CAN_SEND_OBJ_ID  = 2,   // default object mesage id
 	CAN_INT_PRIORITY = 5,   // medium-low int priority
 	CAN_MSGBUF_LEN   = 8,   // standard maximum message length
 };

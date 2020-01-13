@@ -19,33 +19,57 @@
 #include "util/util.h"
 
 /* **************************************************** *
- *                 CAN LOCAL VARIABLES
+ *             CAN MESSAGE RECEVING BUFFER
  * **************************************************** */
-// main can object variable
-static volatile tCANMsgObject msg_struct;
+static volatile tCANMsgObject _msg_recv_s;
 
-static uint32 can_obj_id;  // can msg obj id [1..32]
-void object_id_set (const uint32 x) { can_obj_id = x & 0x1F; }
-uint32 object_id_get (void) { return can_obj_id; }
+static int32 _msg_recv_objid;
+void msg_recv_id_set (const int32 x) { _msg_recv_objid = x & 0x1F; }
+int32 msg_recv_id_get (void) { return _msg_recv_objid; }
 
-/* **************************************************** *
- *           CAN MESSAGE BUFFER MANIPULATION
- * **************************************************** */
-static volatile uint8 msg_buffer[CAN_MSGBUF_LEN];
+static volatile uint8 msg_recv_buffer[CAN_MSGBUF_LEN];
 
-inline static void msg_buf_update (const int32 obj_id) {
-	CANMessageGet(CAN0_BASE, obj_id, &msg_struct, true);
+inline static void msg_recv_update (void) {
+	CANMessageGet(CAN0_BASE, msg_recv_id_get(), &_msg_recv_s, true);
 }
 
-static void msg_buf_init (void) {
-	msg_struct.pui8MsgData = msg_buffer;
-	msg_struct.ui32MsgID = 0xFFFF; // workaround for 29-bits wide id
-	msg_struct.ui32MsgIDMask = 0;  // empty mask receives everything
-	msg_struct.ui32Flags = MSG_OBJ_RX_INT_ENABLE \
-						 | MSG_OBJ_EXTENDED_ID;
-	msg_struct.ui32MsgLen = CAN_MSGBUF_LEN;
+static void msg_recv_init (const int32 obj_id) {
+	for (int i = 0; i < CAN_MSGBUF_LEN; i++) msg_recv_buffer[i] = 0;
 
-	object_id_set(CAN_OBJECT_ID);
+	_msg_recv_s.pui8MsgData = msg_recv_buffer;
+	_msg_recv_s.ui32MsgID = 0xFFFF; // workaround for 29-bits wide id
+	_msg_recv_s.ui32MsgIDMask = 0;  // empty mask receives everything
+	_msg_recv_s.ui32Flags = MSG_OBJ_RX_INT_ENABLE | MSG_OBJ_EXTENDED_ID;
+	_msg_recv_s.ui32MsgLen = CAN_MSGBUF_LEN;
+
+	msg_recv_id_set (obj_id);
+}
+
+/* **************************************************** *
+ *              CAN MESSAGE SENDING BUFFER
+ * **************************************************** */
+static volatile tCANMsgObject _msg_send_s;
+
+static int32 _msg_send_objid;
+void msg_send_id_set (const int32 x) { _msg_send_objid = x & 0x1F; }
+int32 msg_send_id_get (void) { return _msg_send_objid; }
+
+static volatile uint8 msg_send_buffer[CAN_MSGBUF_LEN];
+
+inline static void msg_send_update (void) {
+	CANMessageSet (CAN0_BASE, msg_send_id_get(), &_msg_send_s, MSG_OBJ_TYPE_TX);
+}
+
+static void msg_send_init (const int32 obj_id) {
+	for (int i = 0; i < CAN_MSGBUF_LEN; i++) msg_send_buffer[i] = 8;
+
+	_msg_send_s.pui8MsgData = msg_send_buffer;
+	_msg_send_s.ui32MsgID = 0xFFFF; // workaround for 29-bits wide id
+	_msg_send_s.ui32MsgIDMask = 0;  // empty mask receives everything
+	_msg_send_s.ui32Flags = /*MSG_OBJ_TX_INT_ENABLE |*/ MSG_OBJ_EXTENDED_ID;
+	_msg_send_s.ui32MsgLen = CAN_MSGBUF_LEN;
+
+	msg_send_id_set (obj_id);
 }
 
 /* **************************************************** *
@@ -56,14 +80,14 @@ void _test (void) {
 	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
 	const uint32 obj_id = object_id_get();
 
-//	_println("S[0x%X]", status);
+	//	_println("S[0x%X]", status);
 	if (status == CAN_STATUS_RXOK) {
-		msg_buf_update(obj_id);
-//		_println("[%i]:[%i]:[%i]:[%i]", \
-//				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
-//				msg_struct.ui32Flags, obj_id);
-//		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
-//		GpioLedsSet(3, -1);
+		msg_buf_receive(obj_id);
+	//		_println("[%i]:[%i]:[%i]:[%i]", \
+	//				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
+	//				msg_struct.ui32Flags, obj_id);
+	//		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
+	//		GpioLedsSet(3, -1);
 	}
 }
 
@@ -81,20 +105,27 @@ void CanTransmissionInterruptAttachmentCall (void) {
 }
 
 void CanInterruptHandler (void) {
-	const uint32 int_cause = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
-	const uint32 object = object_id_get();
+	uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
+	uint32 object = 0; // empty obj_id holder
 
-	if (int_cause == CAN_INT_INTID_STATUS) {
-		const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-		if (status == CAN_STATUS_RXOK) {
-			msg_buf_update(object);
-//			CanTransmissionInterruptAttachmentCall();
-//			_test();
+	if (status == CAN_INT_INTID_STATUS) {
+		status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
+
+		// check which interrupt we got
+		if (status & CAN_STATUS_RXOK) {
+			object = msg_recv_id_get ();
+			msg_recv_update ();
+			msg_send_update ();
+		} else if (status & CAN_STATUS_TXOK) {
+			object = msg_send_id_get ();
+			msg_send_update ();
 		}
+//		CanTransmissionInterruptAttachmentCall();
+		CANIntClear(CAN0_BASE, object);
 	} else {
 		GpioLedsSet(3, -1);
+		CANIntClear(CAN0_BASE, CAN_INT_INTID_STATUS);
 	}
-	CANIntClear(CAN0_BASE, object);
 }
 
 /* **************************************************** *
@@ -123,5 +154,6 @@ void CanTransmissionInit (const uint32_t rate) {
 	CANEnable(CAN0_BASE);
 //	SysCtlDelay(100);
 
-	msg_buf_init();
+	msg_recv_init(CAN_RECV_OBJ_ID);
+	msg_send_init(CAN_SEND_OBJ_ID);
 }

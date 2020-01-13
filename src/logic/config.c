@@ -43,7 +43,7 @@ static void periph_system (void) {
 static void periph_comm (void) {
 	SpiExternalAdcInit(PeripheralSpiRateGet());
 	UsartConsoleInit(PeripheralUsartRateGet());
-//	_println("console> ready");
+	_println("console> ready");
 	CanTransmissionInit(PeripheralCanRateGet());
 //	CanTransmissionAttachInterrupt();
 }
