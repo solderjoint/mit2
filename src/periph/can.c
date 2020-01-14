@@ -73,25 +73,6 @@ static void msg_send_init (const int32 obj_id) {
 }
 
 /* **************************************************** *
- *                   CAN TEST ROUTINE
- * **************************************************** */
-#include "periph/gpio.h"  // debug led checking
-void _test (void) {
-	const uint32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-	const uint32 obj_id = object_id_get();
-
-	//	_println("S[0x%X]", status);
-	if (status == CAN_STATUS_RXOK) {
-		msg_buf_receive(obj_id);
-	//		_println("[%i]:[%i]:[%i]:[%i]", \
-	//				msg_struct.ui32MsgLen, msg_struct.ui32MsgID, \
-	//				msg_struct.ui32Flags, obj_id);
-	//		CANIntDisable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_STATUS);
-	//		GpioLedsSet(3, -1);
-	}
-}
-
-/* **************************************************** *
  *                CAN INTERRUPT HANDLER
  * **************************************************** */
 static void (*canTransmissionInterruptAttachment) (void) = NULL;
@@ -104,17 +85,51 @@ void CanTransmissionInterruptAttachmentCall (void) {
 		canTransmissionInterruptAttachment();
 }
 
+
+#include "periph/gpio.h"
+static volatile int8 flag;
+static volatile uint32 *aptr1[] = {
+	(CAN0_BASE + CAN_O_IF2ARB1), (CAN0_BASE + CAN_O_IF2ARB2),
+	(CAN0_BASE + CAN_O_IF2MCTL),
+	(CAN0_BASE + CAN_O_IF2DA1), (CAN0_BASE + CAN_O_IF2DA2),
+	(CAN0_BASE + CAN_O_IF2DB1), (CAN0_BASE + CAN_O_IF2DB2),
+};
+
+//static volatile uint32 *aptr2[] = {
+//	(CAN0_BASE + CAN_O_IF1ARB1), (CAN0_BASE + CAN_O_IF1ARB2),
+//	(CAN0_BASE + CAN_O_IF1MCTL),
+//	(CAN0_BASE + CAN_O_IF1DA1), (CAN0_BASE + CAN_O_IF1DA2),
+//	(CAN0_BASE + CAN_O_IF1DB1), (CAN0_BASE + CAN_O_IF1DB2),
+//};
+
+inline static int32 _recv_id_get (void) {
+	volatile uint32 *ptrh = CAN0_BASE + CAN_O_IF2ARB2;
+	*ptrh |= CAN_IF1ARB2_XTD;
+	(*(uint32 *) (CAN0_BASE + CAN_O_IF2ARB2)) |= CAN_IF1ARB2_XTD;
+
+	if (flag == 0) {
+		// returns 0x4000 0000
+		for (int i = 0; i < 7; i++) _printf ("[%04X]", *aptr1[i]);
+//		for (int i = 0; i < 7; i++) _printf ("[%04X]", *aptr2[i]);
+		_puts("");
+		flag = 1;
+	}
+	return _msg_recv_s.ui32MsgID;
+}
+
 void CanInterruptHandler (void) {
 	uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
-	uint32 object = 0; // empty obj_id holder
+	uint32 object = -1; // empty obj_id holder
 
 	if (status == CAN_INT_INTID_STATUS) {
 		status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-
 		// check which interrupt we got
 		if (status & CAN_STATUS_RXOK) {
 			object = msg_recv_id_get ();
 			msg_recv_update ();
+
+			if (_recv_id_get () != 0) GpioLedsSet (3, -1);
+
 			msg_send_update ();
 		} else if (status & CAN_STATUS_TXOK) {
 			object = msg_send_id_get ();
