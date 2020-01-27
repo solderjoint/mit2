@@ -7,8 +7,14 @@
 /* **************************************************** *
  *              MATHEMATICAL NUMBER MACROS
  * **************************************************** */
-#define CONST_E     (2.7182818285f)
-#define CONST_PI    (3.1415926535f)
+#define HWREG(REG)     (*((volatile uint32 *) (REG)))
+
+/* **************************************************** *
+ *              MATHEMATICAL NUMBER MACROS
+ * **************************************************** */
+#define CONST_E        (2.7182818285f)
+#define CONST_PI       (3.1415926535f)
+#define CONST_PHI      (1.6180339887f)
 
 #define kil(n)         (1000 * (n))
 #define mil(n)         (1000000 * (n))
