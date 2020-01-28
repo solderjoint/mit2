@@ -39,9 +39,10 @@ static void msg_recv_init (const int32 obj_id) {
 
 	_msg_recv_s.pui8MsgData = msg_recv_buffer;
 	_msg_recv_s.ui32MsgID = 0x203F40; // workaround for 29-bits wide id
-	_msg_recv_s.ui32MsgIDMask = 0;    // empty mask receives everything
+//	_msg_recv_s.ui32MsgIDMask = 0x273FF0;    // empty mask receives everything
+	_msg_recv_s.ui32MsgIDMask = 1;    // empty mask receives everything
 	_msg_recv_s.ui32Flags = MSG_OBJ_RX_INT_ENABLE \
-			| MSG_OBJ_EXTENDED_ID /*| MSG_OBJ_USE_ID_FILTER*/;
+			| MSG_OBJ_EXTENDED_ID | MSG_OBJ_USE_ID_FILTER;
 	_msg_recv_s.ui32MsgLen = CAN_MSGBUF_LEN;
 
 	msg_recv_id_set (obj_id);
@@ -68,7 +69,7 @@ static void msg_send_init (const int32 obj_id) {
 	for (int i = 0; i < CAN_MSGBUF_LEN; i++) msg_send_buffer[i] = 8;
 
 	_msg_send_s.pui8MsgData = msg_send_buffer;
-	_msg_send_s.ui32MsgID = 0x654321; // workaround for 29-bits wide id
+	_msg_send_s.ui32MsgID = 0x123456; // workaround for 29-bits wide id
 	_msg_send_s.ui32MsgIDMask = 0;    // empty mask receives everything
 	_msg_send_s.ui32Flags = /*MSG_OBJ_TX_INT_ENABLE |*/ MSG_OBJ_EXTENDED_ID;
 	_msg_send_s.ui32MsgLen = CAN_MSGBUF_LEN;
@@ -90,53 +91,64 @@ void CanTransmissionInterruptAttachmentCall (void) {
 		canTransmissionInterruptAttachment();
 }
 
-
+/* **************************************************** */
 #include "periph/gpio.h"
 static volatile int32 flag;
 
-void _test_recv_init (void) {
-//	HWREG(CAN0_BASE + CAN_O_IF2MCTL) = 0x8487;
-	flag = 0;
-}
+inline static void _test_recv_init (void) { flag = 0; }
 
-inline static int32 _recv_id_get (void) {
+inline static int32 _test_recv_id (void) {
 	// IF1 is responsible for sender, IF2 is for receiver
-//	const uint32 id = HWREG(CAN0_BASE + CAN_O_IF2ARB1) \
-//			| (HWREG(CAN0_BASE + CAN_O_IF2ARB2) << 16);
-	const int32 id =  HWREG(CAN0_BASE + CAN_O_IF2ARB1) \
-			| ((HWREG(CAN0_BASE + CAN_O_IF2ARB2) & CAN_IF1ARB2_ID_M) << 16);
+	const int32 id = HWREG(CAN0_BASE + CAN_O_IF2ARB1) \
+			| ((HWREG(CAN0_BASE + CAN_O_IF2ARB2) & CAN_IF2ARB2_ID_M) << 16);
 
-	if ((flag % 25) == 0) { _println ("[%07X]", id); }
+	if ((flag % 33) == 0) {
+//		const uint32 regda = HWREG(CAN0_BASE + CAN_O_IF2DA1) \
+//				| (HWREG(CAN0_BASE + CAN_O_IF2DA2) << 16);
+//		const uint32 regdb = HWREG(CAN0_BASE + CAN_O_IF2DB1) \
+//				| (HWREG(CAN0_BASE + CAN_O_IF2DB2) << 16);
+//		const uint32 regerr = HWREG(CAN0_BASE + CAN_O_ERR);
+//		_println ("[%08X]", regerr);
+	}
+
+	if ((flag % 2) == 0) {
+		for (int i = 0; i < CAN_MSGBUF_LEN; i++)
+			msg_send_buffer[i] = flag % 0xFF;
+	}
 	flag++;
 	return id;
 }
 
+/* **************************************************** */
 void CanInterruptHandler (void) {
-	uint32 status = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
-	uint32 object = -1; // empty obj_id holder
+	const uint32 cause = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE);
 
-	if (status == CAN_INT_INTID_STATUS) {
-		status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
-//		// check which interrupt we got
+	// check which interrupt we got
+	if (cause == CAN_INT_INTID_STATUS) {
+		const int32 status = CANStatusGet(CAN0_BASE, CAN_STS_CONTROL);
+		// message was received successfully
 		if (status & CAN_STATUS_RXOK) {
-			object = msg_recv_id_get ();
-			_recv_id_get ();
-			const int32 id = msg_recv_update ();
+//			if ((flag % 33) == 0) _println ("%04X", status);
+			msg_recv_update ();
+			const int32 id = _test_recv_id ();
+
 			if (id == 0x203F40) {
 				msg_send_update (0x3F2060);
-				GpioLedsSet(3, -1);
 			}
-//			_recv_id_get ();
+			else if (id == 0x213F40) msg_send_update (0x3F2160);
+			else if (id == 0x223F40) msg_send_update (0x3F2260);
+			else if (id == 0x233F40) msg_send_update (0x3F2360);
+			else if (id == 0x243F40) msg_send_update (0x3F2460);
+
+		// process next message
 		} else if (status & CAN_STATUS_TXOK) {
-			object = msg_send_id_get ();
 //			msg_send_update ();
 		}
-//		CanTransmissionInterruptAttachmentCall();
 		CANIntClear(CAN0_BASE, CAN_INT_INTID_STATUS);
-		CANIntClear(CAN0_BASE, object);
+		CANIntClear(CAN0_BASE, status);
 	} else {
-		object = msg_recv_id_get ();
-		CANIntClear(CAN0_BASE, object);
+//		assert ();  // should never have happened
+		CANIntClear(CAN0_BASE, 0);
 	}
 }
 
@@ -169,4 +181,5 @@ void CanTransmissionInit (const uint32_t rate) {
 	_test_recv_init();
 	msg_recv_init(CAN_RECV_OBJ_ID);
 	msg_send_init(CAN_SEND_OBJ_ID);
+//	msg_recv_init2();
 }

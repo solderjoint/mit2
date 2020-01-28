@@ -17,8 +17,6 @@
 #include "logic/crash.h"
 #include "logic/config.h"
 
-#include "periph/gpio.h"
-
 #include "vars/mutex.h"
 #include "vars/period.h"
 
@@ -46,7 +44,7 @@ int main(void) {
 				MutexClear(MUTEX_VOLTUPDATE);
 			}
 		}
-		GpioLedsSet(2, -1); // cpu free time output
+//		GpioLedsSet(2, -1); // cpu free time output
 		// 333.3K switches == 1.5usec for whole cycle
 	}
 	return 0;
