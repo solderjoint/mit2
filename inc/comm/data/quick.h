@@ -14,8 +14,8 @@
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-void QuickOutputPrepare (uint8 buf[8]);
-void QuickInputProcess (const uint8 buf[8]);
+int32 QuickOutputProcess(uint8 buf[8]);
+int32 QuickInputProcess(const uint8 buf[8]);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

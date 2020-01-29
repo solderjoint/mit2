@@ -30,6 +30,7 @@ int main(void) {
 	ConfigInitVariables();
 
 	while (1) {
+		// TODO: create stream checker for usart handler ?
 		if (MutexCheckPending() > 0) {
 			if (MutexGet(MUTEX_LINECHECK)) {
 				CrashCheck();

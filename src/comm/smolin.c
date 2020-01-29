@@ -12,36 +12,25 @@
 /* **************************************************** *
  *         SMOLIN PROTOCOL HEADER MANIPULATION
  * **************************************************** */
-struct smolin_header_t {
-	uint32 _reserved:8;
-	uint32 receiver:8;
-	uint32 sender:8;
-	uint32 text_end:1;
-	uint32 quickdata:1;
-	uint32 request:1;
-	uint32 text_pos:4;
-};
-static struct smolin_header_t header_struct;
+//static union obj_u {
+//	uint32 i;
+//	struct smolin_header_t s;
+//} header_union;
 
-static union obj_u {
-	uint32 i;
-	struct smolin_header_t s;
-} header_union;
-
-static void HeaderSet (const uint32 x) {
-	header_union.i = x;
-	header_struct = header_union.s;
-}
-static uint32 HeaderGet (void) {
-	header_union.s = header_struct;
-	return header_union.i;
-}
-static uint8 HeaderReceiverGet (void) { return header_struct.receiver; }
-static uint8 HeaderSenderGet (void) { return header_struct.sender; }
-static uint8 HeaderTextEndBitGet (void) { return header_struct.text_end; }
-static uint8 HeaderQuickDataBitGet (void) { return header_struct.quickdata; }
-static uint8 HeaderRequestBitGet (void) { return header_struct.request; }
-static uint8 HeaderTextPositionGet (void) { return header_struct.text_pos; }
+//static void HeaderSet (const uint32 x) {
+//	header_union.i = x;
+//	header_struct = header_union.s;
+//}
+//static uint32 HeaderGet (void) {
+//	header_union.s = header_struct;
+//	return header_union.i;
+//}
+//static uint8 HeaderReceiverGet (void) { return header_struct.receiver; }
+//static uint8 HeaderSenderGet (void) { return header_struct.sender; }
+//static uint8 HeaderTextEndBitGet (void) { return header_struct.text_end; }
+//static uint8 HeaderQuickDataBitGet (void) { return header_struct.quickdata; }
+//static uint8 HeaderRequestBitGet (void) { return header_struct.request; }
+//static uint8 HeaderTextPositionGet (void) { return header_struct.text_pos; }
 
 /* **************************************************** *
  *          CAN TOTAL MESSAGES RECEIVED TABLE
@@ -86,4 +75,55 @@ int32 SmolinProtocolProcess
 	} else {
 		// append to received table
 	}
+}
+
+/* **************************************************** *
+ *            SMOLIN PROTOCOL ENTRY WRAPPERS
+ * **************************************************** */
+//#include "periph/can.h"
+#include "vars/canmessage.h"
+#include "util/print.h"
+
+static uint8 input_buffer[CAN_MSGBUF_LEN];
+static uint8 output_buffer[CAN_MSGBUF_LEN];
+
+static union smolin_header_u {
+	int32 i;
+	struct smolin_header_t s;
+} input_header, output_header;
+
+
+/* **************************************************** */
+
+inline void SmolinProtocolProcessIncoming (void) {
+	CanMessageReceive();  // update incoming message
+	input_header.i = CanMessageReceiverIdGet();
+	const uint8 *ptr = CanMessageReceiverBufferGet();
+	for (int i = 0; i < CAN_MSGBUF_LEN; i++) {
+		input_buffer[i] = ptr[i];
+	}
+
+	const int32 device_id = 0x20;
+	if (input_header.s.to == device_id) {
+		const int32 from = input_header.s.from;
+		if (input_header.s.quickdata > 0) {
+			QuickInputProcess(input_buffer);
+			QuickOutputProcess(output_buffer);
+
+			output_header.s.from = device_id;
+			output_header.s.to = from;
+			output_header.s.quickdata = 1;
+			output_header.s.response = 1;
+			CanMessageSenderIdSet(output_header.i);
+			CanMessageSenderBufferSet(output_buffer);
+			CanMessageSend();
+		}
+	}
+}
+
+/* **************************************************** *
+ *            SMOLIN PROTOCOL ENTRY WRAPPERS
+ * **************************************************** */
+
+inline void SmolinProtocolProcessOutgoing (void) {
 }

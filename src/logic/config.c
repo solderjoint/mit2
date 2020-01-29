@@ -14,6 +14,7 @@
 #include "periph/usart.h"
 #include "periph/watchdog.h"
 
+#include "vars/canmessage.h"
 #include "vars/fourierconsts.h"
 #include "vars/mutex.h"
 #include "vars/period.h"
@@ -41,11 +42,14 @@ static void periph_system (void) {
 }
 
 static void periph_comm (void) {
-	SpiExternalAdcInit(PeripheralSpiRateGet());
 	UsartConsoleInit(PeripheralUsartRateGet());
 	_println("console> ready");
+	SpiExternalAdcInit(PeripheralSpiRateGet());
+
 	CanTransmissionInit(PeripheralCanRateGet());
-//	CanTransmissionAttachInterrupt();
+	CanMessageInit();
+	CanTransmissionAttachInterruptOnReceive(SmolinProtocolProcessIncoming);
+	CanTransmissionAttachInterruptOnSend(SmolinProtocolProcessOutgoing);
 }
 
 static void periph_gpio (void) {
@@ -70,8 +74,9 @@ int32 ConfigInitVariables (void) {
 	PeriodLineVoltCheckInit();
 	PeriodLineVoltUpdateInit();
 	PeriodCommCheckInit();
-
 	MutexInit();
+
+
 
 	CrashVarsInit();
 }
