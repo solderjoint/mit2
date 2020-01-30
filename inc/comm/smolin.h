@@ -15,15 +15,25 @@
 //	CAN_MSGBUF_SIZEX = 8,  // message table x size
 //};
 
-struct smolin_header_t {
-	int32 _reserved:8;
-	int32 to:8;
-	int32 from:8;
-	int32 text_end:1;
-	int32 quickdata:1;
-	int32 response:1;
-	int32 text_pos:4;
+enum smolinHeaderEnum {
+	HEADER_TEXTPOS  = 0,
+	HEADER_REQUEST  = 5,
+	HEADER_FASTDATA = 6,
+	HEADER_TEXTEND  = 7,
+	HEADER_ID_FROM  = 8,
+	HEADER_ID_DEST  = 16,
+	HEADER_FULL_MSG = 0xFFFFFF,
 };
+
+//struct smolin_header_t {
+//	int32 _reserved : 8;
+//	int32 from : 8;
+//	int32 to : 8;
+//	int32 text_end:1;
+//	int32 quickdata:1;
+//	int32 response:1;
+//	int32 text_pos:4;
+//};
 
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES

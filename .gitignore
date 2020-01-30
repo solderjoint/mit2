@@ -5,10 +5,9 @@
 *.hex
 *.bin
 *.map
-*.swp
 *.creator*
 
-# system junk
+# unnecessary folders
 /device/
 /device/**
 /example/
@@ -17,6 +16,10 @@
 /docs/**
 /_old
 /_old/**
+
+# system junk
 *.autosave
+*.backup
 *.d
+*.swp
 

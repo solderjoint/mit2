@@ -19,6 +19,7 @@ void CanMessageInit (void);
 
 void CanMessageReceive(void);
 uint8* CanMessageReceiverBufferGet (void);
+int32 CanMessageReceiverSizeGet (void);
 int32 CanMessageReceiverIdGet (void);
 
 void CanMessageSend (void);

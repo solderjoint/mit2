@@ -39,6 +39,12 @@ inline int32 CanMessageReceiverIdGet (void) {
 	return (id & 0x1FFFFFFF);
 }
 
+inline int32 CanMessageReceiverSizeGet (void) {
+	// returns size of incoming buffer
+	const int32 size = recv_struct.ui32MsgLen;
+	return (size > 8)? -1 : size;
+}
+
 static void CanMessageReceiverInit (void) {
 	for (int i = 0; i < CAN_MSGBUF_LEN; i++) recv_buffer[i] = 0;
 

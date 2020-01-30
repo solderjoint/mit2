@@ -25,12 +25,6 @@
 //	header_union.s = header_struct;
 //	return header_union.i;
 //}
-//static uint8 HeaderReceiverGet (void) { return header_struct.receiver; }
-//static uint8 HeaderSenderGet (void) { return header_struct.sender; }
-//static uint8 HeaderTextEndBitGet (void) { return header_struct.text_end; }
-//static uint8 HeaderQuickDataBitGet (void) { return header_struct.quickdata; }
-//static uint8 HeaderRequestBitGet (void) { return header_struct.request; }
-//static uint8 HeaderTextPositionGet (void) { return header_struct.text_pos; }
 
 /* **************************************************** *
  *          CAN TOTAL MESSAGES RECEIVED TABLE
@@ -86,14 +80,59 @@ int32 SmolinProtocolProcess
 #include "vars/canmessage.h"
 #include "util/print.h"
 
+/* **************************************************** *
+ *                SMOLIN HEADER WRAPPERS
+ * **************************************************** */
 static uint8 input_buffer[CAN_MSGBUF_LEN];
+static int32 input_header;
+
+inline static void InputHeaderSet (const int32 x) {
+	input_header = x & HEADER_FULL_MSG;
+}
+inline static int32 InputHeaderIdFromGet (void) {
+	return ((input_header >> HEADER_ID_FROM) & 0xFF);
+}
+inline static int32 InputHeaderIdDestGet (void) {
+	return ((input_header >> HEADER_ID_DEST) & 0xFF);
+}
+inline static int32 InputHeaderTextEndGet (void) {
+	return ((input_header >> HEADER_TEXTEND) & 0x01);
+}
+inline static int32 InputHeaderFastDataGet (void) {
+	return ((input_header >> HEADER_FASTDATA) & 0x01);
+}
+inline static int32 InputHeaderRequestGet (void) {
+	return ((input_header >> HEADER_REQUEST) & 0x01);
+}
+inline static int32 InputHeaderTextPosGet (void) {
+	return ((input_header >> HEADER_TEXTPOS) & 0x1F);
+}
+
+/* **************************************************** */
 static uint8 output_buffer[CAN_MSGBUF_LEN];
+static int32 output_header;
 
-static union smolin_header_u {
-	int32 i;
-	struct smolin_header_t s;
-} input_header, output_header;
-
+inline static void OutputHeaderClear (void) {
+	output_header = 0;
+}
+inline static void OutputHeaderIdFromSet (const int32 x) {
+	output_header |= ((x & 0xFF) << HEADER_ID_FROM);
+}
+inline static void OutputHeaderIdDestSet (const int32 x) {
+	output_header |= ((x & 0xFF) << HEADER_ID_DEST);
+}
+inline static void OutputHeaderTextEndSet (const int32 x) {
+	output_header |= ((x & 0x01) << HEADER_TEXTEND);
+}
+inline static void OutputHeaderFastDataSet (const int32 x) {
+	output_header |= ((x & 0x01) << HEADER_FASTDATA);
+}
+inline static void OutputHeaderRequestSet (const int32 x) {
+	output_header |= ((x & 0x01) << HEADER_REQUEST);
+}
+inline static void OutputHeaderTextPosSet (const int32 x) {
+	output_header |= ((x & 0x1F) << HEADER_TEXTPOS);
+}
 
 /* **************************************************** */
 static int32 counter = 0;
@@ -101,48 +140,37 @@ static int32 counter = 0;
 inline void SmolinProtocolProcessIncoming (void) {
 	// wrapper for incoming message processing
 	CanMessageReceive();  // update incoming message
-	for (int i = 0; i < 10; i++) counter++;
-	input_header.i = CanMessageReceiverIdGet();
+	InputHeaderSet (CanMessageReceiverIdGet());
+
+	// protect buffer from overwriting by copying it
 	const uint8 *ptr = CanMessageReceiverBufferGet();
-	for (int i = 0; i < CAN_MSGBUF_LEN; i++) {
-		input_buffer[i] = ptr[i];  // save buffer from overwriting
+	const int32 size = CanMessageReceiverSizeGet ();
+	for (int i = 0; i < size; i++) input_buffer[i] = ptr[i];
+
+	// using hard '4' instea of real result from hard-coded pins
+	const int32 device_id = GpioModuleAdressGet () \
+			| (4 << 3) /*(GpioModuleCodenameGet () << 3)*/;
+
+	if (InputHeaderIdDestGet() == device_id) {
+		if (InputHeaderFastDataGet()) {
+			QuickInputProcess(input_buffer);
+			QuickOutputProcess(output_buffer);
+
+			OutputHeaderClear();
+			OutputHeaderIdFromSet (device_id);
+			OutputHeaderIdDestSet (InputHeaderIdFromGet ());
+			OutputHeaderRequestSet (1);
+
+			CanMessageSenderIdSet(output_header);
+			CanMessageSenderBufferSet(output_buffer);
+			CanMessageSend();
+		}
+		GpioLedsSet (2, -1);
 	}
 
-	GpioLedsSet (2, -1);
-//	counter++;
-//	if (counter % 21 == 0) _printf ("%06X ", input_header.i);
-
-	// TODO: get wrapper for device_id from gpio
-//	const int32 device_id = 0x20;
-
-//	if (input_header.s.to == device_id) {
-//		const int32 from = input_header.s.from;
-//		if (input_header.s.quickdata > 0) {
-//			QuickInputProcess(input_buffer);
-//			QuickOutputProcess(output_buffer);
-
-//			output_header.s.from = device_id;
-//			output_header.s.to = from;
-//			output_header.s.quickdata = 1;
-//			output_header.s.response = 1;
-//			CanMessageSenderIdSet(output_header.i);
-//			CanMessageSenderBufferSet(output_buffer);
-//			CanMessageSend();
-//		}
-	if (input_header.i == 0x203F40) {
-		CanMessageSenderIdSet(0x3F2060);
-		CanMessageSenderBufferSet(output_buffer);
-		CanMessageSend();
-	} else if (input_header.i == 0x223F40) {
-		CanMessageSenderIdSet(0x3F2260);	CanMessageSend();
-	} else if (input_header.i == 0x243F40) {
-		CanMessageSenderIdSet(0x3F2460);	CanMessageSend();
-	} else if (input_header.i == 0x263F40) {
-		CanMessageSenderIdSet(0x3F2660);	CanMessageSend();
-	} else if (input_header.i == 0x283F40) {
-		CanMessageSenderIdSet(0x3F2860);	CanMessageSend();
-	}
-
+//	for (int i = 0; i < CAN_MSGBUF_LEN; i++) {
+//		output_buffer[i] = ((uint8) counter);
+//	}  counter++;
 }
 
 /* **************************************************** *

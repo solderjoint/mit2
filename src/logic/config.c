@@ -76,8 +76,6 @@ int32 ConfigInitVariables (void) {
 	MutexInit();
 
 	CanMessageInit();
-	// it's not important to set id first
-//	CanMessageReceiverIdSet (0x203F40);
 
 	CrashVarsInit();
 }

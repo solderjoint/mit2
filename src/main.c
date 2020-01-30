@@ -1,6 +1,6 @@
 /*
  * Calculation module firmware project.
- * rev 1A since august 2019
+ * rev 1C since august 2019
  *
  * The goal of this project is to complete following routines:
  * + check pin designated as a line endpoint signal catcher
