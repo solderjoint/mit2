@@ -35,16 +35,19 @@ uint8* CanMessageReceiverBufferGet (void) {
 
 inline int32 CanMessageReceiverIdGet (void) {
 	// returns 29-bit length incoming message id
-	return recv_struct.ui32MsgID & 0x1FFFFFFF;
+	const int32 id = recv_struct.ui32MsgID;
+	return (id & 0x1FFFFFFF);
 }
 
 static void CanMessageReceiverInit (void) {
 	for (int i = 0; i < CAN_MSGBUF_LEN; i++) recv_buffer[i] = 0;
 
+	// setting (empty mask + id filter) correctly accepts
+	// incoming messages, otherwise nothing will be received
 	recv_struct.pui8MsgData = recv_buffer;
 	recv_struct.ui32MsgLen = CAN_MSGBUF_LEN;
 	recv_struct.ui32MsgID = 0xABCDEF; // workaround for 29-bits wide id
-	recv_struct.ui32MsgIDMask = 1;    // empty mask receives everything
+	recv_struct.ui32MsgIDMask = 0;    // empty mask receives everything
 	recv_struct.ui32Flags = MSG_OBJ_RX_INT_ENABLE \
 			| MSG_OBJ_EXTENDED_ID | MSG_OBJ_USE_ID_FILTER;
 

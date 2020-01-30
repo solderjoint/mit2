@@ -6,10 +6,9 @@
 *.bin
 *.map
 *.swp
+*.creator*
 
 # system junk
-/build/
-/build/**
 /device/
 /device/**
 /example/
@@ -20,4 +19,4 @@
 /_old/**
 *.autosave
 *.d
- 
+

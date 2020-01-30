@@ -47,7 +47,6 @@ static void periph_comm (void) {
 	SpiExternalAdcInit(PeripheralSpiRateGet());
 
 	CanTransmissionInit(PeripheralCanRateGet());
-	CanMessageInit();
 	CanTransmissionAttachInterruptOnReceive(SmolinProtocolProcessIncoming);
 	CanTransmissionAttachInterruptOnSend(SmolinProtocolProcessOutgoing);
 }
@@ -76,7 +75,9 @@ int32 ConfigInitVariables (void) {
 	PeriodCommCheckInit();
 	MutexInit();
 
-
+	CanMessageInit();
+	// it's not important to set id first
+//	CanMessageReceiverIdSet (0x203F40);
 
 	CrashVarsInit();
 }

@@ -81,6 +81,8 @@ int32 SmolinProtocolProcess
  *            SMOLIN PROTOCOL ENTRY WRAPPERS
  * **************************************************** */
 //#include "periph/can.h"
+#include "periph/gpio.h"
+
 #include "vars/canmessage.h"
 #include "util/print.h"
 
@@ -94,31 +96,53 @@ static union smolin_header_u {
 
 
 /* **************************************************** */
+static int32 counter = 0;
 
 inline void SmolinProtocolProcessIncoming (void) {
+	// wrapper for incoming message processing
 	CanMessageReceive();  // update incoming message
+	for (int i = 0; i < 10; i++) counter++;
 	input_header.i = CanMessageReceiverIdGet();
 	const uint8 *ptr = CanMessageReceiverBufferGet();
 	for (int i = 0; i < CAN_MSGBUF_LEN; i++) {
-		input_buffer[i] = ptr[i];
+		input_buffer[i] = ptr[i];  // save buffer from overwriting
 	}
 
-	const int32 device_id = 0x20;
-	if (input_header.s.to == device_id) {
-		const int32 from = input_header.s.from;
-		if (input_header.s.quickdata > 0) {
-			QuickInputProcess(input_buffer);
-			QuickOutputProcess(output_buffer);
+	GpioLedsSet (2, -1);
+//	counter++;
+//	if (counter % 21 == 0) _printf ("%06X ", input_header.i);
 
-			output_header.s.from = device_id;
-			output_header.s.to = from;
-			output_header.s.quickdata = 1;
-			output_header.s.response = 1;
-			CanMessageSenderIdSet(output_header.i);
-			CanMessageSenderBufferSet(output_buffer);
-			CanMessageSend();
-		}
+	// TODO: get wrapper for device_id from gpio
+//	const int32 device_id = 0x20;
+
+//	if (input_header.s.to == device_id) {
+//		const int32 from = input_header.s.from;
+//		if (input_header.s.quickdata > 0) {
+//			QuickInputProcess(input_buffer);
+//			QuickOutputProcess(output_buffer);
+
+//			output_header.s.from = device_id;
+//			output_header.s.to = from;
+//			output_header.s.quickdata = 1;
+//			output_header.s.response = 1;
+//			CanMessageSenderIdSet(output_header.i);
+//			CanMessageSenderBufferSet(output_buffer);
+//			CanMessageSend();
+//		}
+	if (input_header.i == 0x203F40) {
+		CanMessageSenderIdSet(0x3F2060);
+		CanMessageSenderBufferSet(output_buffer);
+		CanMessageSend();
+	} else if (input_header.i == 0x223F40) {
+		CanMessageSenderIdSet(0x3F2260);	CanMessageSend();
+	} else if (input_header.i == 0x243F40) {
+		CanMessageSenderIdSet(0x3F2460);	CanMessageSend();
+	} else if (input_header.i == 0x263F40) {
+		CanMessageSenderIdSet(0x3F2660);	CanMessageSend();
+	} else if (input_header.i == 0x283F40) {
+		CanMessageSenderIdSet(0x3F2860);	CanMessageSend();
 	}
+
 }
 
 /* **************************************************** *
@@ -126,4 +150,5 @@ inline void SmolinProtocolProcessIncoming (void) {
  * **************************************************** */
 
 inline void SmolinProtocolProcessOutgoing (void) {
+	// empty stub
 }

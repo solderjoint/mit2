@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-//#include <stdint.h>
 
 #include <tivaware/inc/hw_can.h>
 #include <tivaware/inc/hw_ints.h>

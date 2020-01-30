@@ -96,6 +96,7 @@ inc/vars/peripheral.h
 ###############################
 ##        ENTRY POINT        ##
 ###############################
+.gitignore
 src/main.c
 inc/project.h
 project.ld
