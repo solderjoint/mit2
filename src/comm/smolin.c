@@ -1,30 +1,12 @@
 
 #include "comm/smolin.h"
 
-#include <stdint.h>
-#include <string.h>
-
 #include "comm/data/quick.h"
+//#include "comm/data/longword.h"
+//#include "comm/data/modbus.h"
 
 #include "util/print.h"
 #include "util/util.h"
-
-/* **************************************************** *
- *         SMOLIN PROTOCOL HEADER MANIPULATION
- * **************************************************** */
-//static union obj_u {
-//	uint32 i;
-//	struct smolin_header_t s;
-//} header_union;
-
-//static void HeaderSet (const uint32 x) {
-//	header_union.i = x;
-//	header_struct = header_union.s;
-//}
-//static uint32 HeaderGet (void) {
-//	header_union.s = header_struct;
-//	return header_union.i;
-//}
 
 /* **************************************************** *
  *          CAN TOTAL MESSAGES RECEIVED TABLE
@@ -81,13 +63,19 @@ int32 SmolinProtocolProcess
 #include "util/print.h"
 
 /* **************************************************** *
- *                SMOLIN HEADER WRAPPERS
+ *           SMOLIN INCOMING MESSAGE WRAPPERS
  * **************************************************** */
 static uint8 input_buffer[CAN_MSGBUF_LEN];
 static int32 input_header;
 
 inline static void InputHeaderSet (const int32 x) {
 	input_header = x & HEADER_FULL_MSG;
+}
+inline static int32 InputHeaderModbusFunctionGet (void) {
+	return ((input_header >> HEADER_MBUS_FUN) & 0x07);
+}
+inline static int32 InputHeaderModbusDataGet (void) {
+	return ((input_header >> HEADER_MBUSDATA) & 0x01);
 }
 inline static int32 InputHeaderIdFromGet (void) {
 	return ((input_header >> HEADER_ID_FROM) & 0xFF);
@@ -108,12 +96,20 @@ inline static int32 InputHeaderTextPosGet (void) {
 	return ((input_header >> HEADER_TEXTPOS) & 0x1F);
 }
 
-/* **************************************************** */
+/* **************************************************** *
+ *           SMOLIN OUTGOING MESSAGE WRAPPERS
+ * **************************************************** */
 static uint8 output_buffer[CAN_MSGBUF_LEN];
 static int32 output_header;
 
 inline static void OutputHeaderClear (void) {
 	output_header = 0;
+}
+inline static int32 OutputHeaderModbusFunctionSet (const int32 x) {
+	output_header |= ((x & 0x07) << HEADER_MBUS_FUN);
+}
+inline static int32 OutputHeaderModbusDataSet (const int32 x) {
+	output_header |= ((x & 0x01) << HEADER_MBUSDATA);
 }
 inline static void OutputHeaderIdFromSet (const int32 x) {
 	output_header |= ((x & 0xFF) << HEADER_ID_FROM);
@@ -134,20 +130,35 @@ inline static void OutputHeaderTextPosSet (const int32 x) {
 	output_header |= ((x & 0x1F) << HEADER_TEXTPOS);
 }
 
-/* **************************************************** */
-static int32 counter = 0;
+/* **************************************************** *
+ *              SMOLIN PROTOCOL UTILITIES
+ * **************************************************** */
+inline static void smolin_send (void) {
+	CanMessageSenderIdSet(output_header);
+	CanMessageSenderBufferSet(output_buffer);
+	CanMessageSend();
+}
 
+inline static void SmolinProtocolQuickSend (void) {
+	OutputHeaderClear();
+	OutputHeaderIdFromSet (InputHeaderIdDestGet());
+	OutputHeaderIdDestSet (InputHeaderIdFromGet());
+	OutputHeaderRequestSet (1);
+	smolin_send();  // call sending wrapper
+}
+
+/* **************************************************** *
+ *           SMOLIN PROTOCOL INCOMING HANDLER
+ * **************************************************** */
 inline void SmolinProtocolProcessIncoming (void) {
-	// wrapper for incoming message processing
 	CanMessageReceive();  // update incoming message
 	InputHeaderSet (CanMessageReceiverIdGet());
-
 	// protect buffer from overwriting by copying it
 	const uint8 *ptr = CanMessageReceiverBufferGet();
-	const int32 size = CanMessageReceiverSizeGet ();
+	const int32 size = CanMessageReceiverSizeGet() % 9;  // <= 8
 	for (int i = 0; i < size; i++) input_buffer[i] = ptr[i];
 
-	// using hard '4' instea of real result from hard-coded pins
+	// using hard '4' instead of result from hard-coded pins
 	const int32 device_id = GpioModuleAdressGet () \
 			| (4 << 3) /*(GpioModuleCodenameGet () << 3)*/;
 
@@ -155,28 +166,15 @@ inline void SmolinProtocolProcessIncoming (void) {
 		if (InputHeaderFastDataGet()) {
 			QuickInputProcess(input_buffer);
 			QuickOutputProcess(output_buffer);
-
-			OutputHeaderClear();
-			OutputHeaderIdFromSet (device_id);
-			OutputHeaderIdDestSet (InputHeaderIdFromGet ());
-			OutputHeaderRequestSet (1);
-
-			CanMessageSenderIdSet(output_header);
-			CanMessageSenderBufferSet(output_buffer);
-			CanMessageSend();
+			SmolinProtocolQuickSend();
 		}
-		GpioLedsSet (2, -1);
 	}
-
-//	for (int i = 0; i < CAN_MSGBUF_LEN; i++) {
-//		output_buffer[i] = ((uint8) counter);
-//	}  counter++;
+	GpioLedsSet (2, -1);  // signal the end of processing
 }
 
 /* **************************************************** *
- *            SMOLIN PROTOCOL ENTRY WRAPPERS
+ *           SMOLIN PROTOCOL OUTGOING HANDLER
  * **************************************************** */
-
 inline void SmolinProtocolProcessOutgoing (void) {
 	// empty stub
 }

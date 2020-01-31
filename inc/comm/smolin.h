@@ -22,24 +22,14 @@ enum smolinHeaderEnum {
 	HEADER_TEXTEND  = 7,
 	HEADER_ID_FROM  = 8,
 	HEADER_ID_DEST  = 16,
-	HEADER_FULL_MSG = 0xFFFFFF,
+	HEADER_MBUSDATA = 24,
+	HEADER_MBUS_FUN = 25,
+	HEADER_FULL_MSG = 0x1FFFFFFF,
 };
-
-//struct smolin_header_t {
-//	int32 _reserved : 8;
-//	int32 from : 8;
-//	int32 to : 8;
-//	int32 text_end:1;
-//	int32 quickdata:1;
-//	int32 response:1;
-//	int32 text_pos:4;
-//};
 
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-//int32 SmolinProtocolProcess
-//(const uint32 header, const uint32 length, uint8 msg[8]);
 void SmolinProtocolProcessIncoming (void);
 void SmolinProtocolProcessOutgoing (void);
 

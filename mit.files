@@ -23,6 +23,8 @@ inc/logic/math/sampling.h
 ###############################
 src/comm/smolin.c
 inc/comm/smolin.h
+inc/comm/data/mbus.h
+src/comm/data/mbus.c
 src/comm/data/quick.c
 inc/comm/data/quick.h
 

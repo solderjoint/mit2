@@ -36,16 +36,11 @@ int main(void) {
 				CrashCheck();
 				MutexClear(MUTEX_LINECHECK);
 			}
-			if (MutexGet(MUTEX_COMMCHECK)) {
-				// can message routine
-				MutexClear(MUTEX_COMMCHECK);
-			}
 			if (MutexGet(MUTEX_VOLTUPDATE)) {
 				CrashUpdateNormalVoltage();
 				MutexClear(MUTEX_VOLTUPDATE);
 			}
 		}
-//		GpioLedsSet(2, -1); // cpu free time output
 		// 333.3K switches == 1.5usec for whole cycle
 	}
 	return 0;

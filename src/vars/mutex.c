@@ -15,7 +15,7 @@
 static volatile int32 mutex_buf;
 
 inline static void mutex_check (const int32 time, \
-			const int32 comparison, enum mutexEnum var_pos) {
+		const int32 comparison, enum mutexEnum var_pos) {
 	if (time % comparison == 0) mutex_buf |= (1 << var_pos);
 }
 
@@ -26,10 +26,10 @@ static void _mutex_handler (void) {
 	const int32 time = PeriodCounterGet();
 	const int32 line = PeriodLineVoltCheckGet();
 	const int32 volt = PeriodLineVoltUpdateGet();
-	const int32 comm = PeriodCommCheckGet();
+//	const int32 comm = PeriodCommCheckGet();
 
 	mutex_check(time, line, MUTEX_LINECHECK);
-	mutex_check(time, comm, MUTEX_COMMCHECK);
+//	mutex_check(time, comm, MUTEX_COMMCHECK);
 	mutex_check(time, volt, MUTEX_VOLTUPDATE);
 
 	PeriodCounterIncrement();
@@ -56,7 +56,6 @@ inline int32 MutexGet (enum mutexEnum var_pos) {
 
 inline int32 MutexClear (enum mutexEnum var_pos) {
 	_check (var_pos < _MUTEX_MAXNUM);
-	const int32 shift = (1 << (var_pos));
-	mutex_buf &= ~shift;
+	mutex_buf &= ~(1 << (var_pos));
 	return mutex_buf;
 }
