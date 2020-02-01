@@ -7,11 +7,11 @@
  * 10b - response from a slave device
  * 11b - impossible state (grand error)
  *
- * Can message packet is disassembled as following:
- * [1] byte - function code (can be from 1 to 127)
- * [2-3] bytes - starting address for a function
- * [4] byte - describes significant bytes in packet
- * [5-6,7-8] bytes - incoming/outgoing data
+ * Can message packet is represented as:
+ * [1] byte - function code (can be from 0x1 to 0x7F)
+ * [2-3] bytes - starting address of a coil/register
+ * [4] byte - number of data bytes in packet (0/2/4)
+ * [5-6,7-8] bytes - incoming/outgoing data payload
  */
 
 #ifndef __COMM_MODICON_H
@@ -33,11 +33,11 @@ enum mbusGeneralEnum {
 };
 
 enum mbusExceptionEnum {
-	MBUS_ERROR_FUNCTION = 0x1,
-	MBUS_ERROR_ADDRESS  = 0x2,
-	MBUS_ERROR_VALUE    = 0x3,
-	MBUS_ERROR_DEV_FAIL = 0x4,
-//	MBUS_ERROR_DEV_BUSY = 0x6,
+	MBUS_ERROR_FUNCTION = -1,
+	MBUS_ERROR_ADDRESS  = -2,
+	MBUS_ERROR_VALUE    = -3,
+	MBUS_ERROR_DEV_FAIL = -4,
+//	MBUS_ERROR_DEV_BUSY = -6,
 };
 
 enum mbusFunctionEnum {

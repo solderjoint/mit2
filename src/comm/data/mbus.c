@@ -3,38 +3,18 @@
 
 #include <math.h>
 
-#include "vars/fourierconsts.h"
+#include "logic/config.h"
 
 /* **************************************************** *
- *             MODICON BUS VAIABLES HANDLER
+ *     MODICON BUS VARIABLES READER/WRITER WRAPPERS
  * **************************************************** */
-static int32 mbus_read_coil (const int32 address) {
-	int32 res = 0;
-	switch (address) {
-	case 1:
-		res = 1;
-		break;
-	case 10001:
-		res = 10001;
-		break;
-	default:
-		res = MBUS_ERROR_ADDRESS;
-		break;
-	}
-	return res;
+// TODO: create wrapper in config.c for variable handling
+static inline int32 mbus_read_reg (const int32 address) {
+	return ConfigVarTableGet (address);
 }
 
-static int32 mbus_read_reg (const int32 address) {
-	int32 res = 0;
-	switch (address) {
-	case 30001:
-		res = 30001;
-		break;
-	default:
-		res = MBUS_ERROR_ADDRESS;
-		break;
-	}
-	return res;
+static inline int32 mbus_write_reg (const int32 address, const int32 value) {
+	return ConfigVarTableSet (address, (value & 0xFFFF));
 }
 
 /* **************************************************** *
@@ -49,11 +29,9 @@ static uint16 mbus_get_address (void) {
 static uint8 mbus_get_bytes (void) {
 	return ((mbus_in[3] + (mbus_in[3] % 2)) % 5);
 }
-static uint16 mbus_get_data1 (void) {
-	return ((mbus_in[4] << 8) | mbus_in[5]);
-}
-static uint16 mbus_get_data2 (void) {
-	return ((mbus_in[6] << 8) | mbus_in[7]);
+static uint16 mbus_get_data (const int32 pos) {
+	const int32 offset = 4 + (abs(pos) % 2) * 2;  // only 0..1 is accepted
+	return ((mbus_in[offset] << 8) | mbus_in[offset + 1]);
 }
 
 /* **************************************************** */
@@ -64,11 +42,9 @@ static void mbus_set_address (const uint16 add) {
 	mbus_out[1] = add >> 8;  mbus_out[2] = add & 0xFF;
 }
 static void mbus_set_bytes (const uint8 x) { mbus_out[3] = x % 5; }
-static void mbus_set_data1 (const uint16 data1) {
-	mbus_out[4] = data1 >> 8;  mbus_out[5] = data1 & 0xFF;
-}
-static void mbus_set_data2 (const uint16 data2) {
-	mbus_out[6] = data2 >> 8;  mbus_out[7] = data2 & 0xFF;
+static void mbus_set_data (const uint16 data, const int32 pos) {
+	const int32 offset = 4 + (abs(pos) % 2) * 2;  // only 0..1 is accepted
+	mbus_out[offset] = data >> 8;  mbus_out[offset+1] = data & 0xFF;
 }
 static void mbus_set_error (const int32 err) {
 	for (int i = 0; i < 8; i++) mbus_out[i] = 0;
@@ -91,12 +67,8 @@ static inline int32 ModbusFunctionRead (void) {
 		error = MBUS_ERROR_ADDRESS;
 	} else {
 		for (int i = 0; i < 2; i++) data[i] = 0;
-		for (int i = 0; i < bytes; i += 2) {
-			if (address <= MBUS_MEMORY_RW_COIL) {
-				const int32 res = mbus_read_coil(address);
-				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
-				else data[i] = ((uint16) res);
-			} else if (address <= MBUS_MEMORY_RW_REGS) {
+		for (int i = 0; i < (bytes / 2); i++) {
+			if (address <= MBUS_MEMORY_RW_REGS) {
 				const int32 res = mbus_read_reg(address);
 				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
 				else data[i] = ((uint16) res);
@@ -119,13 +91,10 @@ static inline int32 ModbusFunctionWrite (void) {
 		error = MBUS_ERROR_ADDRESS;
 	} else {
 		for (int i = 0; i < 2; i++) data[i] = 0;
-		for (int i = 0; i < bytes; i += 2) {
-			if (address <= MBUS_MEMORY_RW_COIL) {
-				const int32 res = mbus_write_coil(address);
-				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
-				else data[i] = ((uint16) res);
-			} else if (address <= MBUS_MEMORY_RW_REGS) {
-				const int32 res = mbus_write_reg(address);
+		for (int i = 0; i < (bytes / 2); i++) {
+			const uint16 value = mbus_get_data(i);
+			if (address <= MBUS_MEMORY_RW_REGS) {
+				const int32 res = mbus_write_reg(address, value);
 				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
 				else data[i] = ((uint16) res);
 			}
@@ -138,15 +107,15 @@ static inline int32 ModbusFunctionWrite (void) {
  *         UNIFIED MODICON BUS RESPONSE HANDLER
  * **************************************************** */
 static inline int8 ModbusResponse (const int32 error) {
-	// << FUNC[1] ADDRESS[2] BYTES[1] DATA1[2] DATA2[2]
+	// << FUNC[1] ADDRESS[2] BYTES[1] DATA1[2] DATA28[2]
 	if (error != 0) {
 		mbus_set_error(error);
 	} else {
 		mbus_set_func(mbus_get_func());
 		mbus_set_address(mbus_get_address());
 		mbus_set_bytes(mbus_get_bytes());
-		mbus_set_data1(data[0]);
-		mbus_set_data2(data[1]);  // will be zero nevertheless
+		mbus_set_data(data[0], 0);
+		mbus_set_data(data[1], 1);  // will be zero nevertheless
 	}
 	return ((int8) error);
 }

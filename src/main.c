@@ -26,8 +26,8 @@
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
 int main(void) {
-	ConfigStartup();
-	ConfigInitVariables();
+	ConfigPeripheralsInit();
+	ConfigVariablesInit();
 
 	while (1) {
 		// TODO: create stream checker for usart handler ?

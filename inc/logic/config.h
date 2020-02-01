@@ -15,15 +15,21 @@
 /* **************************************************** *
  *                HEADER SPECIFIC MACROS
  * **************************************************** */
-enum StartupErrorEnum {
-	ERROR_NONE = 0,
+enum configErrorEnum {
+	CONFIG_ERROR_NONE     =  0,
+	CONFIG_ERROR_GENERAL  = -1,
+	CONFIG_ERROR_ADDRESS  = -2,
+	CONFIG_ERROR_VALUE    = -3,
+	CONFIG_ERROR_DEV_FAIL = -4,
 };
 
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int32 ConfigInitVariables (void);
-int32 ConfigStartup (void);
+int32 ConfigPeripheralsInit (void);
+int32 ConfigVariablesInit (void);
+int32 ConfigVarTableGet (const int32 address);
+int32 ConfigVarTableSet (const int32 address, const uint16 value);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION
