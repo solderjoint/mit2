@@ -36,14 +36,12 @@ enum mbusExceptionEnum {
 	MBUS_ERROR_FUNCTION = 0x1,
 	MBUS_ERROR_ADDRESS  = 0x2,
 	MBUS_ERROR_VALUE    = 0x3,
-//	MBUS_ERROR_DEV_FAIL = 0x4,
-//	MBUS_ERROR_ACK      = 0x5,
-	MBUS_ERROR_DEV_BUSY = 0x6,
-//	MBUS_ERROR_PARITY   = 0x8,
-	MBUS_ERROR_ADDER    = 0x80, // this added value indicates error
+	MBUS_ERROR_DEV_FAIL = 0x4,
+//	MBUS_ERROR_DEV_BUSY = 0x6,
 };
 
 enum mbusFunctionEnum {
+	MBUS_FUNC_ERROR_ADD   = 0x80, // this added value indicates error
 	MBUS_FUNC_READ_COIL   = 1,
 	MBUS_FUNC_READ_COIL2  = 2,
 	MBUS_FUNC_READ_REG    = 3,
@@ -54,15 +52,10 @@ enum mbusFunctionEnum {
 	MBUS_FUNC_WRITE_MREG  = 16,
 };
 
-//enum mbusUserFunctionEnum {
-//	MBUS_FUNC_READ_INT32  = 101, // user code from 100 to 110
-//	MBUS_FUNC_WRITE_INT32 = 105,
-//};
-
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int8 ModbusMessageProcess(const uint8 input[8], uint8 output[8]);
+int8 ModbusMessageProcess(const uint8 input[8], uint8 *output);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION
