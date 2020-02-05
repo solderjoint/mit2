@@ -5,17 +5,15 @@
 *.hex
 *.bin
 *.map
+*.su
+*.config
 *.creator*
 
 # unnecessary folders
-/device/
-/device/**
-/example/
-/example/**
-/docs/
-/docs/**
-/_old
-/_old/**
+/build
+/build/**
+/obj
+/obj/**
 
 # system junk
 *.autosave

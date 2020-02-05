@@ -1,32 +1,41 @@
 # ####################################################### #
 TARGET     = mit
 # ####################################################### #
-MAKE      ?= remake
-RM         = rm
+MAKE      := remake
+BURNER    := openocd
+GDB       := gdb-multiarch
 
-GDB        = gdb-multiarch
+AS         = arm-none-eabi-gcc -x assembler-with-cpp
 CC         = arm-none-eabi-gcc
-CPP        = arm-none-eabi-g++
-OBJCOPY    = arm-none-eabi-objcopy
-OBJDUMP    = arm-none-eabi-objdump
+COPY       = arm-none-eabi-copy
+DUMP       = arm-none-eabi-objdump
 SIZE       = arm-none-eabi-size
 
-BURNER     = openocd
+STACKUSAGE = cat $(find obj/ -iname *.su | tr '\n' ' ')
 
 # ####################################################### #
 DEVICE     = PART_TM4C1231H6PZ
-BINDIR    ?= build
+BINDIR    := build
 INCDIR    ?= inc
 LIBDIR    ?= libs
+OBJDIR    := obj
 SRCDIR    ?= src
-CSRC       = $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*/*.c $(SRCDIR)/*/*/*.c)
-CPPSRC     = $(wildcard $(SRCDIR)/*.cpp $(SRCDIR)/*/*.cpp)
-ASRC       = $(wildcard $(SRCDIR)/*/*.S $(SRCDIR)/*/*.asm)
-OBJ        = $(CSRC:.c=.o) $(CPPSRC:.cpp=.o) $(ASRC:.S=.o)
+
+# ####################################################### #
+ASRC       = $(shell find $(SRCDIR) -type f -name '*.asm')
+CSRC       = $(shell find $(SRCDIR) -type f -name '*.c')
+CPPSRC     = $(shell find $(SRCDIR) -type f -name '*.cpp')
+
+OBJ        = $(addprefix $(OBJDIR)/, $(notdir $(CSRC:.c=.o)))
+OBJ       += $(addprefix $(OBJDIR)/, $(notdir $(CPPSRC:.cpp=.o)))
+OBJ       += $(addprefix $(OBJDIR)/, $(notdir $(ASRC:.asm=.o)))
+
+vpath %.c    $(sort $(dir $(CSRC)))
+vpath %.cpp  $(sort $(dir $(CPPSRC)))
+vpath %.asm  $(sort $(dir $(ASRC)))
 
 # ####################################################### #
 TIVADIR    = libs/tivaware
-#LIBLIST    = -lgcc -lm -lc -lc_nano -ldriver
 LIBLIST    = -lgcc -lm -lc -ldriver
 
 CINC       = -I$(TIVADIR)/driverlib  -I$(TIVADIR)/inc
@@ -35,8 +44,9 @@ CINC      += -I$(INCDIR)/*/*
 CINC      += -I./newlib-1.18.0/newlib/libc/include
 
 # ####################################################### #
-CFLAGS     = -funroll-loops  -g3 -Os -w
-CFLAGS    += -fdata-sections -ffunction-sections
+#CFLAGS     = -funroll-loops -fstack-usage -Og -g -gdwarf-2
+CFLAGS     = -funroll-loops -fstack-usage -Os
+CFLAGS    += -fdata-sections -ffunction-sections -w
 CFLAGS    += -fno-common -fverbose-asm -fmax-errors=16
 CFLAGS    += -W -Wall -Wextra -Wshadow -Wcast-align
 CFLAGS    += -Werror=implicit-function-declaration
@@ -46,36 +56,50 @@ CFLAGS    += $(CINC)  -D $(DEVICE)
 
 ASMFLAGS   = $(CFLAGS)
 
-DEBUGFLAGS = -f openocd.cfg -c "adapter_khz 2000"
-BURNFLAGS  = -c "program $(BINDIR)/$(TARGET).elf verify reset" -c shutdown
-
+# ####################################################### #
 LDSCRIPT   = project.ld
 LDFLAGS    = -T $(LDSCRIPT) -L$(TIVADIR)/driverlib/gcc $(LIBLIST)
 LDFLAGS   += --static -nostartfiles -Wl,--gc-sections
 LDFLAGS   += --specs=nano.specs --specs=nosys.specs
 
+DEBUGFLAGS = -f openocd.cfg -c "adapter_khz 2000"
+BURNFLAGS  = -c "program $(BINDIR)/$(TARGET).elf verify reset" -c shutdown
+
 # ####################################################### #
 .PHONY: all burn clean list  init debug
 
 clean:
-	$(RM) -f $(OBJ) $(SRCDIR)/*.d $(SRCDIR)/*/*.d $(BINDIR)/$(TARGET).*
+	rm -f $(OBJDIR)/* $(BINDIR)/*
 
 burn: $(TARGET).elf
 	$(BURNER) $(DEBUGFLAGS) $(BURNFLAGS)
 
-list: $(TARGET).elf
-	$(OBJDUMP) -DSlf $(BINDIR)/$(TARGET).elf > $(BINDIR)/$(TARGET).asm
+all: $(BINDIR)/$(TARGET).elf
+	$(SIZE) $(BINDIR)/$(TARGET).elf
+	$(value STACKUSAGE) > $(BINDIR)/$(TARGET).su
 
-all: $(TARGET).elf
-	$(SIZE) $(BINDIR)/$(TARGET).elf | tee $(BINDIR)/$(TARGET).size
+list: $(BINDIR)/$(TARGET).elf
+	$(DUMP) -DSlf $< > $(BINDIR)/$(TARGET).list
 
-$(TARGET).elf: $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(BINDIR)/$@ $(LDFLAGS)
-#	$(CPP) $(CFLAGS) $(OBJ) -o $(BINDIR)/$@ $(LDFLAGS)
+# ####################################################### #
+$(BINDIR):
+	mkdir -p $@
+$(OBJDIR):
+	mkdir -p $@
 
+$(OBJDIR)/%.o: %.asm $(OBJDIR)
+	$(AS) $(ASMFLAGS) -c -o $@ $<
+$(OBJDIR)/%.o: %.cpp $(OBJDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+$(OBJDIR)/%.o: %.c $(OBJDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BINDIR)/$(TARGET).elf: $(OBJ) $(BINDIR)
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
+
+# ####################################################### #
 init: $(TARGET).elf
 	$(BURNER) $(DEBUGFLAGS)
-
 debug:
 	$(GDB) -ex "target remote localhost:3333" $(BINDIR)/$(TARGET).elf
 

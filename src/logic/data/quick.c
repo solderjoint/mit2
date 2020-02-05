@@ -1,5 +1,5 @@
 
-#include "comm/data/quick.h"
+#include "logic/data/quick.h"
 
 #include "vars/linestatus.h"
 #include "vars/relaystatus.h"

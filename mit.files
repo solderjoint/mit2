@@ -3,105 +3,102 @@
 ###############################
 inc/logic/config.h
 src/logic/config.c
-src/logic/crash.c
 inc/logic/crash.h
+src/logic/crash.c
 
-src/logic/data/db.c
+inc/logic/comm/smolin.h
+src/logic/comm/smolin.c
+src/logic/comm/mbus.c
+inc/logic/comm/mbus.h
+
 inc/logic/data/db.h
+src/logic/data/db.c
+inc/logic/data/quick.h
+src/logic/data/quick.c
+inc/logic/data/vartable.h
+src/logic/data/vartable.c
 
-src/logic/math/domain.c
 inc/logic/math/domain.h
-src/logic/math/fft1024.c
+src/logic/math/domain.c
 inc/logic/math/fft1024.h
-src/logic/math/linecheck.c
+src/logic/math/fft1024.c
 inc/logic/math/linecheck.h
-src/logic/math/sampling.c
+src/logic/math/linecheck.c
 inc/logic/math/sampling.h
-
-###############################
-##    COMMUNICATIONS UNIT    ##
-###############################
-src/comm/smolin.c
-inc/comm/smolin.h
-inc/comm/data/mbus.h
-src/comm/data/mbus.c
-src/comm/data/quick.c
-inc/comm/data/quick.h
+src/logic/math/sampling.c
 
 ###############################
 ##     PERIPHERIAL USAGE     ##
 ###############################
-src/periph/can.c
 inc/periph/can.h
-src/periph/gpio.c
+src/periph/can.c
 inc/periph/gpio.h
-src/periph/rom.c
+src/periph/gpio.c
 inc/periph/rom.h
-src/periph/spi.c
+src/periph/rom.c
 inc/periph/spi.h
-src/periph/timer.c
+src/periph/spi.c
 inc/periph/timer.h
-src/periph/usart.c
+src/periph/timer.c
 inc/periph/usart.h
-src/periph/watchdog.c
+src/periph/usart.c
 inc/periph/watchdog.h
+src/periph/watchdog.c
 
 ###############################
 ##      SYSTEM ROUTINES      ##
 ###############################
-src/system/diagnostic.c
 inc/system/diagnostic.h
-src/system/startup.c
+src/system/diagnostic.c
 #inc/system/startup.h
-src/system/syscalls.c
+src/system/startup.c
 inc/system/syscalls.h
+src/system/syscalls.c
 inc/system/tm4c123.h
 
 ###############################
 ##         UTILITIES         ##
 ###############################
-src/util/crc.c
 inc/util/crc.h
-src/util/debug.c
+src/util/crc.c
 inc/util/debug.h
-src/util/print.c
+src/util/debug.c
 inc/util/print.h
+src/util/print.c
 inc/util/securevar.h
 inc/util/typedefs.h
-src/util/util.c
 inc/util/util.h
+src/util/util.c
 
 ###############################
 ##    ISOLATED VARIABLES     ##
 ###############################
-src/vars/buzzerdomain.c
 inc/vars/buzzerdomain.h
-src/vars/fourierconsts.c
+src/vars/buzzerdomain.c
 inc/vars/fourierconsts.h
-src/vars/voltageconsts.c
+src/vars/fourierconsts.c
 inc/vars/voltageconsts.h
+src/vars/voltageconsts.c
 
-src/vars/linestatus.c
 inc/vars/linestatus.h
-src/vars/relaystatus.c
+src/vars/linestatus.c
 inc/vars/relaystatus.h
+src/vars/relaystatus.c
 
-src/vars/canmessage.c
 inc/vars/canmessage.h
-src/vars/mutex.c
+src/vars/canmessage.c
 inc/vars/mutex.h
-src/vars/period.c
+src/vars/mutex.c
 inc/vars/period.h
-src/vars/peripheral.c
+src/vars/period.c
 inc/vars/peripheral.h
+src/vars/peripheral.c
 
 ###############################
 ##        ENTRY POINT        ##
 ###############################
-.gitignore
-src/main.c
 inc/project.h
+src/main.c
 project.ld
 Makefile
 README.md
-openocd.cfg

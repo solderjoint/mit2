@@ -1,9 +1,9 @@
 
-#include "comm/smolin.h"
+#include "logic/comm/smolin.h"
 
-#include "comm/data/quick.h"
-//#include "comm/data/longword.h"
-//#include "comm/data/modbus.h"
+#include "logic/data/quick.h"
+//#include "logic/data/longword.h"
+//#include "logic/comm/mbus.h"
 
 #include "util/print.h"
 #include "util/util.h"

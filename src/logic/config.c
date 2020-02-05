@@ -1,9 +1,8 @@
 
 #include "logic/config.h"
 
-#include "comm/smolin.h"
-
 #include "logic/crash.h"
+#include "logic/comm/smolin.h"
 #include "logic/data/db.h"
 
 #include "periph/can.h"
@@ -25,41 +24,6 @@
 #include "vars/voltageconsts.h"
 
 #include "util/print.h"
-
-// TODO: finish variables table and move it to header
-enum configVarTableEnum {
-	VAR_LINE_STATUS = 10001,
-};
-
-/* **************************************************** *
- *         MODICON BUS VARIABLES TABLE HANDLING
- * **************************************************** */
-int32 ConfigVarTableGet (const int32 address) {
-	int32 res;
-	switch (address & 0xFFFF) {
-	case VAR_LINE_STATUS:
-		res = LineStatusGet();
-		break;
-	default:
-		res = CONFIG_ERROR_ADDRESS;
-		break;
-	}
-	return res;
-}
-
-int32 ConfigVarTableSet (const int32 address, const uint16 value) {
-	int32 res;
-	switch (address & 0xFFFF) {
-	case VAR_LINE_STATUS:
-		LineStatusSet(value & 0xFF);
-		res = LineStatusGet();
-		break;
-	default:
-		res = CONFIG_ERROR_ADDRESS;
-		break;
-	}
-	return res;
-}
 
 /* **************************************************** *
  *        SAMPLING DEFAULT LOCAL VARIABLES INIT
