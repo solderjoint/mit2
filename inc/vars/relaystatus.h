@@ -10,12 +10,15 @@
 /* **************************************************** *
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
+enum relayStatusEnum {
+	RELAY_OFF = 0,
+	RELAY_ON  = 1,
+};
 
 /* **************************************************** *
  *             SECURE LINE STATUS VARIABLE
  * **************************************************** */
-int32 RelayStatusSet (void);
-int32 RelayStatusReset (void);
+int32 RelayStatusSet (const int32 state);
 int32 RelayStatusGet (void) ;
 
 /* **************************************************** *

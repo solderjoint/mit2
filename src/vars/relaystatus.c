@@ -12,12 +12,8 @@ inline int32 RelayStatusGet (void) {
 	return GpioTriggerGet();
 }
 
-int32 RelayStatusSet (void) {
-	GpioTriggerSet();
-	return RelayStatusGet();
-}
-
-int32 RelayStatusReset (void) {
-	GpioTriggerReset();
+int32 RelayStatusSet (const int32 state) {
+	if (state > RELAY_OFF) GpioTriggerSet();
+	else GpioTriggerReset();
 	return RelayStatusGet();
 }

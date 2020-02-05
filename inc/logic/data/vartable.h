@@ -16,7 +16,7 @@
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 ConfigVarTableGet (const int32 address);
-int32 ConfigVarTableSet (const int32 address, const uint16 value);
+int32 ConfigVarTableSet (const int32 address, const int16 value);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION
