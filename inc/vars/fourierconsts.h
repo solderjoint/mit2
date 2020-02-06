@@ -10,12 +10,7 @@
 /* **************************************************** *
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
-#define FOURIER_SAMPLE_MULT    (0.002442599f)  // adc multiplier
-#define FOURIER_SAMPLE_BUFLEN  (1024)   // size of sampling buffer
-#define FOURIER_SAMPLE_RATE    (12800)  // default sampling rate
-#define FOURIER_OVERSAMPLES    (4)      // fourier oversamples
-#define FOURIER_FREQRANGE_MIN  (4150)   // default minimum freq
-#define FOURIER_FREQRANGE_MAX  (5850)   // default minimum freq
+//#define FOURIER_SAMPLE_MULT    (0.002442599f)  // adc multiplier
 
 /* **************************************************** *
  *             CONSTS MANIPULATION WRAPPERS
@@ -32,8 +27,8 @@ void FourierSamplingRateSet (const int32 x);
 float FourierFreqResolutionGet (void);
 float FourierFreqStepGet (void);
 
-float FourierSampleMultGet (void);
-void FourierSampleMultSet (const float x);
+//float FourierSampleMultGet (void);
+//void FourierSampleMultSet (const float x);
 
 int32 FourierFreqRangeMinGet (void);
 void FourierFreqRangeMinSet (const int32 x);

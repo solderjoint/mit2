@@ -4,7 +4,10 @@
 #include "periph/spi.h"
 #include "periph/timer.h"
 #include "vars/fourierconsts.h"
+#include "vars/voltageconsts.h"
 #include "util/print.h"
+
+#include "project.h"
 
 /* **************************************************** *
  *           SAMPLING BUFFER POINTER WRAPPERS
@@ -47,7 +50,7 @@ void SamplingBufferSet (float x) {
 
 void SamplingInterruptAttachment (void) {
 	const uint16 adcraw = SpiExternalAdcGetNonBlocking();
-	const float mult = FourierSampleMultGet();
+	const float mult = VoltageACMultGet();
 	const float res = mult * adcraw;
 	SamplingBufferSet (res);
 }
@@ -85,7 +88,7 @@ void SamplingVarsReset (void) {
 	FourierBufferLengthSet(FOURIER_SAMPLE_BUFLEN);
 	FourierSamplingRateSet(FOURIER_SAMPLE_RATE);
 	FourierOversamplesSet(FOURIER_OVERSAMPLES);
-	FourierSampleMultSet(FOURIER_SAMPLE_MULT);
+//	FourierSampleMultSet(FOURIER_SAMPLE_MULT);
 
 	FourierFreqRangeMinSet(FOURIER_FREQRANGE_MIN);
 	FourierFreqRangeMaxSet(FOURIER_FREQRANGE_MAX);

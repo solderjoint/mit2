@@ -71,7 +71,7 @@ BURNFLAGS  = -c "program $(BINDIR)/$(TARGET).elf verify reset" -c shutdown
 clean:
 	rm -f $(OBJDIR)/* $(BINDIR)/*
 
-burn: $(TARGET).elf
+burn: $(BINDIR)/$(TARGET).elf
 	$(BURNER) $(DEBUGFLAGS) $(BURNFLAGS)
 
 all: $(BINDIR)/$(TARGET).elf

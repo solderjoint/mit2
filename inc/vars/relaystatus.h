@@ -11,8 +11,9 @@
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
 enum relayStatusEnum {
-	RELAY_OFF = 0,
-	RELAY_ON  = 1,
+	RELAY_BROKEN = -1,
+	RELAY_OFF    = 0,
+	RELAY_ON     = 1,
 };
 
 /* **************************************************** *

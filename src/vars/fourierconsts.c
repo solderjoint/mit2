@@ -1,5 +1,6 @@
 
 #include "vars/fourierconsts.h"
+#include "project.h"
 
 /* **************************************************** *
  *             DEFAULT FREQUENCY VARIABLES
@@ -31,11 +32,11 @@ float FourierFreqResolutionGet (void) {
 /* **************************************************** *
  *               LINE DEPENDANT VARIABLES
  * **************************************************** */
-static float fourierSampleMult;
-float FourierSampleMultGet (void) { return fourierSampleMult; }
-void FourierSampleMultSet (const float x) {
-	if ((x > 0.f) && (x < 1.0f)) fourierSampleMult = x;
-}
+//static float fourierSampleMult;
+//float FourierSampleMultGet (void) { return fourierSampleMult; }
+//void FourierSampleMultSet (const float x) {
+//	if ((x > 0.f) && (x < 1.0f)) fourierSampleMult = x;
+//}
 
 static int32 fourierFreqRangeMin;
 int32 FourierFreqRangeMinGet (void) { return fourierFreqRangeMin; }

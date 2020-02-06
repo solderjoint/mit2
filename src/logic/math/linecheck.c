@@ -58,7 +58,7 @@ void LineVoltageBufferSet (float val) {
 
 void LineVoltageBufferRenew (void) {
 	const uint16 adcraw = SpiExternalAdcGetNonBlocking();
-	const float mult = /*LineVoltDCMultGet()*/ VOLT_DCMULT;
+	const float mult = VoltageDCMultGet() /*VOLT_DCMULT*/;
 	const float res = cast(float, adcraw) * mult;
 	LineVoltageBufferSet(res);
 }

@@ -1,5 +1,6 @@
 
 #include "vars/voltageconsts.h"
+#include "project.h"
 
 /* **************************************************** *
  *          LINE AND FREQ VOLTAGE MULTIPLIERS

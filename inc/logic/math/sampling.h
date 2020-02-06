@@ -15,9 +15,6 @@
  * **************************************************** */
 typedef float complex cf32_t;
 
-#define SAMPLING_OVERSAMPLES  (4)  // N of oversamples
-#define SAMPLING_BUFFERMULT   (0.00244141f)  // volt result mult
-
 /* **************************************************** *
  *             FOURIER FUNCTION PROTOTYPES
  * **************************************************** */
