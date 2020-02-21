@@ -25,7 +25,7 @@ static struct {
 	uint8 buf[USART_BUFLEN_MAX];
 } usartConsoleBuffer;
 
-uint8 UsartConsoleBufferGet (void) {
+uint8 UartConsoleBufferGet (void) {
 	const uint32 ptr = usartConsoleBuffer.start;
 	const uint8 symbol = usartConsoleBuffer.buf[ptr];
 	// assign next pointer
@@ -35,7 +35,7 @@ uint8 UsartConsoleBufferGet (void) {
 	return symbol;
 }
 
-void UsartConsoleBufferSet (uint8 symbol) {
+void UartConsoleBufferSet (uint8 symbol) {
 	const uint32 end = usartConsoleBuffer.end;
 	usartConsoleBuffer.buf[end] = symbol;
 	// assign new end point
@@ -50,9 +50,9 @@ void UsartConsoleBufferSet (uint8 symbol) {
 /* **************************************************** *
  *           USART CONSOLE INTERRUPT HANDLER
  * **************************************************** */
-void UsartConsoleInterrupt (void) {
+void UartConsoleInterrupt (void) {
 	if (UARTIntStatus(UART0_BASE, true) == UART_INT_TX) {
-		const uint8 tx = UsartConsoleBufferGet();
+		const uint8 tx = UartConsoleBufferGet();
 //		if (tx) UARTCharPut(UART0_BASE, tx);
 		if (tx > 0) UARTCharPutNonBlocking(UART0_BASE, tx);
 		UARTIntClear(UART0_BASE, UART_INT_TX);
@@ -62,26 +62,26 @@ void UsartConsoleInterrupt (void) {
 /* **************************************************** *
  *         USART CONSOLE NON-BLOCKING WRAPPERS
  * **************************************************** */
-inline int32 UsartConsoleSendCharNonBlocking (uint8 tx) {
-	UsartConsoleBufferSet(tx);
+inline int32 UartConsoleSendCharNonBlocking (uint8 tx) {
+	UartConsoleBufferSet(tx);
 }
 
-inline int32 UsartConsoleSendNonBlocking (uint8 buf[], const uint32 len) {
+inline int32 UartConsoleSendNonBlocking (uint8 buf[], const uint32 len) {
 	uint32 i;
 	const uint32 int_len = (len < USART_STRLEN_MAX)? len : USART_STRLEN_MAX;
 	for (i = 0; (i < int_len) && (buf[i] != '\0'); i++)
-		UsartConsoleBufferSet(buf[i]);
+		UartConsoleBufferSet(buf[i]);
 	return i;
 }
 
 /* **************************************************** *
  *          USART CONSOLE WRITE/READ WRAPPERS
  * **************************************************** */
-void UsartConsolePutchar (uint8 symbol) {
+void UartConsolePutchar (uint8 symbol) {
 	UARTCharPut(UART0_BASE, symbol);
 }
 
-uint32 UsartConsoleSendBlocking (uint8 buf[], const uint32 len) {
+uint32 UartConsoleSendBlocking (uint8 buf[], const uint32 len) {
 	uint32 i;
 	const uint32 int_len = (len < USART_STRLEN_MAX)? len : USART_STRLEN_MAX;
 	for (i = 0; (i < int_len) && (buf[i] != '\0'); i++)
@@ -89,7 +89,7 @@ uint32 UsartConsoleSendBlocking (uint8 buf[], const uint32 len) {
 	return i;
 }
 
-uint32 UsartConsoleScan (uint8 buf[], const uint32 len) {
+uint32 UartConsoleScan (uint8 buf[], const uint32 len) {
 	uint32 i;
 	const uint32 int_len = (len < USART_STRLEN_MAX)? len : USART_STRLEN_MAX;
 	for (i = 0; i < int_len; i++) {
@@ -103,7 +103,7 @@ uint32 UsartConsoleScan (uint8 buf[], const uint32 len) {
 /* **************************************************** *
  *           USART PC CONSOLE INITIALIZATION
  * **************************************************** */
-void UsartConsoleInit (const uint32 rate) {
+void UartConsoleInit (const uint32 rate) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0));
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -120,7 +120,7 @@ void UsartConsoleInit (const uint32 rate) {
 						UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE));
 
 	// TODO: catch a fucking interrupt destabilizer
-//	UARTIntRegister(UART0_BASE, UsartConsoleInterrupt);
+//	UARTIntRegister(UART0_BASE, UartConsoleInterrupt);
 //	UARTIntEnable(UART0_BASE, UART_INT_TX);
 //	IntEnable(INT_UART0);
 //	IntPrioritySet(INT_UART0, (USART_INT_PRIORITY << 5));

@@ -25,7 +25,7 @@ int32 SamplingBufferOversamplesIncrement (void) {
 	if (SamplingBufferIsFull() > 0) return -1;
 	int_cbuf_counter = 0;
 	int_samples_counter++;
-	_putchar('.');
+	xputchar('.');
 	return int_samples_counter;
 }
 

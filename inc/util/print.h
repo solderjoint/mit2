@@ -27,18 +27,18 @@ enum _printEnum {
 //#define PRINT_OUTPUT_STREAM(FUN) _out_stream = (void(*)(uint8))(FUN)
 //extern void (*_out_stream) (uint8);
 
-void _putchar (uint8 c);
-int32 _print (const uint8 buf[]);
-int32 _puts (const uint8 buf[]);
+void xputchar (uint8 c);
+//int32 xputs (const uint8 buf[]);
+int32 xputs (const uint8 buf[]);
 
-void _fputchar (void (*stream) (uint8), uint8 c);
-int32 _fputs (void (*stream) (uint8), const uint8 buf[]);
+void xfputchar (void (*stream) (uint8), uint8 c);
+int32 xfputs (void (*stream) (uint8), const uint8 buf[]);
 
 
-void _printf (const char* fmt, ...);
-void _println (const char* fmt, ...);
+void xprintf (const char* fmt, ...);
+void xprintln (const char* fmt, ...);
 
-void _fprintf (void (*func) (uint8), const char* fmt, ...);
+void xfprintf (void (*func) (uint8), const char* fmt, ...);
 //void _sprintf (uint8 *buff, const char* fmt, ...);
 
 /* **************************************************** *

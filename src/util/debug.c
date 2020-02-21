@@ -94,7 +94,7 @@
 //	if (buf == NULL) return -1;
 
 //	snprintf(buf, 96, fmt, __VA_ARGS__);
-//	const int32 count = UsartWriteStrLen(_DEBUG_UART_PORT, buf, 96);
+//	const int32 count = UartWriteStrLen(_DEBUG_UART_PORT, buf, 96);
 
 //	free (buf);
 //	return count;
@@ -115,7 +115,7 @@
 
 ////#define _println(STR,...) \
 ////		snprintf(gPrintBuf, 112, (STR), __VA_ARGS__); \
-////			UsartWriteStrLen(CONSOLE, gPrintBuf, 112); \
-////			UsartWriteChar (CONSOLE, '\n')
+////			UartWriteStrLen(CONSOLE, gPrintBuf, 112); \
+////			UartWriteChar (CONSOLE, '\n')
 
 

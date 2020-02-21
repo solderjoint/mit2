@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Header for various frequency domain const manipulation
  */
 
@@ -29,6 +29,9 @@ float FourierFreqStepGet (void);
 
 //float FourierSampleMultGet (void);
 //void FourierSampleMultSet (const float x);
+
+int32 FourierFreqRefGet (void);
+void FourierFreqRefSet (const int32 x);
 
 int32 FourierFreqRangeMinGet (void);
 void FourierFreqRangeMinSet (const int32 x);

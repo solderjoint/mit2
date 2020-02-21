@@ -94,7 +94,7 @@ int32 DomainFindMaxAreaValues
 		if (area > check_max) {
 			const int32 freq = i * FourierFreqResolutionGet();
 			const int32 rpwr = ((int32) cabsf(buf[i]));
-			_printf(" [%d:%d:%d] ", freq, cast(int32, area), rpwr);
+			xprintf(" [%d:%d:%d] ", freq, cast(int32, area), rpwr);
 			FoundDomainSet(freq);
 			count++;
 		}

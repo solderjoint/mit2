@@ -35,8 +35,8 @@ static void periph_system (void) {
 }
 
 static void periph_comm (void) {
-	UsartConsoleInit(PeripheralUsartRateGet());
-	_println("console> ready");
+	UartConsoleInit(PeripheralUartRateGet());
+	xprintln("console> ready");
 
 	SpiExternalAdcInit(PeripheralSpiRateGet());
 	SpiExternalAdcGetNonBlocking();
@@ -68,6 +68,30 @@ static void periph_other (void) {
 /* **************************************************** *
  *        CONFIGURABLE VARIABLES INITIALIZATION
  * **************************************************** */
+/*
+#include "util/util.h"
+
+#include <stddef.h>
+static int32 data[128];
+
+void test (void) {
+	// writing int32 takes only 66..166 microseconds!
+	const size_t size = sizeof(data) / sizeof(data[0]);
+	const int32 key = 0xAA55BEEF;
+
+	for (size_t i = 0; i < size; i++) data[i] = key;
+	RomDataWrite (0, data, sizeof(data));
+	for (size_t i = 0; i < size; i++) data[i] = 0x00;
+	RomDataRead (0, data, sizeof(data));
+	for (size_t i = 0; i < size; i++) {
+		if (data[i] != key) {
+			xprintln ("asserted @%i", i);
+			break;
+		}
+	}
+}
+*/
+
 int32 ConfigVariablesInit (void) {
 	PeriodLineVoltCheckInit();
 	PeriodLineVoltUpdateInit();

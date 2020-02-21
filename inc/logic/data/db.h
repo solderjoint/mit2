@@ -19,7 +19,7 @@ enum databaseEnum {
 	DATABASE_WRITE_ERROR = -4,
 	DATABASE_READ_ERROR = -2,
 	DATABASE_HASHTYPE_CRC32 = 0,
-	DATABASE_SIZE = 128,
+	DATABASE_SIZE = 256,
 };
 
 /* **************************************************** *

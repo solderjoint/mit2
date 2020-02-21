@@ -1,4 +1,4 @@
-# Line Control System project
+﻿# Line Control System project
 Calculation module firmware project (designed to use with TM4C1231H6 mcu and MIT2 module).<br>
 [rev 1C since august 2019]
 
@@ -15,7 +15,8 @@ The goal of this project is to complete following routines:
 * create a list of variables ready for a modbus table
 * perform startup diagnostics to check hardware errors
 * implement a bootloader with firmware update ability
- 
+* implement fourier frequency reference point wrapper
+* move found domain wrapper to separate vars/
 
 ## src/comm
 Communication protocol handlers.
@@ -48,7 +49,7 @@ Main program logic.
 * math/fft1024 is a Fourier procedure that accepts voltage/time buffer of 1024 complex float32 values (each complex value has real and imaginary part) and outputs the resulting power/frequency array of 1024 complex float32 values; this part alone takes 16Kbytes of memory
 * math/linecheck is a wrapper that is used to check current line status, relay state and voltage
 * math/sampling is a wrapper for Fourier transform that controls the correct timing of voltage sampling and it also controls oversampling
- 
+
 ## src/periph
 Drivers used to initialize and handle work of various peripherals.
 

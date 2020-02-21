@@ -35,7 +35,7 @@ static uint32 TimeStampGet (void) {
  *              FOURIER WRAPPER FUNCTIONS
  * **************************************************** */
 int32 CrashFourierCapture (void) {
-	_puts("info>capturing");
+	xputs("info>capturing");
 
 	TimeStampSet();
 	SamplingInit(fftInputBuf);
@@ -43,14 +43,14 @@ int32 CrashFourierCapture (void) {
 }
 
 int32 CrashFourierProcess (void) {
-	_println(" in %i ms", TimeStampGet());
-	_puts("info>processing");
+	xprintln(" in %i ms", TimeStampGet());
+	xputs("info>processing");
 
 	TimeStampSet();
 	SamplingFinish();
 	FourierProcess(fftInputBuf, FOURIER_POINTS);
 	DomainProcess(fftInputBuf);
-	_println(" in %i ms", TimeStampGet());
+	xprintln(" in %i ms", TimeStampGet());
 	return 0;
 }
 
@@ -69,10 +69,10 @@ int32 CrashFourierPerform (int32 state) {
 	else if (state == STATUS_PROCESSING) {
 		if (CrashFourierProcess() == 0) {
 			if (DomainResultIsNotEmpty()) {
-				_puts("err>buzzer found\n");
+				xputs("err>buzzer found\n");
 				return LineStatusSet(STATUS_BUZZERFOUND);
 			} else {
-				_puts("err>line breach\n");
+				xputs("err>line breach\n");
 				return LineStatusSet(STATUS_OVERFLOW);
 			}
 		}
@@ -84,15 +84,15 @@ int32 CrashFourierPerform (int32 state) {
  * **************************************************** */
 int32 CrashCheckLineState (void) {
 	if (CheckEndpointSignalLoss()) {
-		_puts("err>signal lost\n");
+		xputs("err>signal lost\n");
 		return LineStatusSet(STATUS_SIGNALLOST);
 	}
 	if (CheckLineVoltageSpike()) {
-		_puts("err>voltage spike\n");
+		xputs("err>voltage spike\n");
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
 	else if (CheckLineVoltageOverflow() < 0) {
-		_puts("err>line short\n");
+		xputs("err>line short\n");
 		return LineStatusSet(STATUS_UNDERFLOW);
 	}
 }

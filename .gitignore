@@ -12,6 +12,7 @@
 # unnecessary folders
 /build
 /build/**
+/example/TM4C123*
 /obj
 /obj/**
 /_old

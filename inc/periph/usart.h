@@ -20,15 +20,15 @@ enum _usartEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-void UsartConsoleInit (const uint32 rate);
+void UartConsoleInit (const uint32 rate);
 
-int32 UsartConsoleSendNonBlocking (uint8 buf[], const uint32 len);
-int32 UsartConsoleSendCharNonBlocking (uint8 tx);
+int32 UartConsoleSendNonBlocking (uint8 buf[], const uint32 len);
+int32 UartConsoleSendCharNonBlocking (uint8 tx);
 
-void UsartConsolePutchar (uint8 symbol);
-uint32 UsartConsoleSendBlocking (uint8 buf[], const uint32 len);
+void UartConsolePutchar (uint8 symbol);
+uint32 UartConsoleSendBlocking (uint8 buf[], const uint32 len);
 
-uint32 UsartConsoleScan (uint8 buf[], const uint32 len);
+uint32 UartConsoleScan (uint8 buf[], const uint32 len);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

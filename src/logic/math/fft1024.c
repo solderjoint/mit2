@@ -43,7 +43,7 @@ static void FourierTransform
 (cf32_t input[], cf32_t temp[], const int n, const int step) {
 	const float FFT_PI = 3.1415926535897932384626f;
 	if (step < n) {
-//		UsartConsolePutchar('.');
+//		UartConsolePutchar('.');
 		FourierTransform(temp, input, n, step * 2);
 		FourierTransform(temp + step, input + step, n, step * 2);
 		for (int i = 0; i < n; i += 2 * step) {

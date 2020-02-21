@@ -16,80 +16,75 @@
 /* **************************************************** *
  *             PRINTOUT FUNCTION PROTOTYPES
  * **************************************************** */
-void _putchar (uint8 c);
-int32 _puts (const uint8 buf[]);
+void xputchar (uint8 c);
+int32 xputs (const uint8 buf[]);
 
-void _fputchar (void (*stream) (uint8), uint8 c);
-int32 _fputs (void (*stream) (uint8), const uint8 buf[]);
+void xfputchar (void (*stream) (uint8), uint8 c);
+int32 xfputs (void (*stream) (uint8), const uint8 buf[]);
 
 static void _vprintf (void (*stream) (uint8), const char* fmt, va_list arp);
 
 /* **************************************************** *
  *                SIMPLE OUTPUT WRAPPERS
  * **************************************************** */
-inline void _putchar (uint8 c) {
+inline void xputchar (uint8 c) {
 #ifdef PRINT_NEWLINE_WIN
-	if (c == '\n') _putchar('\r');
+	if (c == '\n') xputchar('\r');
 #endif
 
 #ifdef PRINT_NONBLOCKING
-	UsartConsoleSendCharNonBlocking (c);
+	UartConsoleSendCharNonBlocking (c);
 #else
-	UsartConsolePutchar(c);
+	UartConsolePutchar(c);
 #endif
 }
 
-int32 _print (const uint8 buf[]) {
+int32 xputs (const uint8 buf[]) {
 	int32 i;
-	for (i = 0; (i < PRINT_BUFLEN_MAX) && (buf[i]); i++)
-		_putchar(buf[i]);
-	return i;
-}
+	for (i = 0; (i < PRINT_BUFLEN_MAX) && (buf[i]); i++) xputchar(buf[i]);
+	xputchar('\n');
 
-int32 _puts (const uint8 buf[]) {
-	const int32 res = _print(buf);
-	_putchar('\n');
-	return res + 1;
+	return i + 1;
 }
 
 /* **************************************************** *
  *          SELECTABLE STREAM OUTPUT WRAPPERS
  * **************************************************** */
-inline void _fputchar (void (*stream) (uint8), uint8 c) {
+inline void xfputchar (void (*stream) (uint8), uint8 c) {
 	if (*stream == NULL) return;
 #ifdef PRINT_NEWLINE_WIN
-	if (c == '\n') _fputchar(*stream, '\r');
+	if (c == '\n') xfputchar(*stream, '\r');
 #endif
 	stream(c);
 }
 
-int32 _fputs (void (*stream) (uint8), const uint8 buf[]) {
+int32 xfputs (void (*stream) (uint8), const uint8 buf[]) {
 	if (*stream == NULL) return -1;
 	int32 i;
 	for (i = 0; (i < PRINT_BUFLEN_MAX) && (buf[i]); i++)
-		_fputchar(*stream, buf[i]);
+		xfputchar(*stream, buf[i]);
 	return i;
 }
 
 /* **************************************************** *
  *           INTERNAL FORMATTED STRING OUTPUT
  * **************************************************** */
-void _printf (const char* fmt, ...) {
+void xprintf (const char* fmt, ...) {
 	va_list arp;
 	va_start(arp, fmt);
-	_vprintf(UsartConsolePutchar, fmt, arp); // main function call
+	_vprintf(UartConsolePutchar, fmt, arp); // main function call
 	va_end(arp);
 }
 /* **************************************************** */
-void _println (const char* fmt, ...) {
+void xprintln (const char* fmt, ...) {
 	va_list arp;
 	va_start(arp, fmt);
-	_vprintf(UsartConsolePutchar, fmt, arp); // main function call
+	_vprintf(UartConsolePutchar, fmt, arp); // main function call
 	va_end(arp);
-	_putchar('\n');
+	xputchar('\n');
 }
 /* **************************************************** */
-void _fprintf (void (*func) (uint8), const char* fmt, ...) {
+void xfprintf (void (*func) (uint8), const char* fmt, ...) {
 	if (*func == NULL) return;
 
 	va_list arp;
@@ -104,7 +99,7 @@ void _fprintf (void (*func) (uint8), const char* fmt, ...) {
 
 //	va_list arp;
 //	va_start(arp, fmt);
-//	_vprintf(UsartConsolePutchar(uint8), fmt, arp);
+//	_vprintf(UartConsolePutchar(uint8), fmt, arp);
 //	va_end(arp);
 
 //	*outptr = '0';      // terminate with null character
@@ -132,7 +127,7 @@ static void _vprintf (void (*stream) (uint8), const char* fmt, va_list arp) {
 		c = *fmt++;
 		if (!c) break;
 		if (c != '%') {
-			_fputchar(*stream, c);
+			xfputchar(*stream, c);
 			continue;
 		}
 
@@ -168,14 +163,14 @@ static void _vprintf (void (*stream) (uint8), const char* fmt, va_list arp) {
 			p = va_arg(arp, uint8*);
 			for (j = 0; p[j]; j++) ;
 			while (!(flag & 2) && j++ < width)
-				_fputchar(*stream, ' ');
-			_fputs(*stream, p);
+				xfputchar(*stream, ' ');
+			xfputs(*stream, p);
 			while (j++ < width)
-				_fputchar(*stream, ' ');
+				xfputchar(*stream, ' ');
 			continue;
 
 		case 'C' :  // symbol
-			_fputchar(*stream, (uint8)va_arg(arp, int));
+			xfputchar(*stream, (uint8)va_arg(arp, int));
 			continue;
 
 		case 'I' :  // simple integer variable
@@ -197,7 +192,7 @@ static void _vprintf (void (*stream) (uint8), const char* fmt, va_list arp) {
 			break;
 
 		default :   // unknown
-			_fputchar(*stream, c);
+			xfputchar(*stream, c);
 			continue;
 		}
 
@@ -224,14 +219,14 @@ static void _vprintf (void (*stream) (uint8), const char* fmt, va_list arp) {
 		j = i;
 		type = (flag & 1) ? '0' : ' ';
 		while (!(flag & 2) && j++ < width)
-			_fputchar(*stream, type);
+			xfputchar(*stream, type);
 
 		do {
-			_fputchar(*stream, _vprint_str[--i]);
+			xfputchar(*stream, _vprint_str[--i]);
 		} while(i);
 
 		while (j++ < width)
-			_fputchar(*stream, ' ');
+			xfputchar(*stream, ' ');
 	}
 }
 

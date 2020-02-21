@@ -49,16 +49,16 @@ int32 PeripheralSpiRateSet (const uint32 val) {
 /* **************************************************** *
  *               USART PERIPHERAL WRAPPER
  * **************************************************** */
-int32 PeripheralUsartRateGet (void) {
-	*var_name = stringify(PeripheralUsartRate);
+int32 PeripheralUartRateGet (void) {
+	*var_name = stringify(PeripheralUartRate);
 	const uint32 hash = DatabaseHashGet(var_name);
 	const uint32 val = DatabaseValueGet(hash);
 	return (val > mil(2))? USART_RATE : val;
 }
 
-int32 PeripheralUsartRateSet (const uint32 val) {
+int32 PeripheralUartRateSet (const uint32 val) {
 	const uint32 rate = (val > mil(2))? USART_RATE : val;
-	const char buf[] = stringify(PeripheralUsartRate);
+	const char buf[] = stringify(PeripheralUartRate);
 	const uint32 hash = DatabaseHashGet(buf);
 	return DatabaseValueSet(hash, rate);
 }

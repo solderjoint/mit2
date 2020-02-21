@@ -20,8 +20,8 @@ int32 PeripheralCanRateSet (const uint32 val);
 int32 PeripheralSpiRateGet (void);
 int32 PeripheralSpiRateSet (const uint32 val);
 
-int32 PeripheralUsartRateGet (void);
-int32 PeripheralUsartRateSet (const uint32 val);
+int32 PeripheralUartRateGet (void);
+int32 PeripheralUartRateSet (const uint32 val);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

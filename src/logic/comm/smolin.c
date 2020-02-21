@@ -32,7 +32,7 @@
  *                SMOLIN DATA PROCESSING
  * **************************************************** */
 static void SmolinDataProcess (uint8 msg[8]) {
-	_println("%u\t", HeaderReceiverGet());
+	xprintln("%u\t", HeaderReceiverGet());
 }
 
 /* **************************************************** *

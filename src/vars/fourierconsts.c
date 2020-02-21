@@ -1,4 +1,4 @@
-
+﻿
 #include "vars/fourierconsts.h"
 #include "project.h"
 
@@ -37,6 +37,13 @@ float FourierFreqResolutionGet (void) {
 //void FourierSampleMultSet (const float x) {
 //	if ((x > 0.f) && (x < 1.0f)) fourierSampleMult = x;
 //}
+
+static int32 fourierFreqRef;
+int32 FourierFreqRefGet (void) { return fourierFreqRef; }
+void FourierFreqRefSet (const int32 x) {
+	const int32 max = FourierSamplingRateGet() / 2;
+	if ((x > 1000) && (x < max)) fourierFreqRef = x;
+}
 
 static int32 fourierFreqRangeMin;
 int32 FourierFreqRangeMinGet (void) { return fourierFreqRangeMin; }
