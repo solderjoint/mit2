@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Header for freq searchable domain manipulations
  */
 
@@ -10,14 +10,17 @@
 /* **************************************************** *
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
-#define BUZZER_BUFLEN    (32)
-#define BUZZER_FREQ_MAX  (1 << 15)
-#define BUZZER_FREQ_MIN  (1 << 10)
-#define BUZZER_NUM_MAX   (1 << 10)
+enum buzzerDomainEnum {
+	BUZZER_BUFLEN   = 64,
+	BUZZER_FREQ_MAX = 10000,
+	BUZZER_FREQ_MIN = 1000,
+	BUZZER_NUM_MAX  = 32,
+};
 
 /* **************************************************** *
- *             SECURE LINE STATUS VARIABLE
+ *                 FUNCTION PROTOTYPES
  * **************************************************** */
+void BuzzerDomainInit (void);
 void BuzzerDomainReset (void);
 int32 BuzzerDomainSet (const uint16 num, const uint32 freq);
 

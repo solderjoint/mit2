@@ -1,51 +1,13 @@
-
+﻿
 #include "logic/math/domain.h"
 
 #include <math.h>
 #include <stddef.h>
 
 #include "vars/buzzerdomain.h"
+#include "vars/founddomain.h"
 #include "vars/fourierconsts.h"
 #include "util/print.h"
-
-/* **************************************************** *
- *               FOUND FREQUENCIES BUFFER
- * **************************************************** */
-struct domain_t {
-	uint32 next;
-	int32 freq[FREQ_DOM_BUFLEN];
-} ;
-static struct domain_t foundDomain;
-
-void FoundDomainReset (void) {
-	for (uint32 i = 0; i < FREQ_DOM_BUFLEN; i++)
-		foundDomain.freq[i] = 0;
-	foundDomain.next = 0;
-}
-
-void FoundDomainSet (const uint32 freq) {
-	const uint32 next = foundDomain.next;
-	const uint32 ptr = (next < FREQ_DOM_BUFLEN)? next : 0;
-	foundDomain.freq[ptr] = freq;
-	foundDomain.next++;
-}
-
-int32 FoundDomainGetByCounter (const uint32 counter) {
-	if (counter >= FREQ_DOM_BUFLEN) return -1;
-	return foundDomain.freq[counter];
-}
-
-void FoundDomainClear (const uint32 ptr) {
-	if (ptr >= FREQ_DOM_BUFLEN) return -1;
-	foundDomain.freq[ptr] = 0;
-}
-
-int32 DomainResultIsNotEmpty (void) {
-	for (int i = 0; i < FREQ_DOM_BUFLEN; i++) {
-		if (foundDomain.freq[i] > 0) return 1;
-	}
-	return 0;
-}
 
 /* **************************************************** *
  *           GET SQUARE AREA UNDER THE GRAPH
@@ -74,8 +36,8 @@ int32 DomainFindMaxAreaValues
 	if (end > 4096) return -2;
 	if (end < start) return -10;
 
-	const float pwr_min = FREQ_PWR_MIN;
-	const float pwr_mult = FREQ_PWR_MINCOEF;
+	const float pwr_min = FourierPowerMinGet();
+	const float pwr_mult = FourierPowerMultMinGet();
 	const int32 step = BuzzerDomainGetFreqStep() / FourierFreqResolutionGet();
 
 	float max = 0.0f, sum = 0.0f;
@@ -98,7 +60,7 @@ int32 DomainFindMaxAreaValues
 			FoundDomainSet(freq);
 			count++;
 		}
-		if (count >= FREQ_DOM_BUFLEN) continue;
+		if (count >= FoundDomainGetLengthMax()) continue;
 	}
 	return count;
 }
@@ -108,7 +70,7 @@ int32 DomainFindMaxAreaValues
  * **************************************************** */
 int32 DomainUpdateFoundMaxValues (void) {
 	// update domain buffer with newfound values
-	const uint32 size = FREQ_DOM_BUFLEN;
+	const uint32 size = FoundDomainGetLengthMax();
 	for (int32 i = 0; i < size; i++) {
 		const int32 found = FoundDomainGetByCounter(i);
 		const int32 num = BuzzerDomainGetNumByFreq(found);
@@ -121,26 +83,26 @@ int32 DomainUpdateFoundMaxValues (void) {
 /* **************************************************** *
  *        RESET BUZZER DOMAIN VALUES TO DEFAULT
  * **************************************************** */
-void DomainVarsReset (void) {
-#define BUZZER_FREQ_X1   (4150)
-#define BUZZER_FREQ_X2   (4900)
-#define BUZZER_FREQ_X3   (5100)
-#define BUZZER_FREQ_X4   (5850)
-#define BUZZER_FREQ_STEP (50)
+//void DomainVarsReset (void) {
+//#define BUZZER_FREQ_X1   (4150)
+//#define BUZZER_FREQ_X2   (4900)
+//#define BUZZER_FREQ_X3   (5100)
+//#define BUZZER_FREQ_X4   (5850)
+//#define BUZZER_FREQ_STEP (50)
 
-	BuzzerDomainReset(); // start counting from zero
+//	BuzzerDomainReset(); // start counting from zero
 
-	const int32 x2 = 1 + (BUZZER_FREQ_X2 - BUZZER_FREQ_X1) / BUZZER_FREQ_STEP;
-	for (int32 i = 0; i < x2; i++) {
-		const int32 val = BUZZER_FREQ_X1 + i * BUZZER_FREQ_STEP;
-		BuzzerDomainSet(i + 1, val);
-	}
-	const int32 x4 = 1 + (BUZZER_FREQ_X4 - BUZZER_FREQ_X3) / BUZZER_FREQ_STEP;
-	for (int32 i = 0; i < x4; i++) {
-		const int32 val = BUZZER_FREQ_X3 + i * BUZZER_FREQ_STEP;
-		BuzzerDomainSet(i + 1 + x2, val);
-	}
-}
+//	const int32 x2 = 1 + (BUZZER_FREQ_X2 - BUZZER_FREQ_X1) / BUZZER_FREQ_STEP;
+//	for (int32 i = 0; i < x2; i++) {
+//		const int32 val = BUZZER_FREQ_X1 + i * BUZZER_FREQ_STEP;
+//		BuzzerDomainSet(i + 1, val);
+//	}
+//	const int32 x4 = 1 + (BUZZER_FREQ_X4 - BUZZER_FREQ_X3) / BUZZER_FREQ_STEP;
+//	for (int32 i = 0; i < x4; i++) {
+//		const int32 val = BUZZER_FREQ_X3 + i * BUZZER_FREQ_STEP;
+//		BuzzerDomainSet(i + 1 + x2, val);
+//	}
+//}
 
 /* **************************************************** *
  *     UPDATE FOUND MAXIMUM AREA VALUES IN SEQUENCE

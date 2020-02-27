@@ -1,14 +1,15 @@
 ﻿
 #include "vars/fourierconsts.h"
+
 #include "project.h"
 
 /* **************************************************** *
  *             DEFAULT FREQUENCY VARIABLES
  * **************************************************** */
-static int32 fourierOversamples;
-int32 FourierOversamplesGet (void) { return fourierOversamples; }
-void FourierOversamplesSet (const int32 x) {
-	if ((x > 0) && (x <= 128)) fourierOversamples = x;
+static int32 fourierSamplingPasses;
+int32 FourierSamplingPassesGet (void) { return fourierSamplingPasses; }
+void FourierSamplingPassesSet (const int32 x) {
+	if ((x > 0) && (x <= 128)) fourierSamplingPasses = x;
 }
 
 static int32 fourierSamplingBufLen;
@@ -30,6 +31,23 @@ float FourierFreqResolutionGet (void) {
 }
 
 /* **************************************************** *
+ *            CONVERSION POWER COEFFICIENTS
+ * **************************************************** */
+static float fourierPowerMultMin;
+float FourierPowerMultMinGet (void) { return fourierPowerMultMin; }
+void FourierPowerMultMinSet (const float x) {
+	const float fx = (x > 0.1f)? ((x < 100.f)? x : 100.f) : 0.1f;
+	fourierPowerMultMin = fx;
+}
+
+static float fourierPowerMin;
+float FourierPowerMinGet (void) { return fourierPowerMin; }
+void FourierPowerMinSet (const float x) {
+	const float fx = (x > 100.f)? ((x < 10000.f)? x : 10000.f) : 100.f;
+	fourierPowerMin = fx;
+}
+
+/* **************************************************** *
  *               LINE DEPENDANT VARIABLES
  * **************************************************** */
 //static float fourierSampleMult;
@@ -39,8 +57,8 @@ float FourierFreqResolutionGet (void) {
 //}
 
 static int32 fourierFreqRef;
-int32 FourierFreqRefGet (void) { return fourierFreqRef; }
-void FourierFreqRefSet (const int32 x) {
+int32 FourierFreqReferenceGet (void) { return fourierFreqRef; }
+void FourierFreqReferenceSet (const int32 x) {
 	const int32 max = FourierSamplingRateGet() / 2;
 	if ((x > 1000) && (x < max)) fourierFreqRef = x;
 }
@@ -59,3 +77,18 @@ void FourierFreqRangeMaxSet (const int32 x) {
 	if ((x > 1000) && (x < max)) fourierFreqRangeMax = x;
 }
 
+/* **************************************************** *
+ *               LINE DEPENDANT VARIABLES
+ * **************************************************** */
+void FourierConstantsInit (void) {
+	fourierSamplingPasses = FOURIER_SAMPLE_PASSES;
+	fourierSamplingBufLen = FOURIER_SAMPLE_BUFLEN;
+	fourierSamplingRate = FOURIER_SAMPLE_RATE;
+
+	fourierPowerMultMin = ((float) FOURIER_POWER_MULTMIN) / 100.f;
+	fourierPowerMin = (float) FOURIER_POWER_MIN;
+
+	fourierFreqRangeMin = FOURIER_FREQ_RANGEMIN;
+	fourierFreqRangeMax = FOURIER_FREQ_RANGEMAX;
+	fourierFreqRef = FOURIER_FREQ_REFPOWER;
+}

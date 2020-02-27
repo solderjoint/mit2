@@ -1,4 +1,4 @@
-
+﻿
 #include "logic/config.h"
 
 #include "logic/crash.h"
@@ -35,13 +35,13 @@ static void periph_system (void) {
 }
 
 static void periph_comm (void) {
-	UartConsoleInit(PeripheralUartRateGet());
+	UartConsoleInit(PeriphUartRateGet());
 	xprintln("console> ready");
 
-	SpiExternalAdcInit(PeripheralSpiRateGet());
+	SpiExternalAdcInit(PeriphSpiRateGet());
 	SpiExternalAdcGetNonBlocking();
 
-	CanTransmissionInit(PeripheralCanRateGet());
+	CanTransmissionInit(PeriphCanRateGet());
 	CanTransmissionAttachInterruptOnReceive(SmolinProtocolProcessIncoming);
 //	CanTransmissionAttachInterruptOnSend(SmolinProtocolProcessOutgoing);
 }
@@ -68,39 +68,35 @@ static void periph_other (void) {
 /* **************************************************** *
  *        CONFIGURABLE VARIABLES INITIALIZATION
  * **************************************************** */
-/*
-#include "util/util.h"
-
-#include <stddef.h>
-static int32 data[128];
-
-void test (void) {
-	// writing int32 takes only 66..166 microseconds!
-	const size_t size = sizeof(data) / sizeof(data[0]);
-	const int32 key = 0xAA55BEEF;
-
-	for (size_t i = 0; i < size; i++) data[i] = key;
-	RomDataWrite (0, data, sizeof(data));
-	for (size_t i = 0; i < size; i++) data[i] = 0x00;
-	RomDataRead (0, data, sizeof(data));
-	for (size_t i = 0; i < size; i++) {
-		if (data[i] != key) {
-			xprintln ("asserted @%i", i);
-			break;
-		}
-	}
+static void vars_init (void) {
+	CanMessageInit();
+	FoundDomainReset();
+	FourierConstantsInit();
+	PeriodConstantsInit();
+	PeriphConstantsInit();
+	VoltageConstantsInit();
 }
-*/
+
+static void vars_logic (void) {
+	CrashUpdateNormalVoltage();
+	_delay_ms(100);  // 1 second of sleep to stabilize
+	BuzzerDomainInit();
+	LineStatusSet(STATUS_OK);
+	RelayStatusSet(RELAY_ON);
+	MutexInit();
+}
+
+static void vars_restore (void) {
+	// restore values from eeprom
+	xprintln("vac\t%i\t%i", (int) VoltageACMaxGet(), (int) VoltageACAdcCountsGet() );
+	xprintln("vdc\t%i\t%i", (int) VoltageDCMaxGet(), (int) VoltageDCAdcCountsGet() );
+	xprintln("mult\t%i\t%i", (int) VoltageDCMultGet(), (int) VoltageACMultGet());
+}
 
 int32 ConfigVariablesInit (void) {
-	PeriodLineVoltCheckInit();
-	PeriodLineVoltUpdateInit();
-	PeriodCommCheckInit();
-	MutexInit();
-
-	CanMessageInit();
-
-	CrashVarsInit();
+	vars_init();
+	vars_logic();
+	vars_restore();
 }
 
 /* **************************************************** *

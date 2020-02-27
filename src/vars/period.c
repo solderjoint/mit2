@@ -1,16 +1,8 @@
-
+﻿
 #include "vars/period.h"
 
-#include <string.h>
-
-#include "logic/data/db.h"
 #include "util/util.h"
 #include "project.h"
-
-/* **************************************************** *
- *              LOCAL VARIABLE NAME BUFFER
- * **************************************************** */
-static char var_name[64];
 
 /* **************************************************** *
  *              SEMAPHORE COUNTER WRAPPER
@@ -23,44 +15,34 @@ uint32 PeriodCounterGet (void) { return period_counter; }
 /* **************************************************** *
  *          TIMER SEMAPHORE FREQUENCY VARIABLE
  * **************************************************** */
+static int32 period_freq;
+
 int32 PeriodSemaphoreFreqGet (void) {
-	*var_name = stringify(VarSemaphoreFreq);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const int32 val = DatabaseValueGet(hash);
-	return ((val < 10) || (val > 1000))? PERIOD_TIMER_FREQ : val;
+	const int32 val = (period_freq > 10)? period_freq : PERIOD_TIMER_FREQ;
+	return (val > 1000)? PERIOD_TIMER_FREQ : val;
 }
 
 int32 PeriodSemaphoreFreqSet (const uint32 val) {
-	const uint32 rate = ((val < 10) || (val > 1000))? PERIOD_TIMER_FREQ : val;
-	const char buf[] = stringify(VarSemaphoreFreq);
-	const uint32 hash = DatabaseHashGet(buf);
-	const int32 res = DatabaseValueSet(hash, rate);
-	if (res == 0) period_counter = 0; // clear counter
-	return res;
+	const int32 rate = ((val < 10) || (val > 1000)) \
+			? PERIOD_TIMER_FREQ : val;
+	period_freq = rate;
+	period_counter = 0; // clear counter
+	return period_freq;
 }
 
 /* **************************************************** *
  *              LINE VOLTAGE CHECK PERIOD
  * **************************************************** */
-static int32 volt_check;
-
-void PeriodLineVoltCheckInit (void) {
-	*var_name = stringify(PeriodLineVoltCheck);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const int32 val = DatabaseValueGet(hash);
-	volt_check = (val > 100)? PERIOD_CHECK_LINE : val;
-}
+static int32 line_check;
 
 inline int32 PeriodLineVoltCheckGet (void) {
-	const int32 val = volt_check;
-	return ((val < 1) || (val > 100))? PERIOD_CHECK_LINE : val;
+	const int32 x = line_check;
+	return ((x < 1) || (x > 100))? PERIOD_CHECK_LINE : x;
 }
 
 int32 PeriodLineVoltCheckSet (const uint32 val) {
-	const uint32 rate = (val > 100)? PERIOD_CHECK_LINE : val;
-	const char buf[] = stringify(PeriodLineVoltCheck);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+	line_check = (val > 100)? PERIOD_CHECK_LINE : val;
+	return line_check;
 }
 
 /* **************************************************** *
@@ -68,25 +50,15 @@ int32 PeriodLineVoltCheckSet (const uint32 val) {
  * **************************************************** */
 static int32 volt_update;
 
-void PeriodLineVoltUpdateInit (void) {
-	*var_name = stringify(PeriodLineVoltUpdate);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const int32 val = DatabaseValueGet(hash);
-	volt_update = ((val < 1000) || (val > kil(100)))
-						 ? PERIOD_RENEW_VOLT : val;
-}
-
 inline int32 PeriodLineVoltUpdateGet (void) {
-	const int32 val = volt_update;
-	return ((val < 1) || (val > 100))? PERIOD_RENEW_VOLT : val;
+	const int32 x = volt_update;
+	return ((x < 100) || (x > mil(1)))? PERIOD_RENEW_VOLT : x;
 }
 
 int32 PeriodLineVoltUpdateSet (const uint32 val) {
-	const uint32 rate = ((val >= kil(1)) && (val <= kil(100)))
-						? PERIOD_RENEW_VOLT : val;
-	const char buf[] = stringify(PeriodLineVoltUpdate);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+	volt_update = ((val >= 100) && (val <= mil(1))) \
+				? PERIOD_RENEW_VOLT : val;
+	return volt_update;
 }
 
 /* **************************************************** *
@@ -94,24 +66,25 @@ int32 PeriodLineVoltUpdateSet (const uint32 val) {
  * **************************************************** */
 static int32 comm_check;
 
-void PeriodCommCheckInit (void) {
-	*var_name = stringify(PeriodCommCheck);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const int32 val = DatabaseValueGet(hash);
-	comm_check = ((val < 1000) || (val > kil(100)))
-						 ? PERIOD_CHECK_COMM : val;
-}
-
 inline int32 PeriodCommCheckGet (void) {
 	const int32 val = comm_check;
-	return ((val < 1) || (val > 100))? PERIOD_CHECK_COMM : val;
+	return ((val < 100) || (val > mil(1)))? PERIOD_CHECK_COMM : val;
 }
 
 int32 PeriodCommCheckSet (const uint32 val) {
-	const uint32 rate = ((val >= kil(1)) && (val <= kil(100)))
-						? PERIOD_RENEW_VOLT : val;
-	const char buf[] = stringify(PeriodCommCheck);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+	const uint32 rate = ((val >= 100) && (val <= mil(1)))
+						? PERIOD_CHECK_COMM : val;
+	comm_check = rate;
+	return comm_check;
 }
 
+/* **************************************************** *
+ *            EXTERNAL DEFAULT VALUE SETTER
+ * **************************************************** */
+char PeriodConstantsInit (void) {
+	period_counter = 0; // clear the counter
+	period_freq = PERIOD_TIMER_FREQ;
+	comm_check = PERIOD_CHECK_COMM;
+	line_check = PERIOD_CHECK_LINE;
+	volt_update = PERIOD_RENEW_VOLT;
+}

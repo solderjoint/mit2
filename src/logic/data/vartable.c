@@ -29,7 +29,7 @@
 int32 ConfigVarTableGet (const int32 address) {
 	int32 res;
 	switch (address & 0xFFFF) {
-
+		/* **************************************************** */
 
 		/* **************************************************** */
 		case VAR_LINE_STATUS: res = LineStatusGet(); break;
@@ -39,12 +39,12 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_UPTIME0: res = _time() & 0xFFFF; break;
 
 		case VAR_PERIPH_LEDSTATE: res = GpioLedsPortGet(); break;
-		case VAR_PERIPH_CANRATE1: res = PeripheralCanRateGet() >> 16; break;
-		case VAR_PERIPH_CANRATE0: res = PeripheralCanRateGet()&0xFFFF; break;
-		case VAR_PERIPH_SPIRATE1: res = PeripheralSpiRateGet() >> 16; break;
-		case VAR_PERIPH_SPIRATE0: res = PeripheralSpiRateGet()&0xFFFF; break;
-		case VAR_PERIPH_UARTRATE1: res = PeripheralUartRateGet() >> 16; break;
-		case VAR_PERIPH_UARTRATE0: res = PeripheralUartRateGet()&0xFFFF; break;
+		case VAR_PERIPH_CANRATE1: res = PeriphCanRateGet() >> 16; break;
+		case VAR_PERIPH_CANRATE0: res = PeriphCanRateGet()&0xFFFF; break;
+		case VAR_PERIPH_SPIRATE1: res = PeriphSpiRateGet() >> 16; break;
+		case VAR_PERIPH_SPIRATE0: res = PeriphSpiRateGet()&0xFFFF; break;
+		case VAR_PERIPH_UARTRATE1: res = PeriphUartRateGet() >> 16; break;
+		case VAR_PERIPH_UARTRATE0: res = PeriphUartRateGet()&0xFFFF; break;
 
 		case VAR_MUTEX_PERIOD: res = MutexCheckPending() & 0xFFFF; break;
 		case VAR_PERIOD_LINECHECK: res = PeriodLineVoltCheckGet(); break;
@@ -65,7 +65,7 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_VOLT_LINEBREACH: res = (int) kil(VoltageOverflowGet()); break;
 		case VAR_VOLT_LINESHORT: res = (int) kil(VoltageUnderflowGet()); break;
 
-		case VAR_FOURIER_OVERSAMPLES: res = FourierOversamplesGet(); break;
+		case VAR_FOURIER_OVERSAMPLES: res = FourierSamplingPassesGet(); break;
 		case VAR_FOURIER_SAMPLERATE: res = FourierSamplingRateGet(); break;
 		case VAR_FOURIER_VOLTMULT1:
 			res = ((int) bil(VoltageACMultGet())) >> 16; break;
@@ -73,10 +73,10 @@ int32 ConfigVarTableGet (const int32 address) {
 			res = ((int) bil(VoltageACMultGet())) & 0xFFFF; break;
 		case VAR_FOURIER_FREQMIN: res = FourierFreqRangeMinGet(); break;
 		case VAR_FOURIER_FREQMAX: res = FourierFreqRangeMaxGet(); break;
-		case VAR_FOURIER_FREQREF: res = FourierFreqRefGet(); break;
+		case VAR_FOURIER_FREQREF: res = FourierFreqReferenceGet(); break;
 
 
-		case VAR_SEARCHBUF_SIZE: /*res = FoundDomainSizeGet();*/ break;
+		case VAR_SEARCHBUF_SIZE: res = FoundDomainSizeGet(); break;
 
 		case VAR_SEARCHBUF_NUM01:
 		case VAR_SEARCHBUF_NUM02:

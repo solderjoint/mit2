@@ -1,4 +1,4 @@
-###############################
+﻿###############################
 ##      MAIN LOGIC UNIT      ##
 ###############################
 inc/logic/config.h
@@ -75,6 +75,8 @@ src/util/util.c
 ###############################
 inc/vars/buzzerdomain.h
 src/vars/buzzerdomain.c
+inc/vars/founddomain.h
+src/vars/founddomain.c
 inc/vars/fourierconsts.h
 src/vars/fourierconsts.c
 inc/vars/voltageconsts.h

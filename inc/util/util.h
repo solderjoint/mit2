@@ -46,9 +46,9 @@ uint32 _time_ms (void);
 uint32 _time_us (void);
 uint32 _time_raw (void);
 
-void _delay (uint32 length);
-void _delay_ms (uint32 length);
-void _delay_us (uint32 length);
+void _delay (int32 length);
+void _delay_ms (int32 length);
+void _delay_us (int32 length);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

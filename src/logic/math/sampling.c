@@ -17,7 +17,7 @@ static int32 int_cbuf_counter;
 static int32 int_samples_counter;
 
 int32 SamplingBufferIsFull (void) {
-	const int32 max_oversamples = FourierOversamplesGet();
+	const int32 max_oversamples = FourierSamplingPassesGet();
 	return (int_samples_counter >= max_oversamples)? 1 : 0;
 }
 
@@ -87,11 +87,11 @@ int32 SamplingNormalize (const uint32 start, const uint32 len) {
 void SamplingVarsReset (void) {
 	FourierBufferLengthSet(FOURIER_SAMPLE_BUFLEN);
 	FourierSamplingRateSet(FOURIER_SAMPLE_RATE);
-	FourierOversamplesSet(FOURIER_OVERSAMPLES);
+	FourierSamplingPassesSet(FOURIER_SAMPLE_PASSES);
 //	FourierSampleMultSet(FOURIER_SAMPLE_MULT);
 
-	FourierFreqRangeMinSet(FOURIER_FREQRANGE_MIN);
-	FourierFreqRangeMaxSet(FOURIER_FREQRANGE_MAX);
+	FourierFreqRangeMinSet(FOURIER_FREQ_RANGEMIN);
+	FourierFreqRangeMaxSet(FOURIER_FREQ_RANGEMAX);
 }
 
 /* **************************************************** *

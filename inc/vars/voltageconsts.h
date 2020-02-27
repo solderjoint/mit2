@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Header for various voltage const manipulation
  */
 
@@ -10,22 +10,23 @@
 /* **************************************************** *
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
-#define VOLT_DCMULT     (0.011724475f)  // convert 0..2048ADC to 0..24VDC
-#define VOLT_ACMULT     (0.002442599f)  // convert 0..2048ADC to 0..5VAC
-#define VOLT_SPIKE      (4.00f) // minimum voltage diff to crash
-#define VOLT_NORMAL     (4.00f) // normal conditions voltage
-#define VOLT_OVERFLOW   (22.5f) // overflow voltage value [V]
-#define VOLT_UNDERFLOW  (0.50f) // underflow voltage value [V]
 
 /* **************************************************** *
  *             CONSTS MANIPULATION WRAPPERS
  * **************************************************** */
+int32 VoltageACAdcCountsGet (void);
+void VoltageACAdcCountsSet (const int32 x);
+float VoltageACMaxGet (void);
+void VoltageACMaxSet (const float x);
 float VoltageACMultGet (void);
-void VoltageACMultSet (const float x);
 
+int32 VoltageDCAdcCountsGet (void);
+void VoltageDCAdcCountsSet (const int32 x);
+float VoltageDCMaxGet (void);
+void VoltageDCMaxSet (const float x);
 float VoltageDCMultGet (void);
-void VoltageDCMultSet (const float x);
 
+/* **************************************************** */
 float VoltageSpikeGet (void);
 void VoltageSpikeSet (const float x);
 
@@ -37,6 +38,8 @@ void VoltageOverflowSet (const float x);
 
 float VoltageNormalGet (void);
 void VoltageNormalSet (const float x);
+
+char VoltageConstantsInit (void);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

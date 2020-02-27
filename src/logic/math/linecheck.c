@@ -1,4 +1,4 @@
-
+﻿
 #include "logic/math/linecheck.h"
 
 #include "periph/gpio.h"
@@ -58,7 +58,7 @@ void LineVoltageBufferSet (float val) {
 
 void LineVoltageBufferRenew (void) {
 	const uint16 adcraw = SpiExternalAdcGetNonBlocking();
-	const float mult = VoltageDCMultGet() /*VOLT_DCMULT*/;
+	const float mult = VoltageDCMultGet();
 	const float res = cast(float, adcraw) * mult;
 	LineVoltageBufferSet(res);
 }
@@ -87,31 +87,24 @@ int32 CheckLineVoltageSpike (void) {
 	else return 0;
 }
 
+#include "util/print.h"
 int32 CheckLineVoltageOverflow (void) {
 	const float smax = VoltageOverflowGet();
 	const float smin = VoltageUnderflowGet();
 	const float mean = LineVoltageBufferMeanGet();
 
-	if (mean > smax) return 1;
-	else if (mean < smin) return -1;
+	if (mean > smax) {
+		xprintln("OVF\t%i", (int) mean);
+		return 1;
+	}
+	else if (mean < smin) {
+		xprintln("UDF\t%i", (int) mean);
+		return -1;
+	}
 	else return 0;
 }
-
 
 void CheckLineVoltageNormalUpdate (void) {
 	const float mean = LineVoltageBufferMeanGet();
 	VoltageNormalSet(mean);
-}
-
-/* **************************************************** *
- *            LOCAL VARIABLES INITIALIZATION
- * **************************************************** */
-void CheckLineVarsReset (void) {
-	VoltageACMultSet(VOLT_ACMULT);
-	VoltageDCMultSet(VOLT_DCMULT);
-
-	VoltageSpikeSet(VOLT_SPIKE);
-	VoltageUnderflowSet(VOLT_UNDERFLOW);
-	VoltageOverflowSet(VOLT_OVERFLOW);
-	VoltageNormalSet(VOLT_NORMAL);
 }

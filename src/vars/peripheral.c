@@ -1,64 +1,59 @@
-
+﻿
 #include "vars/peripheral.h"
 
-#include <string.h>
-
-#include "logic/data/db.h"
 #include "util/util.h"
 #include "project.h"
 
 /* **************************************************** *
- *              LOCAL VARIABLE NAME BUFFER
- * **************************************************** */
-static char var_name[64];
-
-/* **************************************************** *
  *                CAN PERIPHERAL WRAPPER
  * **************************************************** */
-int32 PeripheralCanRateGet (void) {
-	*var_name = stringify(PeripheralCanRate);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const int32 val = DatabaseValueGet(hash);
-	return ((val < kil(2)) || (val > mil(2)))? CAN_RATE : val;
+static int32 rate_can;
+
+int32 PeriphCanRateGet (void) {
+	const int32 x = rate_can;
+	return ((x < kil(1)) || (x > mil(1)))? PERIPH_CAN_RATE : x;
 }
 
-int32 PeripheralCanRateSet (const uint32 val) {
-	const uint32 rate = ((val < kil(2)) || (val > mil(2)))? CAN_RATE : val;
-	const char buf[] = stringify(PeripheralCanRate);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+int32 PeriphCanRateSet (const uint32 x) {
+	rate_can = ((x < kil(1)) || (x > mil(1)))? PERIPH_CAN_RATE : x;
+	return rate_can;
 }
 
 /* **************************************************** *
  *                SPI PERIPHERAL WRAPPER
  * **************************************************** */
-int32 PeripheralSpiRateGet (void) {
-	*var_name = stringify(PeripheralSpiRate);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const uint32 val = DatabaseValueGet(hash);
-	return (val > mil(1))? SPI_RATE : val;
+static int32 rate_spi;
+
+int32 PeriphSpiRateGet (void) {
+	const int32 x = rate_spi;
+	return ((x < kil(1)) || (x > mil(1)))? PERIPH_SPI_RATE : x;
 }
 
-int32 PeripheralSpiRateSet (const uint32 val) {
-	const uint32 rate = (val > mil(1))? SPI_RATE : val;
-	const char buf[] = stringify(PeripheralSpiRate);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+int32 PeriphSpiRateSet (const uint32 x) {
+	rate_spi = ((x < kil(1)) || (x > mil(1)))? PERIPH_SPI_RATE : x;
+	return rate_spi;
 }
 
 /* **************************************************** *
  *               USART PERIPHERAL WRAPPER
  * **************************************************** */
-int32 PeripheralUartRateGet (void) {
-	*var_name = stringify(PeripheralUartRate);
-	const uint32 hash = DatabaseHashGet(var_name);
-	const uint32 val = DatabaseValueGet(hash);
-	return (val > mil(2))? USART_RATE : val;
+static int32 rate_uart;
+
+int32 PeriphUartRateGet (void) {
+	const int32 x = rate_uart;
+	return ((x < kil(1)) || (x > mil(1)))? PERIPH_UART_RATE : x;
 }
 
-int32 PeripheralUartRateSet (const uint32 val) {
-	const uint32 rate = (val > mil(2))? USART_RATE : val;
-	const char buf[] = stringify(PeripheralUartRate);
-	const uint32 hash = DatabaseHashGet(buf);
-	return DatabaseValueSet(hash, rate);
+int32 PeriphUartRateSet (const uint32 x) {
+	rate_uart = ((x < kil(1)) || (x > mil(1)))? PERIPH_UART_RATE : x;
+	return rate_uart;
+}
+
+/* **************************************************** *
+ *            EXTERNAL DEFAULT VALUE SETTER
+ * **************************************************** */
+char PeriphConstantsInit (void) {
+	rate_can = PERIPH_CAN_RATE;
+	rate_spi = PERIPH_SPI_RATE;
+	rate_uart = PERIPH_UART_RATE;
 }

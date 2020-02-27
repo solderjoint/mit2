@@ -1,4 +1,4 @@
-
+﻿
 #include "util/util.h"
 
 //#include <stdlib.h>
@@ -25,19 +25,19 @@ uint32 _time_us (void) {
 /* **************************************************** *
  *                 SYSTEM TIMER DELAYS
  * **************************************************** */
-void _delay (uint32 length) {
+void _delay (int32 length) {
 	const uint32 start = _time();
 	uint32 current = _time();
 	while ((current - start) <= length) current = _time();
 }
 
-void _delay_ms (uint32 length) {
+void _delay_ms (int32 length) {
 	const uint32 start = _time_ms();
 	uint32 current = _time_ms();
 	while ((current - start) <= length) current = _time_ms();
 }
 
-void _delay_us (uint32 length) {
+void _delay_us (int32 length) {
 	const uint32 start = _time_us();
 	uint32 current = _time_us();
 	while ((current - start) <= length) current = _time_us();

@@ -1,4 +1,4 @@
-
+﻿
 #include "logic/crash.h"
 
 #include "vars/linestatus.h"
@@ -112,7 +112,6 @@ void CrashVarsInit (void) {
 	LineStatusSet(STATUS_OK);
 	DomainVarsReset();
 	SamplingVarsReset();
-	CheckLineVarsReset();
 }
 
 /* **************************************************** *
