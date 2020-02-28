@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Smolin protocol abstraction layer
  */
 
@@ -23,7 +23,6 @@ enum smolinHeaderEnum {
 	HEADER_ID_FROM  = 8,
 	HEADER_ID_DEST  = 16,
 	HEADER_MBUSDATA = 24,
-	HEADER_MBUS_FUN = 25,
 	HEADER_FULL_MSG = 0x1FFFFFFF,
 };
 

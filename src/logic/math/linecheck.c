@@ -39,7 +39,7 @@ void CheckLineEndpointSignalRenew (void) {
 static float lineVoltageBuffer[LINE_VOLTBUF_SIZE];
 
 float LineVoltageBufferPrevGet (void) { return lineVoltageBuffer[0]; }
-float LineVoltageBufferMeanGet (void) {
+float CheckLineVoltageMeanGet (void) {
 	// return a mean value of voltage buffer
 	float sum = 0.0f;
 	for (int32 i = 0; i < LINE_VOLTBUF_SIZE; i++)
@@ -82,7 +82,7 @@ int32 CheckLineVoltageSpike (void) {
 
 	const float diff = VoltageSpikeGet();
 	const float norm = VoltageNormalGet();
-	const float mean = LineVoltageBufferMeanGet();
+	const float mean = CheckLineVoltageMeanGet();
 	if (mean > (diff + norm)) return 1;
 	else return 0;
 }
@@ -90,7 +90,7 @@ int32 CheckLineVoltageSpike (void) {
 int32 CheckLineVoltageOverflow (void) {
 	const float smax = VoltageOverflowGet();
 	const float smin = VoltageUnderflowGet();
-	const float mean = LineVoltageBufferMeanGet();
+	const float mean = CheckLineVoltageMeanGet();
 
 	if (mean > smax) return 1;
 	else if (mean < smin) return -1;
@@ -98,6 +98,6 @@ int32 CheckLineVoltageOverflow (void) {
 }
 
 void CheckLineVoltageNormalUpdate (void) {
-	const float mean = LineVoltageBufferMeanGet();
+	const float mean = CheckLineVoltageMeanGet();
 	VoltageNormalSet(mean);
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Pseudo modicon bus abstraction layer
  *
  * Can header double bit indicates mbus-like transmission:
@@ -26,10 +26,10 @@ enum mbusGeneralEnum {
 	MBUS_DATA_SIZE_CELL = 2,
 	MBUS_DATA_SIZE_MAX  = 4,
 	MBUS_MEMORY_START   = 1,
-	MBUS_MEMORY_RO_COIL = 9999,  // read only bools right border
-	MBUS_MEMORY_RW_COIL = 19999, // read/write bools
-	MBUS_MEMORY_RO_REGS = 39999, // read only 16-bits regs
-	MBUS_MEMORY_RW_REGS = 49999, // read/write 16-bits regs
+//	MBUS_MEMORY_RO_COIL = 9999,  // read only bools right border
+//	MBUS_MEMORY_RW_COIL = 19999, // read/write bools
+	MBUS_MEMORY_RO_REGS = 30000, // read only 16-bits regs
+	MBUS_MEMORY_RW_REGS = 40000, // read/write 16-bits regs
 };
 
 enum mbusExceptionEnum {

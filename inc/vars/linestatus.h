@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Header for line status variable manipulation
  */
 
@@ -13,8 +13,8 @@
 enum lineStatusEnum {
 	STATUS_OK = 0,
 	STATUS_VOLTSPIKE = 1,
-	STATUS_SAMPLING,
-	STATUS_PROCESSING,
+	STATUS_SAMPLING = 2,
+	STATUS_PROCESSING = 4,
 	STATUS_SIGNALLOST = 8,
 	STATUS_UNDERFLOW = 16,
 	STATUS_OVERFLOW = 32,

@@ -14,13 +14,17 @@
  * **************************************************** */
 #include "periph/gpio.h"
 
-#include "logic/math/domain.h"
+//#include "logic/math/domain.h"
 
+#include "vars/buzzerdomain.h"
+#include "vars/canmessage.h"
+#include "vars/founddomain.h"
 #include "vars/fourierconsts.h"
 #include "vars/linestatus.h"
 #include "vars/mutex.h"
-#include "vars/peripheral.h"
 #include "vars/period.h"
+#include "vars/peripheral.h"
+#include "vars/relaystatus.h"
 #include "vars/voltageconsts.h"
 
 #include "util/util.h"
@@ -76,7 +80,7 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_FOURIER_FREQREF: res = FourierFreqReferenceGet(); break;
 
 
-		case VAR_SEARCHBUF_SIZE: res = FoundDomainSizeGet(); break;
+		case VAR_SEARCHBUF_SIZE: res = FoundDomainGetLength(); break;
 
 		case VAR_SEARCHBUF_NUM01:
 		case VAR_SEARCHBUF_NUM02:
@@ -110,8 +114,10 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_SEARCHBUF_NUM33:
 		case VAR_SEARCHBUF_NUM31:
 		case VAR_SEARCHBUF_NUM32:
-			res = FoundDomainGetByCounter( \
-						(address & 0xFFFF) - VAR_SEARCHBUF_NUM01); break;
+			res = BuzzerDomainGetNumByFreq( \
+					FoundDomainGetByCounter( \
+					(address & 0xFFFF) - VAR_SEARCHBUF_NUM01));
+			break;
 
 
 		default: res = MBUS_ERROR_ADDRESS; break;

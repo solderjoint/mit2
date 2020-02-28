@@ -5,56 +5,61 @@
 
 #include "vars/buzzerdomain.h"  // get limit specifiers
 
-#define FREQ_DOM_BUFLEN     (64)     // input and output buffer length
+enum internalEnum {
+	RAWBUF_LEN  =  128,     // input and output buffer length
+
+};
 
 /* **************************************************** *
- *               FOUND FREQUENCIES BUFFER
+ *             RAW FOUND FREQUENCIES BUFFER
  * **************************************************** */
 struct domain_t {
-	uint32 next;
-	int16 freq[FREQ_DOM_BUFLEN];
+	int32 next;
+	int16 freq[RAWBUF_LEN];
 } ;
-static struct domain_t foundDomain;
+static struct domain_t rawbuf;
 
 /* **************************************************** *
  *               FOUND FREQUENCIES BUFFER
  * **************************************************** */
 void FoundDomainReset (void) {
-	for (uint32 i = 0; i < FREQ_DOM_BUFLEN; i++) {
-		foundDomain.freq[i] = 0;
+	for (uint32 i = 0; i < RAWBUF_LEN; i++) {
+		rawbuf.freq[i] = 0;
 	}
-	foundDomain.next = 0;
+	rawbuf.next = 0;
 }
 
 void FoundDomainSet (const uint32 freq) {
-	const uint32 next = foundDomain.next;
-	const uint32 ptr = (next < FREQ_DOM_BUFLEN)? next : 0;
-	foundDomain.freq[ptr] = freq;
-	foundDomain.next++;
+	const uint32 next = rawbuf.next;
+	const uint32 ptr = (next < RAWBUF_LEN)? next : 0;
+	rawbuf.freq[ptr] = freq;
+	rawbuf.next++;
 }
 
 void FoundDomainClear (const uint32 ptr) {
-	if (ptr >= FREQ_DOM_BUFLEN) return -1;
-	foundDomain.freq[ptr] = 0;
+	if (ptr >= RAWBUF_LEN) return -1;
+	rawbuf.freq[ptr] = 0;
 }
 
 /* **************************************************** *
  *               FOUND FREQUENCIES BUFFER
  * **************************************************** */
 int32 FoundDomainGetByCounter (const uint32 counter) {
-	if (counter >= FREQ_DOM_BUFLEN) return -1;
-	return foundDomain.freq[counter];
+	if (counter >= RAWBUF_LEN) return -1;
+	return rawbuf.freq[counter];
 }
 
 char DomainResultIsNotEmpty (void) {
-	for (int i = 0; i < FREQ_DOM_BUFLEN; i++) {
-		if (foundDomain.freq[i] > 0) return 1;
+	for (int i = 0; i < RAWBUF_LEN; i++) {
+		if (rawbuf.freq[i] > 0) return 1;
 	}
 	return 0;
 }
 
-int32 FoundDomainGetLengthMax (void) {
-	return FREQ_DOM_BUFLEN;
+int32 FoundDomainGetLength (void) {
+	return rawbuf.next;
 }
 
-
+int32 FoundDomainGetLengthMax (void) {
+	return RAWBUF_LEN;
+}

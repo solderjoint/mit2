@@ -1,4 +1,4 @@
-
+﻿
 #include "logic/comm/mbus.h"
 
 #include <math.h>
@@ -62,18 +62,13 @@ static inline int32 ModbusFunctionRead (void) {
 	int32 error = 0;
 	const uint16 address = mbus_get_address();
 	const uint8 bytes = mbus_get_bytes();
+	if (address < MBUS_MEMORY_RO_REGS) error = MBUS_ERROR_ADDRESS;
 
-	if ((address < MBUS_MEMORY_START) || (address > MBUS_MEMORY_RW_REGS)) {
-		error = MBUS_ERROR_ADDRESS;
-	} else {
-		for (int i = 0; i < 2; i++) data[i] = 0;
-		for (int i = 0; i < (bytes / 2); i++) {
-			if (address <= MBUS_MEMORY_RW_REGS) {
-				const int32 res = mbus_read_reg(address);
-				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
-				else data[i] = ((uint16) res);
-			}
-		}
+	for (int i = 0; i < 2; i++) data[i] = 0;
+	for (int i = 0; i < (bytes / 2); i++) {
+		const int32 res = mbus_read_reg(address);
+		if ((res < 0) || (res > 0xFFFF)) error = abs(res);
+		else data[i] = ((uint16) res);
 	}
 	return error;
 }
@@ -86,19 +81,14 @@ static inline int32 ModbusFunctionWrite (void) {
 	int32 error = 0;
 	const uint16 address = mbus_get_address();
 	const uint8 bytes = mbus_get_bytes();
+	if (address < MBUS_MEMORY_RW_REGS) error = MBUS_ERROR_ADDRESS;
 
-	if ((address < MBUS_MEMORY_START) || (address > MBUS_MEMORY_RW_REGS)) {
-		error = MBUS_ERROR_ADDRESS;
-	} else {
-		for (int i = 0; i < 2; i++) data[i] = 0;
-		for (int i = 0; i < (bytes / 2); i++) {
-			const uint16 value = mbus_get_data(i);
-			if (address <= MBUS_MEMORY_RW_REGS) {
-				const int32 res = mbus_write_reg(address, value);
-				if ((res < 0) || (res > 0xFFFF)) error = abs(res);
-				else data[i] = ((uint16) res);
-			}
-		}
+	for (int i = 0; i < 2; i++) data[i] = 0;
+	for (int i = 0; i < (bytes / 2); i++) {
+		const uint16 value = mbus_get_data(i);
+		const int32 res = mbus_write_reg(address, value);
+		if ((res < 0) || (res > 0xFFFF)) error = abs(res);
+		else data[i] = ((uint16) res);
 	}
 	return error;
 }
@@ -106,16 +96,22 @@ static inline int32 ModbusFunctionWrite (void) {
 /* **************************************************** *
  *         UNIFIED MODICON BUS RESPONSE HANDLER
  * **************************************************** */
+#include "util/print.h"
 static inline int8 ModbusResponse (const int32 error) {
 	// << FUNC[1] ADDRESS[2] BYTES[1] DATA1[2] DATA28[2]
 	if (error != 0) {
 		mbus_set_error(error);
+		xprintln("[mbus]err\t%i:%i:%i", mbus_get_func(), \
+				mbus_get_address(), mbus_get_bytes());
 	} else {
 		mbus_set_func(mbus_get_func());
 		mbus_set_address(mbus_get_address());
 		mbus_set_bytes(mbus_get_bytes());
 		mbus_set_data(data[0], 0);
 		mbus_set_data(data[1], 1);  // will be zero nevertheless
+		xprintln("[mbus]ok\t%i:%i:%i:%X:%X", mbus_get_func(), \
+				 mbus_get_address(), mbus_get_bytes(), \
+				 mbus_get_data(0), mbus_get_data(1));
 	}
 	return ((int8) error);
 }

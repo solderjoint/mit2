@@ -69,7 +69,7 @@ int32 xfputs (void (*stream) (uint8), const uint8 buf[]) {
 /* **************************************************** *
  *           INTERNAL FORMATTED STRING OUTPUT
  * **************************************************** */
-void xprintf (const char* fmt, ...) {
+void xprint (const char* fmt, ...) {
 	va_list arp;
 	va_start(arp, fmt);
 	_vprintf(UartConsolePutchar, fmt, arp); // main function call

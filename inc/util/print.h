@@ -35,7 +35,7 @@ void xfputchar (void (*stream) (uint8), uint8 c);
 int32 xfputs (void (*stream) (uint8), const uint8 buf[]);
 
 
-void xprintf (const char* fmt, ...);
+void xprint (const char* fmt, ...);
 void xprintln (const char* fmt, ...);
 
 void xfprintf (void (*func) (uint8), const char* fmt, ...);

@@ -139,7 +139,9 @@ int StateVoltageNormalUpdate (void) {
 /* **************************************************** */
 int StateLineCheck (void) {
 	const int32 status = LineStatusGet();
+	xputchar('.');
 	if (status == STATUS_OK) {
+		xprint("%7i", (int) kil(CheckLineVoltageMeanGet()));
 		CrashCheckLineState();
 	} else if ((status >= STATUS_VOLTSPIKE) && (status <= STATUS_PROCESSING)) {
 		CrashFourierPerform(status);

@@ -26,6 +26,8 @@ void FoundDomainClear (const uint32 ptr);
 
 int32 FoundDomainGetByCounter (const uint32 counter);
 char DomainResultIsNotEmpty (void);
+
+int32 FoundDomainGetLength (void);
 int32 FoundDomainGetLengthMax (void);
 
 /* **************************************************** *

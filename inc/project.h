@@ -22,11 +22,11 @@ enum projectDefaultEnum {
 	PERIPH_SPI_RATE       = 800000, // external spi baudrate
 	PERIPH_UART_RATE      = 115200, // uart console baudrate
 
-	PERIOD_TIMER_FREQ     = 200,    // default semaphore frequency
+	PERIOD_TIMER_FREQ     = 100,    // default semaphore frequency
 	PERIOD_CHECK_COMM     = 1,      // check messages every N/TIMER_FREQ [ms]
-	PERIOD_CHECK_VOLT     = 5,      // updates line voltage
-	PERIOD_CHECK_ENDPOINT = 10,     // updates endpoint signal state
-	PERIOD_CHECK_STATE    = 50,     // check line state
+	PERIOD_CHECK_VOLT     = 2,      // updates line voltage
+	PERIOD_CHECK_ENDPOINT = 3,      // updates endpoint signal state
+	PERIOD_CHECK_STATE    = 8,      // check line state
 	PERIOD_UPDATE_VOLT    = 60000,  // update normal line voltage level
 
 	FOURIER_FREQ_STEP     = 50,     // default step between freqs
@@ -46,10 +46,10 @@ enum projectDefaultEnum {
 	VOLTAGE_DC_ADCCOUNTS  = 2048,   // dc line adc counts
 	VOLTAGE_DC_MAXVOLT    = 24000,  // dc line maximum voltage [mV]
 
-	VOLTAGE_SPIKE         = 4000,   // minimum voltage diff to crash [mV]
-	VOLTAGE_NORMAL        = 4000,   // normal conditions voltage [mV]
+	VOLTAGE_SPIKE         = 3000,   // minimum voltage diff to crash [mV]
+	VOLTAGE_NORMAL        = 2000,   // normal conditions voltage [mV]
 	VOLTAGE_OVERFLOW      = 22500,  // overflow voltage value [mV]
-	VOLTAGE_UNDERFLOW     = 500,    // underflow voltage value [mV]
+	VOLTAGE_UNDERFLOW     = 20,     // underflow voltage value [mV]
 };
 
 //#define  VOLTAGE_DCMULT     (0.011718750f)  // convert 0..2048ADC to 0..24VDC

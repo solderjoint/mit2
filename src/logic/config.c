@@ -15,6 +15,7 @@
 
 #include "vars/buzzerdomain.h"
 #include "vars/canmessage.h"
+#include "vars/founddomain.h"
 #include "vars/fourierconsts.h"
 #include "vars/linestatus.h"
 #include "vars/mutex.h"

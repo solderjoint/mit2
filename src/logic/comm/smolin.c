@@ -1,9 +1,9 @@
-
+﻿
 #include "logic/comm/smolin.h"
 
 #include "logic/data/quick.h"
 //#include "logic/data/longword.h"
-//#include "logic/comm/mbus.h"
+#include "logic/comm/mbus.h"
 
 #include "util/print.h"
 #include "util/util.h"
@@ -31,27 +31,27 @@
 /* **************************************************** *
  *                SMOLIN DATA PROCESSING
  * **************************************************** */
-static void SmolinDataProcess (uint8 msg[8]) {
-	xprintln("%u\t", HeaderReceiverGet());
-}
+//static void SmolinDataProcess (uint8 msg[8]) {
+//	xprintln("%u\t", HeaderReceiverGet());
+//}
 
 /* **************************************************** *
  *           SMOLIN PROTOCOL MAIN ENTRY POINT
  * **************************************************** */
-int32 SmolinProtocolProcess
-(const uint32 header, const uint32 length, uint8 msg[8]) {
-	_check(length <= 8);
+//int32 SmolinProtocolProcess
+//(const uint32 header, const uint32 length, uint8 msg[8]) {
+//	_check(length <= 8);
 
-	HeaderSet(header);
-	// check that we got our id
-//	const uint32 add_low = 0x20, add_high = 0x27;
-//	if (HeaderReceiverGet() == address)
-	if (HeaderGet() >= 0) {
-		SmolinDataProcess(msg);
-	} else {
-		// append to received table
-	}
-}
+//	HeaderSet(header);
+//	// check that we got our id
+////	const uint32 add_low = 0x20, add_high = 0x27;
+////	if (HeaderReceiverGet() == address)
+//	if (HeaderGet() >= 0) {
+//		SmolinDataProcess(msg);
+//	} else {
+//		// append to received table
+//	}
+//}
 
 /* **************************************************** *
  *            SMOLIN PROTOCOL ENTRY WRAPPERS
@@ -70,9 +70,6 @@ static int32 input_header;
 
 inline static void InputHeaderSet (const int32 x) {
 	input_header = x & HEADER_FULL_MSG;
-}
-inline static int32 InputHeaderModbusFunctionGet (void) {
-	return ((input_header >> HEADER_MBUS_FUN) & 0x07);
 }
 inline static int32 InputHeaderModbusDataGet (void) {
 	return ((input_header >> HEADER_MBUSDATA) & 0x01);
@@ -105,11 +102,8 @@ static int32 output_header;
 inline static void OutputHeaderClear (void) {
 	output_header = 0;
 }
-inline static int32 OutputHeaderModbusFunctionSet (const int32 x) {
-	output_header |= ((x & 0x07) << HEADER_MBUS_FUN);
-}
 inline static int32 OutputHeaderModbusDataSet (const int32 x) {
-	output_header |= ((x & 0x01) << HEADER_MBUSDATA);
+	output_header |= ((x & 0x02) << HEADER_MBUSDATA);
 }
 inline static void OutputHeaderIdFromSet (const int32 x) {
 	output_header |= ((x & 0xFF) << HEADER_ID_FROM);
@@ -147,10 +141,19 @@ inline static void SmolinProtocolQuickSend (void) {
 	smolin_send();  // call sending wrapper
 }
 
+inline static void SmolinProtocolMbusSend (void) {
+	OutputHeaderClear();
+	OutputHeaderIdFromSet (InputHeaderIdDestGet());
+	OutputHeaderIdDestSet (InputHeaderIdFromGet());
+	OutputHeaderModbusDataSet(0xF);
+	smolin_send();  // call sending wrapper
+}
+
 /* **************************************************** *
  *           SMOLIN PROTOCOL INCOMING HANDLER
  * **************************************************** */
 inline void SmolinProtocolProcessIncoming (void) {
+	GpioLedsSet (2, 0);  // signal the start of processing
 	CanMessageReceive();  // update incoming message
 	InputHeaderSet (CanMessageReceiverIdGet());
 	// protect buffer from overwriting by copying it
@@ -167,9 +170,12 @@ inline void SmolinProtocolProcessIncoming (void) {
 			QuickInputProcess(input_buffer);
 			QuickOutputProcess(output_buffer);
 			SmolinProtocolQuickSend();
+		} else if (InputHeaderModbusDataGet()) {
+			ModbusMessageProcess(input_buffer, output_buffer);
+			SmolinProtocolMbusSend();
 		}
 	}
-	GpioLedsSet (2, -1);  // signal the end of processing
+	GpioLedsSet (2, 1);  // signal the end of processing
 }
 
 /* **************************************************** *

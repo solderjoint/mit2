@@ -55,8 +55,9 @@ int32 DomainFindMaxAreaValues
 		const float area = DomainGetGraphArea(buf, i - step/2, i + step/2);
 		if (area > check_max) {
 			const int32 freq = i * FourierFreqResolutionGet();
-			const int32 rpwr = ((int32) cabsf(buf[i]));
-			xprintf(" [%d:%d:%d] ", freq, cast(int32, area), rpwr);
+			const int32 num = BuzzerDomainGetNumByFreq(freq);
+//			const int32 rawpwr = cabsf(buf[i]);
+			xprint("[F%d:A%d:N%d] ", freq, (int32) area, num);
 			FoundDomainSet(freq);
 			count++;
 		}
@@ -79,30 +80,6 @@ int32 DomainUpdateFoundMaxValues (void) {
 	}
 	return 0;
 }
-
-/* **************************************************** *
- *        RESET BUZZER DOMAIN VALUES TO DEFAULT
- * **************************************************** */
-//void DomainVarsReset (void) {
-//#define BUZZER_FREQ_X1   (4150)
-//#define BUZZER_FREQ_X2   (4900)
-//#define BUZZER_FREQ_X3   (5100)
-//#define BUZZER_FREQ_X4   (5850)
-//#define BUZZER_FREQ_STEP (50)
-
-//	BuzzerDomainReset(); // start counting from zero
-
-//	const int32 x2 = 1 + (BUZZER_FREQ_X2 - BUZZER_FREQ_X1) / BUZZER_FREQ_STEP;
-//	for (int32 i = 0; i < x2; i++) {
-//		const int32 val = BUZZER_FREQ_X1 + i * BUZZER_FREQ_STEP;
-//		BuzzerDomainSet(i + 1, val);
-//	}
-//	const int32 x4 = 1 + (BUZZER_FREQ_X4 - BUZZER_FREQ_X3) / BUZZER_FREQ_STEP;
-//	for (int32 i = 0; i < x4; i++) {
-//		const int32 val = BUZZER_FREQ_X3 + i * BUZZER_FREQ_STEP;
-//		BuzzerDomainSet(i + 1 + x2, val);
-//	}
-//}
 
 /* **************************************************** *
  *     UPDATE FOUND MAXIMUM AREA VALUES IN SEQUENCE
