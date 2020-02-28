@@ -3,8 +3,8 @@
 ###############################
 inc/logic/config.h
 src/logic/config.c
-inc/logic/crash.h
-src/logic/crash.c
+inc/logic/state.h
+src/logic/state.c
 
 inc/logic/comm/smolin.h
 src/logic/comm/smolin.c

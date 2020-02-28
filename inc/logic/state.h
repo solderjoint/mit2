@@ -1,7 +1,7 @@
-#ifndef __CRASHROUTINE_H
+﻿#ifndef __CRASHROUTINE_H
 #define __CRASHROUTINE_H
 
-#include "util/typedefs.h"
+//#include "util/typedefs.h"
 
 /* **************************************************** *
  *                HEADER SPECIFIC MACROS
@@ -10,10 +10,11 @@
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int32 CrashCheck (void);
+int StateVoltageNormalUpdate (void);
+int StateEndpointCheck (void);
+int StateVoltageCheck (void);
 
-void CrashUpdateNormalVoltage (void);
-void CrashVarsInit (void);
+int StateLineCheck (void);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

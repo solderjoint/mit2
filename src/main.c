@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Calculation module firmware project.
  * rev 1C since august 2019
  *
@@ -14,7 +14,7 @@
 /* **************************************************** *
  *               PROJECT INCLUDE SECTION
  * **************************************************** */
-#include "logic/crash.h"
+#include "logic/state.h"
 #include "logic/config.h"
 
 #include "vars/mutex.h"
@@ -32,13 +32,20 @@ int main(void) {
 	while (1) {
 		// TODO: create stream checker for usart handler ?
 		if (MutexCheckPending() > 0) {
-			if (MutexGet(MUTEX_LINECHECK)) {
-				CrashCheck();
-				MutexClear(MUTEX_LINECHECK);
+			if (MutexGetAndClear(MUTEX_COMMCHECK)) {
+
 			}
-			if (MutexGet(MUTEX_VOLTUPDATE)) {
-				CrashUpdateNormalVoltage();
-				MutexClear(MUTEX_VOLTUPDATE);
+			if (MutexGetAndClear(MUTEX_VOLTCHECK)) {
+				StateVoltageCheck();
+			}
+			if (MutexGetAndClear(MUTEX_ENDPCHECK)) {
+				StateEndpointCheck();
+			}
+			if (MutexGetAndClear(MUTEX_STATECHECK)) {
+				StateLineCheck();
+			}
+			if (MutexGetAndClear(MUTEX_VOLTUPDATE)) {
+				StateVoltageNormalUpdate();
 			}
 		}
 		// 333.3K switches == 1.5usec for whole cycle

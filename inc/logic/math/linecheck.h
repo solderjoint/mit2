@@ -21,6 +21,8 @@ int32 CheckEndpointSignalLoss (void);
 int32 CheckLineVoltageSpike (void);
 int32 CheckLineVoltageOverflow (void);
 
+void CheckLineEndpointSignalRenew (void);
+void ChecklineVoltageBufferRenew (void);
 void CheckLineVoltageNormalUpdate (void);
 
 /* **************************************************** *

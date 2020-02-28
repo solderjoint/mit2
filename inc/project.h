@@ -22,10 +22,12 @@ enum projectDefaultEnum {
 	PERIPH_SPI_RATE       = 800000, // external spi baudrate
 	PERIPH_UART_RATE      = 115200, // uart console baudrate
 
-	PERIOD_TIMER_FREQ     = 100,    // default semaphore value
-	PERIOD_CHECK_LINE     = 2,      // check every Nx10ms
-	PERIOD_CHECK_COMM     = 20,     // check can messages
-	PERIOD_RENEW_VOLT     = 1000,   // update normal voltage
+	PERIOD_TIMER_FREQ     = 200,    // default semaphore frequency
+	PERIOD_CHECK_COMM     = 1,      // check messages every N/TIMER_FREQ [ms]
+	PERIOD_CHECK_VOLT     = 5,      // updates line voltage
+	PERIOD_CHECK_ENDPOINT = 10,     // updates endpoint signal state
+	PERIOD_CHECK_STATE    = 50,     // check line state
+	PERIOD_UPDATE_VOLT    = 60000,  // update normal line voltage level
 
 	FOURIER_FREQ_STEP     = 50,     // default step between freqs
 	FOURIER_FREQ_RANGEMIN = 4150,   // default minimum freq range

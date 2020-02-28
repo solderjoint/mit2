@@ -1,5 +1,5 @@
 ﻿
-#include "logic/crash.h"
+#include "logic/state.h"
 
 #include "vars/linestatus.h"
 
@@ -91,10 +91,11 @@ int32 CrashCheckLineState (void) {
 		xputs("err>voltage spike\n");
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
-	else if (CheckLineVoltageOverflow() < 0) {
-		xputs("err>line short\n");
-		return LineStatusSet(STATUS_UNDERFLOW);
-	}
+	// disabled since voltage can go as low as 50 mV
+//	else if (CheckLineVoltageOverflow() < 0) {
+//		xputs("err>line short\n");
+//		return LineStatusSet(STATUS_UNDERFLOW);
+//	}
 }
 
 /* **************************************************** *
@@ -117,7 +118,26 @@ void CrashVarsInit (void) {
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
-int32 CrashCheck (void) {
+int StateVoltageCheck (void) {
+	// call linecheck voltage buffer updating
+	ChecklineVoltageBufferRenew();
+	return 0;
+}
+
+int StateEndpointCheck (void) {
+	// call linecheck endpoint updater
+	CheckLineEndpointSignalRenew();
+	return 0;
+}
+
+int StateVoltageNormalUpdate (void) {
+	// updates normal voltage level
+	CheckLineVoltageNormalUpdate();
+	return 0;
+}
+
+/* **************************************************** */
+int StateLineCheck (void) {
 	const int32 status = LineStatusGet();
 	if (status == STATUS_OK) {
 		CrashCheckLineState();

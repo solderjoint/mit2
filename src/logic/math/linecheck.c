@@ -27,7 +27,7 @@ void EndpointSignalSet (uint8 x) {
 	if (x > 0) endpointSignalBuffer[0] = x;
 }
 
-void EndpointSignalRenew (void) {
+void CheckLineEndpointSignalRenew (void) {
 	const uint8 pin = 1;
 //	const uint8 pin = GpioTriggerGet();
 	EndpointSignalSet((pin > 0)? 0 : 1);
@@ -56,7 +56,7 @@ void LineVoltageBufferSet (float val) {
 	/*if (val > 0.0f)*/ lineVoltageBuffer[0] = val;
 }
 
-void LineVoltageBufferRenew (void) {
+void ChecklineVoltageBufferRenew (void) {
 	const uint16 adcraw = SpiExternalAdcGetNonBlocking();
 	const float mult = VoltageDCMultGet();
 	const float res = cast(float, adcraw) * mult;
@@ -67,7 +67,7 @@ void LineVoltageBufferRenew (void) {
  *                  LINE STATUS CHECKS
  * **************************************************** */
 int32 CheckEndpointSignalLoss (void) {
-	EndpointSignalRenew();
+	CheckLineEndpointSignalRenew();
 
 	int32 count = 0;
 	for (int32 i = 0; i < LINE_SIGNALBUF_SIZE; i++) {
@@ -78,7 +78,7 @@ int32 CheckEndpointSignalLoss (void) {
 }
 
 int32 CheckLineVoltageSpike (void) {
-	LineVoltageBufferRenew();
+	ChecklineVoltageBufferRenew();
 
 	const float diff = VoltageSpikeGet();
 	const float norm = VoltageNormalGet();
@@ -87,20 +87,13 @@ int32 CheckLineVoltageSpike (void) {
 	else return 0;
 }
 
-#include "util/print.h"
 int32 CheckLineVoltageOverflow (void) {
 	const float smax = VoltageOverflowGet();
 	const float smin = VoltageUnderflowGet();
 	const float mean = LineVoltageBufferMeanGet();
 
-	if (mean > smax) {
-		xprintln("OVF\t%i", (int) mean);
-		return 1;
-	}
-	else if (mean < smin) {
-		xprintln("UDF\t%i", (int) mean);
-		return -1;
-	}
+	if (mean > smax) return 1;
+	else if (mean < smin) return -1;
 	else return 0;
 }
 

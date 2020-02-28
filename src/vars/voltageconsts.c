@@ -20,12 +20,10 @@ float VoltageACMaxGet (void) {
 }
 void VoltageACMaxSet (const float x) {
 	if ((x > 1.0f) && (x < 10.f)) voltac_max = x;
-	else voltac_max = VOLTAGE_AC_MAXVOLT;
+	else voltac_max = VOLTAGE_AC_MAXVOLT / 1000.f;
 }
 
-float VoltageACMultGet (void) {
-	return VoltageACMaxGet() / ((float) VoltageACAdcCountsGet());
-}
+float VoltageACMultGet (void) { return voltac_max / ((float) voltac_counts); }
 
 /* **************************************************** */
 static int16 voltdc_counts;
@@ -43,12 +41,10 @@ float VoltageDCMaxGet (void) {
 }
 void VoltageDCMaxSet (const float x) {
 	if ((x > 1.0f) && (x < 50.f)) voltdc_max = x;
-	else voltdc_max = VOLTAGE_DC_MAXVOLT;
+	else voltdc_max = VOLTAGE_DC_MAXVOLT / 1000.f;
 }
 
-float VoltageDCMultGet (void) {
-	return VoltageDCMaxGet() / ((float) VoltageDCAdcCountsGet());
-}
+float VoltageDCMultGet (void) { return voltdc_max / ((float) voltdc_counts); }
 
 /* **************************************************** *
  *           LINE VOLTAGE COMPARISON SETTINGS

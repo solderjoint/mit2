@@ -1,7 +1,7 @@
 ﻿
 #include "logic/config.h"
 
-#include "logic/crash.h"
+#include "logic/state.h"
 #include "logic/comm/smolin.h"
 #include "logic/data/db.h"
 
@@ -78,7 +78,7 @@ static void vars_init (void) {
 }
 
 static void vars_logic (void) {
-	CrashUpdateNormalVoltage();
+//	CrashUpdateNormalVoltage();
 	_delay_ms(100);  // 1 second of sleep to stabilize
 	BuzzerDomainInit();
 	LineStatusSet(STATUS_OK);
@@ -88,9 +88,8 @@ static void vars_logic (void) {
 
 static void vars_restore (void) {
 	// restore values from eeprom
-	xprintln("vac\t%i\t%i", (int) VoltageACMaxGet(), (int) VoltageACAdcCountsGet() );
-	xprintln("vdc\t%i\t%i", (int) VoltageDCMaxGet(), (int) VoltageDCAdcCountsGet() );
-	xprintln("mult\t%i\t%i", (int) VoltageDCMultGet(), (int) VoltageACMultGet());
+//	xprintln("mult\t%i\t%i", \
+//			(int) mil(VoltageDCMultGet()), (int) mil(VoltageACMultGet()));
 }
 
 int32 ConfigVariablesInit (void) {
