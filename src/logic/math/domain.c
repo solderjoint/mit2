@@ -57,7 +57,7 @@ int32 DomainFindMaxAreaValues
 			const int32 freq = i * FourierFreqResolutionGet();
 			const int32 num = BuzzerDomainGetNumByFreq(freq);
 //			const int32 rawpwr = cabsf(buf[i]);
-			xprint("[F%d:A%d:N%d] ", freq, (int32) area, num);
+			xprint("[F%d:S%d:N%d] ", freq, (int32) area, num);
 			FoundDomainSet(freq);
 			count++;
 		}

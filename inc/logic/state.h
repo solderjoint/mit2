@@ -10,7 +10,7 @@
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int StateVoltageNormalUpdate (void);
+int StateVoltageNormalSet (void);
 int StateEndpointCheck (void);
 int StateVoltageCheck (void);
 

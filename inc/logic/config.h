@@ -26,8 +26,8 @@ enum configErrorEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int32 ConfigPeripheralsInit (void);
-int32 ConfigVariablesInit (void);
+int32 ConfigurePeripherals (void);
+int32 ConfigureVariables (void);
 int32 ConfigVarTableGet (const int32 address);
 int32 ConfigVarTableSet (const int32 address, const uint16 value);
 

@@ -18,37 +18,25 @@
 #include "logic/config.h"
 
 #include "vars/mutex.h"
-#include "vars/period.h"
-
-#include "util/typedefs.h"
 
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
+#include "periph/gpio.h"
 int main(void) {
-	ConfigPeripheralsInit();
-	ConfigVariablesInit();
+	ConfigurePeripherals();
+	ConfigureVariables();
 
 	while (1) {
-		// TODO: create stream checker for usart handler ?
-		if (MutexCheckPending() > 0) {
-			if (MutexGetAndClear(MUTEX_COMMCHECK)) {
-
-			}
-			if (MutexGetAndClear(MUTEX_VOLTCHECK)) {
-				StateVoltageCheck();
-			}
-			if (MutexGetAndClear(MUTEX_ENDPCHECK)) {
-				StateEndpointCheck();
-			}
-			if (MutexGetAndClear(MUTEX_STATECHECK)) {
-				StateLineCheck();
-			}
-			if (MutexGetAndClear(MUTEX_VOLTUPDATE)) {
-				StateVoltageNormalUpdate();
-			}
-		}
+		GpioLedsSet(3, -1); // show free cycles in main
 		// 333.3K switches == 1.5usec for whole cycle
+		if (MutexCheckPending() > 0) {
+			if (MutexGetAndClear(MUTEX_COMMCHECK)) /*  */;
+			if (MutexGetAndClear(MUTEX_VOLTCHECK)) StateVoltageCheck();
+			if (MutexGetAndClear(MUTEX_ENDPCHECK)) StateEndpointCheck();
+			if (MutexGetAndClear(MUTEX_STATECHECK)) StateLineCheck();
+			if (MutexGetAndClear(MUTEX_VOLTUPDATE)) StateVoltageNormalSet();
+		}
 	}
 	return 0;
 }

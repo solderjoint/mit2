@@ -35,7 +35,7 @@ static uint32 TimeStampGet (void) {
  *              FOURIER WRAPPER FUNCTIONS
  * **************************************************** */
 int32 CrashFourierCapture (void) {
-	xputs("info>capturing");
+	xprint("info>capturing");
 
 	TimeStampSet();
 	SamplingInit(fftInputBuf);
@@ -44,7 +44,7 @@ int32 CrashFourierCapture (void) {
 
 int32 CrashFourierProcess (void) {
 	xprintln(" in %i ms", TimeStampGet());
-	xputs("info>processing");
+	xprint("info>processing");
 
 	TimeStampSet();
 	SamplingFinish();
@@ -69,10 +69,10 @@ int32 CrashFourierPerform (int32 state) {
 	else if (state == STATUS_PROCESSING) {
 		if (CrashFourierProcess() == 0) {
 			if (DomainResultIsNotEmpty()) {
-				xputs("err>buzzer found\n");
+				xputs("err>buzzer found");
 				return LineStatusSet(STATUS_BUZZERFOUND);
 			} else {
-				xputs("err>line breach\n");
+				xputs("err>line breach");
 				return LineStatusSet(STATUS_OVERFLOW);
 			}
 		}
@@ -84,11 +84,11 @@ int32 CrashFourierPerform (int32 state) {
  * **************************************************** */
 int32 CrashCheckLineState (void) {
 	if (CheckEndpointSignalLoss()) {
-		xputs("err>signal lost\n");
+		xputs("err>signal lost");
 		return LineStatusSet(STATUS_SIGNALLOST);
 	}
 	if (CheckLineVoltageSpike()) {
-		xputs("err>voltage spike\n");
+		xputs("err>voltage spike");
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
 	// disabled since voltage can go as low as 50 mV
@@ -130,7 +130,7 @@ int StateEndpointCheck (void) {
 	return 0;
 }
 
-int StateVoltageNormalUpdate (void) {
+int StateVoltageNormalSet (void) {
 	// updates normal voltage level
 	CheckLineVoltageNormalUpdate();
 	return 0;
@@ -139,9 +139,8 @@ int StateVoltageNormalUpdate (void) {
 /* **************************************************** */
 int StateLineCheck (void) {
 	const int32 status = LineStatusGet();
-	xputchar('.');
 	if (status == STATUS_OK) {
-		xprint("%7i", (int) kil(CheckLineVoltageMeanGet()));
+//		xprint("%7i", (int) kil(CheckLineVoltageMeanGet()));
 		CrashCheckLineState();
 	} else if ((status >= STATUS_VOLTSPIKE) && (status <= STATUS_PROCESSING)) {
 		CrashFourierPerform(status);

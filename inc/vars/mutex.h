@@ -24,8 +24,8 @@ enum mutexEnum {
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 MutexInit (void);
-int32 MutexCheckPending (void);
-int32 MutexGet (enum mutexEnum var_pos);
+char MutexCheckPending(void);
+char MutexGet(enum mutexEnum var_pos);
 int32 MutexClear (enum mutexEnum var_pos);
 char MutexGetAndClear (enum mutexEnum var_pos);
 

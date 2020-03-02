@@ -14,23 +14,26 @@
  * **************************************************** */
 static volatile int32 mutex_buf;
 
-inline static void mutex_check (const int32 time, \
-		const int32 comparison, enum mutexEnum var_pos) {
-	if ((comparison <= 0) || (comparison > 0xFFFFFF)) return;
-	else if (time % comparison == 0) mutex_buf |= (1 << var_pos);
+static void mutex_check (const uint32, const uint32, enum mutexEnum);
+inline static void mutex_check (const uint32 time, \
+		const uint32 compare, enum mutexEnum var_pos) {
+	if ((compare != 0) && ((time % compare) == 0)) {
+		mutex_buf |= (1 << var_pos);
+	}
 }
 
 /* **************************************************** *
  *               MUTEX INTERRUPT WRAPPER
  * **************************************************** */
+#include "periph/gpio.h"
 static void _mutex_handler (void) {
-	const int32 time = PeriodCounterGet();
+	const uint32 time = PeriodCounterGet();
 
-	const int32 comm = PeriodCommCheckGet();
-	const int32 endp = PeriodLineEndpointCheckGet();
-	const int32 volt = PeriodLineVoltCheckGet();
-	const int32 line = PeriodLineStateUpdateGet();
-	const int32 vupd = PeriodLineVoltUpdateGet();
+	const uint32 comm = PeriodCommCheckGet();
+	const uint32 endp = PeriodLineEndpointCheckGet();
+	const uint32 volt = PeriodLineVoltCheckGet();
+	const uint32 line = PeriodLineStateUpdateGet();
+	const uint32 vupd = PeriodLineVoltUpdateGet();
 
 	mutex_check(time, comm, MUTEX_COMMCHECK);
 	mutex_check(time, endp, MUTEX_ENDPCHECK);
@@ -38,6 +41,7 @@ static void _mutex_handler (void) {
 	mutex_check(time, line, MUTEX_STATECHECK);
 	mutex_check(time, vupd, MUTEX_VOLTUPDATE);
 
+	GpioLedsSet(2, -1);
 	PeriodCounterIncrement();
 }
 
@@ -49,15 +53,15 @@ int32 MutexInit (void) {
 	TimerSemaphoreAttachInterrupt(_mutex_handler);
 }
 
-inline int32 MutexCheckPending (void) {
+inline char MutexCheckPending (void) {
 	// returns 0 if no mutex is pending
-	return mutex_buf & _MUTEX_MAXNUM;
+	return ((mutex_buf & _MUTEX_MAXNUM) != 0);
 }
 
-inline int32 MutexGet (enum mutexEnum var_pos) {
+inline char MutexGet (enum mutexEnum var_pos) {
 	_check (var_pos < _MUTEX_MAXNUM);
-	const int32 shift = (1 << (var_pos));
-	return mutex_buf & shift;
+	const int32 result = mutex_buf & (1 << (var_pos));
+	return (result != 0);
 }
 
 inline int32 MutexClear (enum mutexEnum var_pos) {
@@ -68,11 +72,6 @@ inline int32 MutexClear (enum mutexEnum var_pos) {
 
 inline char MutexGetAndClear (enum mutexEnum var_pos) {
 	const int32 state = MutexGet(var_pos);
-
-	if (state > 0) {
-		MutexClear(var_pos);
-		return 1;
-	} else {
-		return 0;
-	}
+	if (state) MutexClear(var_pos);
+	return state;
 }

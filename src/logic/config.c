@@ -93,7 +93,7 @@ static void vars_restore (void) {
 //			(int) mil(VoltageDCMultGet()), (int) mil(VoltageACMultGet()));
 }
 
-int32 ConfigVariablesInit (void) {
+int32 ConfigureVariables (void) {
 	vars_init();
 	vars_logic();
 	vars_restore();
@@ -102,7 +102,7 @@ int32 ConfigVariablesInit (void) {
 /* **************************************************** *
  *                INITIALIZATION SECTION
  * **************************************************** */
-int32 ConfigPeripheralsInit (void) {
+int32 ConfigurePeripherals (void) {
 	periph_system();
 	periph_comm();
 	periph_gpio();

@@ -1,4 +1,4 @@
-
+﻿
 #include "periph/can.h"
 
 #include <stdbool.h>
@@ -25,7 +25,7 @@ void CanTransmissionAttachInterruptOnReceive (void (*foo) (void)) {
 	attached_int_on_recv = foo;
 }
 
-static void CanTransmissionInterruptOnReceiveCall (void) {
+static inline void CanTransmissionInterruptOnReceiveCall (void) {
 	if ((*attached_int_on_recv) != NULL) attached_int_on_recv();
 }
 
@@ -36,7 +36,7 @@ void CanTransmissionAttachInterruptOnSend (void (*foo) (void)) {
 	attached_int_on_send = foo;
 }
 
-static void CanTransmissionInterruptOnSendCall (void) {
+static inline void CanTransmissionInterruptOnSendCall (void) {
 	if ((*attached_int_on_send) != NULL) attached_int_on_send();
 }
 
@@ -51,10 +51,11 @@ void CanInterruptHandler (void) {
 		} else if (status & CAN_STATUS_TXOK) {
 			CanTransmissionInterruptOnSendCall();
 		}
-		CANIntClear(CAN0_BASE, CAN_INT_INTID_STATUS);
+		CANIntClear(CAN0_BASE, cause);
 		CANIntClear(CAN0_BASE, status);
 	} else {
-//		assert ();  // should never have happened
+//		xpanic();  // should never have happened
+		CANIntClear(CAN0_BASE, cause);
 		CANIntClear(CAN0_BASE, 0);
 	}
 }

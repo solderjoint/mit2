@@ -65,8 +65,8 @@
 /* **************************************************** *
  *           SMOLIN INCOMING MESSAGE WRAPPERS
  * **************************************************** */
-static uint8 input_buffer[CAN_MSGBUF_LEN];
-static int32 input_header;
+static volatile uint8 input_buffer[CAN_MSGBUF_LEN];
+static volatile int32 input_header;
 
 inline static void InputHeaderSet (const int32 x) {
 	input_header = x & HEADER_FULL_MSG;
@@ -96,8 +96,8 @@ inline static int32 InputHeaderTextPosGet (void) {
 /* **************************************************** *
  *           SMOLIN OUTGOING MESSAGE WRAPPERS
  * **************************************************** */
-static uint8 output_buffer[CAN_MSGBUF_LEN];
-static int32 output_header;
+static volatile uint8 output_buffer[CAN_MSGBUF_LEN];
+static volatile int32 output_header;
 
 inline static void OutputHeaderClear (void) {
 	output_header = 0;
@@ -153,7 +153,7 @@ inline static void SmolinProtocolMbusSend (void) {
  *           SMOLIN PROTOCOL INCOMING HANDLER
  * **************************************************** */
 inline void SmolinProtocolProcessIncoming (void) {
-	GpioLedsSet (2, 0);  // signal the start of processing
+//	GpioLedsSet (2, 0);  // signal the start of processing
 	CanMessageReceive();  // update incoming message
 	InputHeaderSet (CanMessageReceiverIdGet());
 	// protect buffer from overwriting by copying it
@@ -171,11 +171,11 @@ inline void SmolinProtocolProcessIncoming (void) {
 			QuickOutputProcess(output_buffer);
 			SmolinProtocolQuickSend();
 		} else if (InputHeaderModbusDataGet()) {
-			ModbusMessageProcess(input_buffer, output_buffer);
-			SmolinProtocolMbusSend();
+//			ModbusMessageProcess(input_buffer, output_buffer);
+//			SmolinProtocolMbusSend();
 		}
 	}
-	GpioLedsSet (2, 1);  // signal the end of processing
+//	GpioLedsSet (2, 1);  // signal the end of processing
 }
 
 /* **************************************************** *
