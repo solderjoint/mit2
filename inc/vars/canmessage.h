@@ -1,4 +1,4 @@
-#ifndef __VAR_CANMSG_H
+﻿#ifndef __VAR_CANMSG_H
 #define __VAR_CANMSG_H
 
 #include "util/typedefs.h"
@@ -25,6 +25,15 @@ int32 CanMessageReceiverIdGet (void);
 void CanMessageSend (void);
 void CanMessageSenderBufferSet(const uint8 buffer[CAN_MSGBUF_LEN]);
 void CanMessageSenderIdSet (const int32 id);
+
+/* **************************************************** */
+char CanMessageReceiverFlagGet (void);
+void CanMessageReceiverFlagSet (void);
+void CanMessageReceiverFlagClear (void);
+
+char CanMessageSenderFlagGet (void);
+void CanMessageSenderFlagSet (void);
+void CanMessageSenderFlagClear (void) ;
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

@@ -83,8 +83,7 @@ int32 CheckLineVoltageSpike (void) {
 	const float diff = VoltageSpikeGet();
 	const float norm = VoltageNormalGet();
 	const float mean = CheckLineVoltageMeanGet();
-	if (mean > (diff + norm)) return 1;
-	else return 0;
+	return (mean > (diff + norm))? 1 : 0;
 }
 
 int32 CheckLineVoltageOverflow (void) {

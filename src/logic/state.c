@@ -1,8 +1,8 @@
 ﻿
 #include "logic/state.h"
 
-#include "vars/linestatus.h"
 
+#include "logic/comm/smolin.h"
 #include "logic/math/domain.h"
 #include "logic/math/fft1024.h"
 #include "logic/math/linecheck.h"
@@ -12,6 +12,10 @@
 
 #include "util/print.h"
 #include "util/util.h"
+
+#include "vars/canmessage.h"
+#include "vars/founddomain.h"
+#include "vars/linestatus.h"
 
 /* **************************************************** *
  *               LOCAL VARIABLES SECTION
@@ -84,11 +88,13 @@ int32 CrashFourierPerform (int32 state) {
  * **************************************************** */
 int32 CrashCheckLineState (void) {
 	if (CheckEndpointSignalLoss()) {
-		xputs("err>signal lost");
+//		xputs("err>signal lost");
+		xputchar ('1');
 		return LineStatusSet(STATUS_SIGNALLOST);
 	}
 	if (CheckLineVoltageSpike()) {
-		xputs("err>voltage spike");
+//		xputs("err>voltage spike");
+		xputchar ('2');
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
 	// disabled since voltage can go as low as 50 mV
@@ -96,6 +102,7 @@ int32 CrashCheckLineState (void) {
 //		xputs("err>line short\n");
 //		return LineStatusSet(STATUS_UNDERFLOW);
 //	}
+	return 0;
 }
 
 /* **************************************************** *
@@ -109,43 +116,50 @@ void CrashUpdateNormalVoltage (void) {
 	CheckLineVoltageNormalUpdate();
 }
 
-void CrashVarsInit (void) {
-	LineStatusSet(STATUS_OK);
-	DomainVarsReset();
-	SamplingVarsReset();
-}
-
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
-int StateVoltageCheck (void) {
-	// call linecheck voltage buffer updating
-	ChecklineVoltageBufferRenew();
-	return 0;
+void StateSmolinCheck (void) {
+	if (CanMessageReceiverFlagGet()) {
+		SmolinProtocolProcessIncoming();
+		CanMessageReceiverFlagClear();
+	}
+//	if (CanMessageSenderFlagGet()) {
+//		SmolinProtocolProcessOutgoing();
+//		CanMessageSenderFlagClear();
+//	}
 }
 
-int StateEndpointCheck (void) {
-	// call linecheck endpoint updater
-	CheckLineEndpointSignalRenew();
-	return 0;
+void StateVoltageCheck (void) {
+	ChecklineVoltageBufferRenew();  // call voltage buffer updating
 }
 
-int StateVoltageNormalSet (void) {
-	// updates normal voltage level
-	CheckLineVoltageNormalUpdate();
-	return 0;
+void StateEndpointCheck (void) {
+	CheckLineEndpointSignalRenew();  // call linecheck endpoint updater
+}
+
+void StateVoltageNormalSet (void) {
+	CheckLineVoltageNormalUpdate();  // updates normal voltage level
 }
 
 /* **************************************************** */
 int StateLineCheck (void) {
 	const int32 status = LineStatusGet();
-	if (status == STATUS_OK) {
-//		xprint("%7i", (int) kil(CheckLineVoltageMeanGet()));
-		CrashCheckLineState();
-	} else if ((status >= STATUS_VOLTSPIKE) && (status <= STATUS_PROCESSING)) {
-		CrashFourierPerform(status);
-	} else if (status == STATUS_SIGNALLOST) {
-		CrashTriggerSet();
+	switch (status) {
+		case STATUS_OK:
+			return CrashCheckLineState();
+			break;
+
+		case STATUS_VOLTSPIKE:
+		case STATUS_SAMPLING:
+		case STATUS_PROCESSING:
+			xputchar('#');
+			CrashFourierPerform(status);
+			break;
+
+		default:
+			CrashTriggerSet();
+			break;
 	}
-	return 0;
+	return status;
 }

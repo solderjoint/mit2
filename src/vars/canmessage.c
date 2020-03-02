@@ -1,4 +1,4 @@
-
+﻿
 #include "vars/canmessage.h"
 
 #include <stdbool.h>
@@ -16,6 +16,19 @@
 
 //#include "util/print.h"
 #include "util/util.h"
+
+/* **************************************************** *
+ *             CAN MESSAGE RECEVING BUFFER
+ * **************************************************** */
+static volatile char receive_flag;
+inline char CanMessageReceiverFlagGet (void) { return receive_flag; }
+inline void CanMessageReceiverFlagSet (void) { receive_flag = 1; }
+inline void CanMessageReceiverFlagClear (void) { receive_flag = 0; }
+
+static volatile char sender_flag;
+inline char CanMessageSenderFlagGet (void) { return sender_flag; }
+inline void CanMessageSenderFlagSet (void) { sender_flag = 1; }
+inline void CanMessageSenderFlagClear (void) { sender_flag = 0; }
 
 /* **************************************************** *
  *             CAN MESSAGE RECEVING BUFFER
@@ -45,6 +58,7 @@ inline int32 CanMessageReceiverSizeGet (void) {
 	return (size > 8)? -1 : size;
 }
 
+/* **************************************************** */
 static void CanMessageReceiverInit (void) {
 	for (int i = 0; i < CAN_MSGBUF_LEN; i++) recv_buffer[i] = 0;
 

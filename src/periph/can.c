@@ -54,7 +54,7 @@ void CanInterruptHandler (void) {
 		CANIntClear(CAN0_BASE, cause);
 		CANIntClear(CAN0_BASE, status);
 	} else {
-//		xpanic();  // should never have happened
+		// happens when hot-plugging device
 		CANIntClear(CAN0_BASE, cause);
 		CANIntClear(CAN0_BASE, 0);
 	}

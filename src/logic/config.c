@@ -43,8 +43,8 @@ static void periph_comm (void) {
 	SpiExternalAdcGetNonBlocking();
 
 	CanTransmissionInit(PeriphCanRateGet());
-	CanTransmissionAttachInterruptOnReceive(SmolinProtocolProcessIncoming);
-//	CanTransmissionAttachInterruptOnSend(SmolinProtocolProcessOutgoing);
+	CanTransmissionAttachInterruptOnReceive(CanMessageReceiverFlagSet);
+	CanTransmissionAttachInterruptOnSend(CanMessageSenderFlagSet);
 }
 
 static void periph_gpio (void) {

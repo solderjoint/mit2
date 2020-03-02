@@ -31,7 +31,7 @@ int main(void) {
 		GpioLedsSet(3, -1); // show free cycles in main
 		// 333.3K switches == 1.5usec for whole cycle
 		if (MutexCheckPending() > 0) {
-			if (MutexGetAndClear(MUTEX_COMMCHECK)) /*  */;
+			if (MutexGetAndClear(MUTEX_COMMCHECK)) StateSmolinCheck();
 			if (MutexGetAndClear(MUTEX_VOLTCHECK)) StateVoltageCheck();
 			if (MutexGetAndClear(MUTEX_ENDPCHECK)) StateEndpointCheck();
 			if (MutexGetAndClear(MUTEX_STATECHECK)) StateLineCheck();

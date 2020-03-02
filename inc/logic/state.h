@@ -10,9 +10,10 @@
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int StateVoltageNormalSet (void);
-int StateEndpointCheck (void);
-int StateVoltageCheck (void);
+void StateVoltageNormalSet(void);
+void StateEndpointCheck(void);
+void StateVoltageCheck(void);
+void StateSmolinCheck (void);
 
 int StateLineCheck (void);
 
