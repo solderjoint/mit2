@@ -1,4 +1,4 @@
-﻿# Line Control System project
+# Line Control System project
 Calculation module firmware project (designed to use with TM4C1231H6 mcu and MIT2 module).<br>
 [rev 1C since august 2019]
 
@@ -27,7 +27,6 @@ Communication protocol handlers.
 |:--------:|:-------:|:------:|:-------:|:--------:|:-------:|:-------:|
 |[24..25]b |[16..23] |[8..15] |   [7]   |   [6]    |  [5]    | [0..4]  |
 
-* data/longword is a raw forth messaging standard (not implemented atm)
 * data/modbus is a handler for 'modbus' specification of smolin protocol that allows greater flexibility when dealing with foreign devices that do not support longword format
 
 |    #     | [1]Byte |[2..3]B |  [4]B   | [5..6]B | [7..8]B |
@@ -36,15 +35,15 @@ Communication protocol handlers.
 | <ANSWER  |FUNCTION |ADDRESS |BYTESIZE | DATA1/- | DATA2/- |
 |  [ERROR] |ERR_FUNC |ERR_CODE|    -    |    -    |    -    |
 
-* data/quick handles fast data communication standard which is set by a single positive bit in 'fastdata' field; fastdata allows the receiver to accepts 8 bytes of 'quick' data and to send back the same amount of data
+* data/quick handles fast data communication standard which is set by a single positive bit in 'fastdata' field; fastdata allows the receiver to accepts 8 bytes of 'quick' data and to send back the fixed amount of 8 bytes
 
 
 ## src/logic
 Main program logic.
 
-* crash handles the most important logic of the program: line and relay status checking, voltage checking, crash situations
+* state handles the most important logic of the program (the state machine): smolin protocol communication, line and relay status checking, voltage checking, crash situations, normal voltage value updating
 * config is used as a start-up initialization routine for peripherals and configurable variables
-* data/db is a simple (no self-healing ability) single key single value hash table with access by unique id, both keys and values are stored in eeprom; single entry takes just 8 bytes of data (key is a int32, value can be represented as both int32 and float)
+* data/db is a simple (no self-healing ability) single key single value hash table with access by unique id, both keys and values are stored in eeprom (single eeprom write takes from 20 to 40 microseconds); single entry takes just 8 bytes of data (key is a int32, value can be represented as both int32 and float)
 * math/domain is used to handle both pre-processing of input voltage/time buffer and post-processing of resulting power/frequency buffer
 * math/fft1024 is a Fourier procedure that accepts voltage/time buffer of 1024 complex float32 values (each complex value has real and imaginary part) and outputs the resulting power/frequency array of 1024 complex float32 values; this part alone takes 16Kbytes of memory
 * math/linecheck is a wrapper that is used to check current line status, relay state and voltage

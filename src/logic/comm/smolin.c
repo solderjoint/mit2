@@ -153,7 +153,7 @@ inline static void SmolinProtocolMbusSend (void) {
  *           SMOLIN PROTOCOL INCOMING HANDLER
  * **************************************************** */
 inline void SmolinProtocolProcessIncoming (void) {
-//	GpioLedsSet (2, 0);  // signal the start of processing
+	GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);  // signal the start of processing
 	CanMessageReceive();  // update incoming message
 	InputHeaderSet (CanMessageReceiverIdGet());
 	// protect buffer from overwriting by copying it
@@ -175,7 +175,7 @@ inline void SmolinProtocolProcessIncoming (void) {
 			SmolinProtocolMbusSend();
 		}
 	}
-//	GpioLedsSet (2, 1);  // signal the end of processing
+	GpioLedsSet(GPIO_LED2, GPIO_LED_ON);  // signal the end of processing
 }
 
 /* **************************************************** *

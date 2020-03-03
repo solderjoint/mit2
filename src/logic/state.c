@@ -16,6 +16,7 @@
 #include "vars/canmessage.h"
 #include "vars/founddomain.h"
 #include "vars/linestatus.h"
+#include "vars/period.h"
 
 /* **************************************************** *
  *               LOCAL VARIABLES SECTION
@@ -77,7 +78,7 @@ int32 CrashFourierPerform (int32 state) {
 				return LineStatusSet(STATUS_BUZZERFOUND);
 			} else {
 				xputs("err>line breach");
-				return LineStatusSet(STATUS_OVERFLOW);
+				return LineStatusSet(STATUS_LINEBREACH);
 			}
 		}
 	}
@@ -88,13 +89,11 @@ int32 CrashFourierPerform (int32 state) {
  * **************************************************** */
 int32 CrashCheckLineState (void) {
 	if (CheckEndpointSignalLoss()) {
-//		xputs("err>signal lost");
-		xputchar ('1');
+		xputs("err>signal lost");
 		return LineStatusSet(STATUS_SIGNALLOST);
 	}
 	if (CheckLineVoltageSpike()) {
-//		xputs("err>voltage spike");
-		xputchar ('2');
+		xputs("err>voltage spike");
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
 	// disabled since voltage can go as low as 50 mV
@@ -106,32 +105,27 @@ int32 CrashCheckLineState (void) {
 }
 
 /* **************************************************** *
- *           VARIOUS LOGIC VARIABLE WRAPPERS
- * **************************************************** */
-void CrashTriggerSet (void) {
-	GpioTriggerSet();
-}
-
-void CrashUpdateNormalVoltage (void) {
-	CheckLineVoltageNormalUpdate();
-}
-
-/* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
+static int32 nomsg_counter = 0;
+
 void StateSmolinCheck (void) {
 	if (CanMessageReceiverFlagGet()) {
 		SmolinProtocolProcessIncoming();
 		CanMessageReceiverFlagClear();
+		nomsg_counter = 0;
+	} else {
+		const int32 freq = PeriodSemaphoreFreqGet();
+		if (nomsg_counter >= freq) {
+			GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);
+		} else {
+			nomsg_counter++;
+		}
 	}
-//	if (CanMessageSenderFlagGet()) {
-//		SmolinProtocolProcessOutgoing();
-//		CanMessageSenderFlagClear();
-//	}
 }
 
 void StateVoltageCheck (void) {
-	ChecklineVoltageBufferRenew();  // call voltage buffer updating
+	ChecklineVoltageBufferRenew();   // call voltage buffer updating
 }
 
 void StateEndpointCheck (void) {
@@ -139,26 +133,33 @@ void StateEndpointCheck (void) {
 }
 
 void StateVoltageNormalSet (void) {
-	CheckLineVoltageNormalUpdate();  // updates normal voltage level
+	// updates normal voltage level
+	if (!LineStatusGet()) CheckLineVoltageNormalUpdate();
+}
+
+void StateRelaySet (void) {
+	GpioTriggerSet();
 }
 
 /* **************************************************** */
 int StateLineCheck (void) {
-	const int32 status = LineStatusGet();
+	int32 status = LineStatusGet();
 	switch (status) {
 		case STATUS_OK:
-			return CrashCheckLineState();
+			GpioLedsSet(GPIO_LED3, GPIO_LED_OFF);
+			status = CrashCheckLineState();
 			break;
 
 		case STATUS_VOLTSPIKE:
 		case STATUS_SAMPLING:
 		case STATUS_PROCESSING:
-			xputchar('#');
+			GpioLedsSet(GPIO_LED3, GPIO_LED_XOR);
 			CrashFourierPerform(status);
 			break;
 
 		default:
-			CrashTriggerSet();
+			GpioLedsSet(GPIO_LED3, GPIO_LED_ON);
+			StateRelaySet();
 			break;
 	}
 	return status;

@@ -1,4 +1,4 @@
-
+﻿
 #include "periph/gpio.h"
 
 #include <stdbool.h>
@@ -14,30 +14,11 @@
 #include <tivaware/driverlib/pin_map.h>
 #include <tivaware/driverlib/sysctl.h>
 
-/* **************************************************** *
- *                HEADER SPECIFIC MACROS
- * **************************************************** */
-#define PIN_BTN       GPIO_PIN_0 // switch button
-
-#define PIN_LED3      GPIO_PIN_3 // prog mode indicator
-#define PIN_LED2      GPIO_PIN_2 // read mode indicator
-#define PIN_LED1      GPIO_PIN_1 // writing/reading indicator
-#define PIN_LED_ON    (0x00)  // led on state
-#define PIN_LED_OFF   (0xFF)  // led off state
-
-#define PIN_ADDRESS1  GPIO_PIN_4 // module address selector
-#define PIN_ADDRESS2  GPIO_PIN_5 // module address selector
-#define PIN_ADDRESS3  GPIO_PIN_6 // module address selector
-
-#define PIN_CODEID0   GPIO_PIN_0 // module codename hardwired
-#define PIN_CODEID1   GPIO_PIN_1 // module codename hardwired
-#define PIN_CODEID2   GPIO_PIN_5 // module codename hardwired
-#define PIN_CODEID3   GPIO_PIN_6 // module codename hardwired
-#define PIN_CODEID4   GPIO_PIN_7 // module codename hardwired
-
-#define PIN_TRIGSET   GPIO_PIN_0 // trigger signal set
-#define PIN_TRIGCLR   GPIO_PIN_1 // trigger signal reset
-#define PIN_TRIGOUT   GPIO_PIN_3 // trigger signal output
+/* **************************************************** */
+enum internalGpioEnum {
+	LED_STATE_ON   = (0x00),    // led on state
+	LED_STATE_OFF  = (0xFF),    // led off state
+};
 
 /* **************************************************** *
  *             D-TRIGGER PINS MANIPULATION
@@ -46,30 +27,30 @@ void GpioTriggerInit (void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOB));
 
-	GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, PIN_TRIGSET | PIN_TRIGCLR);
-	GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, PIN_TRIGOUT);
+	GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_TRIG_SET | GPIO_TRIG_CLR);
+	GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_TRIG_OUT);
 	SysCtlDelay(100);
 
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGCLR, 0xFF);
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGSET, 0x00);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_CLR, 0xFF);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_SET, 0x00);
 }
 
 void GpioTriggerSet (void) {
 	// turn off opto-relay / break the line
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGSET, 0x00);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_SET, 0x00);
 	SysCtlDelay(1000);
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGSET, 0xFF);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_SET, 0xFF);
 }
 
 void GpioTriggerReset (void) {
 	// reset trigger state
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGCLR, 0x00);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_CLR, 0x00);
 	SysCtlDelay(1000);
-	GPIOPinWrite(GPIO_PORTB_BASE, PIN_TRIGCLR, 0xFF);
+	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_TRIG_CLR, 0xFF);
 }
 
 uint8 GpioTriggerGet (void) {
-	const uint8 res = GPIOPinRead(GPIO_PORTB_BASE, PIN_TRIGOUT) && 0xFF;
+	const uint8 res = GPIOPinRead(GPIO_PORTB_BASE, GPIO_TRIG_OUT) && 0xFF;
 	return res;
 }
 
@@ -81,13 +62,13 @@ void GpioModuleAdressInit (void) {
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
 
 	GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, \
-			PIN_ADDRESS1 | PIN_ADDRESS2 | PIN_ADDRESS3);
+			GPIO_ADDRESS1 | GPIO_ADDRESS2 | GPIO_ADDRESS3);
 	SysCtlDelay(100);
 }
 
 uint8 GpioModuleAdressGet (void) {
 	const uint8 read = GPIOPinRead(GPIO_PORTE_BASE, \
-			PIN_ADDRESS1 | PIN_ADDRESS2 | PIN_ADDRESS3);
+			GPIO_ADDRESS1 | GPIO_ADDRESS2 | GPIO_ADDRESS3);
 	const uint8 mask = (~(read >> 4)) & 0x07; // 0111b mask
 	return mask;
 }
@@ -107,14 +88,14 @@ void GpioModuleCodenameInit (void) {
 		GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 
 	GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, \
-			PIN_CODEID1 | PIN_CODEID2 | PIN_CODEID3 | PIN_CODEID4);
+			GPIO_MODULE1 | GPIO_MODULE2 | GPIO_MODULE3 | GPIO_MODULE4);
 	SysCtlDelay(100);
 }
 
 uint8 GpioModuleCodenameGet (void) {
 	const uint8 high = GPIOPinRead(GPIO_PORTF_BASE, \
-			PIN_CODEID2 | PIN_CODEID3 | PIN_CODEID4);
-	const uint8 low = GPIOPinRead(GPIO_PORTF_BASE, PIN_CODEID0 | PIN_CODEID1);
+			GPIO_MODULE2 | GPIO_MODULE3 | GPIO_MODULE4);
+	const uint8 low = GPIOPinRead(GPIO_PORTF_BASE, GPIO_MODULE0 | GPIO_MODULE1);
 	return (high >> 3) + low;
 }
 
@@ -126,24 +107,32 @@ void GpioLedsInit (void) {
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOK));
 
 	GPIOPinTypeGPIOOutput(GPIO_PORTK_BASE, \
-			PIN_LED1 | PIN_LED2 | PIN_LED3);
+			GPIO_LED1 | GPIO_LED2 | GPIO_LED3);
 	SysCtlDelay(1000);
 	GPIOPinWrite(GPIO_PORTK_BASE, \
-			PIN_LED1 | PIN_LED2 | PIN_LED3, PIN_LED_OFF);
+			GPIO_LED1 | GPIO_LED2 | GPIO_LED3, LED_STATE_OFF);
 	SysCtlDelay(100);
 }
 
 void GpioLedsSet (uint8 pins, int8 val) {
 	uint8 mask;
-	if (pins == 1) mask = PIN_LED1;
-	else if (pins == 2) mask = PIN_LED2;
-	else if (pins == 3) mask = PIN_LED3;
+	if (pins == 1) mask = GPIO_LED1;
+	else if (pins == 2) mask = GPIO_LED2;
+	else if (pins == 3) mask = GPIO_LED3;
 
-	if (val > 0) GPIOPinWrite(GPIO_PORTK_BASE, mask, PIN_LED_ON);
-	else if (val == 0) GPIOPinWrite(GPIO_PORTK_BASE, mask, PIN_LED_OFF);
-	else {
-		const uint8 new = ~(GPIOPinRead(GPIO_PORTK_BASE, mask));
-		GPIOPinWrite(GPIO_PORTK_BASE, mask, new);
+	switch (val) {
+		case GPIO_LED_ON:
+			GPIOPinWrite(GPIO_PORTK_BASE, mask, LED_STATE_ON);
+			break;
+
+		case GPIO_LED_XOR:
+			GPIOPinWrite(GPIO_PORTK_BASE, mask, \
+					~(GPIOPinRead(GPIO_PORTK_BASE, mask)));
+			break;
+
+		default:
+			GPIOPinWrite(GPIO_PORTK_BASE, mask, LED_STATE_OFF);
+			break;
 	}
 }
 
@@ -162,11 +151,11 @@ void GpioButtonInit (void) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOK);
 	while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOK));
 
-	GPIOPinTypeGPIOInput(GPIO_PORTK_BASE, PIN_BTN);
+	GPIOPinTypeGPIOInput(GPIO_PORTK_BASE, GPIO_BUTTON);
 	SysCtlDelay(100);
 }
 
 int32 GpioButtonGet (void) {
-	const int32 res = GPIOPinRead(GPIO_PORTK_BASE, PIN_BTN);
+	const int32 res = GPIOPinRead(GPIO_PORTK_BASE, GPIO_BUTTON);
 	return res;
 }

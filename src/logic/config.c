@@ -79,9 +79,9 @@ static void vars_init (void) {
 }
 
 static void vars_logic (void) {
-//	CrashUpdateNormalVoltage();
 	_delay_ms(100);  // 1 second of sleep to stabilize
 	BuzzerDomainInit();
+//	StateUpdateNormalVoltage();
 	LineStatusSet(STATUS_OK);
 	RelayStatusSet(RELAY_ON);
 	MutexInit();
@@ -89,8 +89,6 @@ static void vars_logic (void) {
 
 static void vars_restore (void) {
 	// restore values from eeprom
-//	xprintln("mult\t%i\t%i", \
-//			(int) mil(VoltageDCMultGet()), (int) mil(VoltageACMultGet()));
 }
 
 int32 ConfigureVariables (void) {

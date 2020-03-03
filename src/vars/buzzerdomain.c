@@ -20,8 +20,8 @@ static struct domain_t domain;
  *       GLOBAL ID NUMBER TO FREQUENCY TRANSFORMS
  * **************************************************** */
 int32 BuzzerDomainGetNumByFreq (const int32 freq) {
-	if (freq < BUZZER_FREQ_MIN) return -1;
-	if (freq > BUZZER_FREQ_MAX) return -2;
+	if (freq < BUZZER_FREQ_MIN) return 0/*-1*/;
+	if (freq > BUZZER_FREQ_MAX) return 0/*-2*/;
 
 	const int32 off = 20;
 	const int32 max = freq + off;
@@ -75,6 +75,15 @@ int32 BuzzerDomainGetCounterByFreq (const uint32 freq) {
 	return 0;
 }
 
+int32 BuzzerDomainGetLength() {
+	// returns size of currently stored buzzer positions
+	int32 counter = 0;
+	for (int32 i = 0; i < BUZZER_BUFLEN; i++) {
+		if (domain.freq[i] != 0) counter++;
+	}
+	return counter;
+}
+
 /* **************************************************** *
  *                MAIN GET/SET WRAPPERS
  * **************************************************** */
@@ -106,6 +115,7 @@ int32 BuzzerDomainSet (const uint16 num, const uint32 freq) {
  *           EXTERNAL INITIALIZATION WRAPPER
  * **************************************************** */
 static const int16 staticfreq[] = {
+	FOURIER_FREQ_REFPOWER,  // reference endpoint
 	4150, 4200, 4250, 4300, 4350, 4400, 4450, 4500,
 	4550, 4600, 4650, 4700, 4750, 4800, 4850, 4900,
 	5100, 5150, 5200, 5250, 5300, 5350, 5400, 5450,

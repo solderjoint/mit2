@@ -14,7 +14,7 @@
  * **************************************************** */
 #include "periph/gpio.h"
 
-//#include "logic/math/domain.h"
+#include "logic/math/linecheck.h"
 
 #include "vars/buzzerdomain.h"
 #include "vars/canmessage.h"
@@ -31,9 +31,65 @@
 
 // CAUTION! A VERY FUCKING LONG SWITCH CASE LIST AHEAD!
 int32 ConfigVarTableGet (const int32 address) {
-	int32 res;
+	int32 res = 0;
 	switch (address & 0xFFFF) {
 		/* **************************************************** */
+		case VAR_LINE_VOLTDC1:
+			res = mil(CheckLineVoltageMeanGet());
+			res = (res >> 16) & 0xFFFF;
+			break;
+		case VAR_LINE_VOLTDC0:
+			res = mil(CheckLineVoltageMeanGet());
+			res &= 0xFFFF;
+			break;
+		case VAR_LINE_VOLTAC1:
+			res = mil(CheckLineVoltageMeanGet());
+			res = (res >> 16) & 0xFFFF;
+			break;
+		case VAR_LINE_VOLTAC0:
+			res = mil(CheckLineVoltageMeanGet());
+			res &= 0xFFFF;
+			break;
+
+		case VAR_MUTEX_REG: res = MutexCheckPending(); break;
+//		case VAR_STREAM_REG: res =
+//		case VAR_FOURIER_BUFSIZE: res =
+//		case VAR_FOURIER_FREQRES:
+
+//		case VAR_FOUNDBUF_SIZE    = 31000:
+//		case VAR_FOUNDBUF_NUM01:
+//case VAR_FOUNDBUF_NUM02:
+//case VAR_FOUNDBUF_NUM03:
+//		case VAR_FOUNDBUF_NUM04:
+//case VAR_FOUNDBUF_NUM05:
+//case VAR_FOUNDBUF_NUM06:
+//		case VAR_FOUNDBUF_NUM07:
+//case VAR_FOUNDBUF_NUM08:
+//case VAR_FOUNDBUF_NUM09:
+//		case VAR_FOUNDBUF_NUM10:
+//case VAR_FOUNDBUF_NUM11:
+//case VAR_FOUNDBUF_NUM12:
+//		case VAR_FOUNDBUF_NUM13:
+//case VAR_FOUNDBUF_NUM14:
+//case VAR_FOUNDBUF_NUM15:
+//		case VAR_FOUNDBUF_NUM16:
+//case VAR_FOUNDBUF_NUM17:
+//case VAR_FOUNDBUF_NUM18:
+//		case VAR_FOUNDBUF_NUM19:
+//case VAR_FOUNDBUF_NUM20:
+//case VAR_FOUNDBUF_NUM21:
+//		case VAR_FOUNDBUF_NUM22:
+//case VAR_FOUNDBUF_NUM23:
+//case VAR_FOUNDBUF_NUM24:
+//		case VAR_FOUNDBUF_NUM25:
+//case VAR_FOUNDBUF_NUM26:
+//case VAR_FOUNDBUF_NUM27:
+//		case VAR_FOUNDBUF_NUM28:
+//case VAR_FOUNDBUF_NUM29:
+//case VAR_FOUNDBUF_NUM33:
+//		case VAR_FOUNDBUF_NUM31:
+//case VAR_FOUNDBUF_NUM32:
+
 
 		/* **************************************************** */
 		case VAR_LINE_STATUS: res = LineStatusGet(); break;
@@ -80,7 +136,7 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_FOURIER_FREQREF: res = FourierFreqReferenceGet(); break;
 
 
-		case VAR_SEARCHBUF_SIZE: res = FoundDomainGetLength(); break;
+		case VAR_SEARCHBUF_SIZE: res = BuzzerDomainGetLength(); break;
 
 		case VAR_SEARCHBUF_NUM01:
 		case VAR_SEARCHBUF_NUM02:
@@ -114,11 +170,9 @@ int32 ConfigVarTableGet (const int32 address) {
 		case VAR_SEARCHBUF_NUM33:
 		case VAR_SEARCHBUF_NUM31:
 		case VAR_SEARCHBUF_NUM32:
-			res = BuzzerDomainGetNumByFreq( \
-					FoundDomainGetByCounter( \
-					(address & 0xFFFF) - VAR_SEARCHBUF_NUM01));
+			res = BuzzerDomainGetFreqByNum( \
+					(address & 0xFFFF) - VAR_SEARCHBUF_NUM01);
 			break;
-
 
 		default: res = MBUS_ERROR_ADDRESS; break;
 	}

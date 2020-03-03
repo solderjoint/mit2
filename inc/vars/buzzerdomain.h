@@ -24,6 +24,7 @@ void BuzzerDomainInit (void);
 void BuzzerDomainReset (void);
 int32 BuzzerDomainSet (const uint16 num, const uint32 freq);
 
+int32 BuzzerDomainGetLength (void);
 int32 BuzzerDomainGetFreqStep (void);
 int32 BuzzerDomainGetNumByFreq(const int32 freq);
 int32 BuzzerDomainGetFreqByNum (const int32 num);

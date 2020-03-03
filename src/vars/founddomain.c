@@ -45,7 +45,7 @@ void FoundDomainClear (const uint32 ptr) {
  *               FOUND FREQUENCIES BUFFER
  * **************************************************** */
 int32 FoundDomainGetByCounter (const uint32 counter) {
-	if (counter >= RAWBUF_LEN) return -1;
+	if (counter >= RAWBUF_LEN) return 0;
 	return rawbuf.freq[counter];
 }
 

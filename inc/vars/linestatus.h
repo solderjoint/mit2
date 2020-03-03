@@ -11,13 +11,13 @@
  *                  SYSTEM-WIDE MACROS
  * **************************************************** */
 enum lineStatusEnum {
-	STATUS_OK = 0,
-	STATUS_VOLTSPIKE = 1,
-	STATUS_SAMPLING = 2,
-	STATUS_PROCESSING = 4,
-	STATUS_SIGNALLOST = 8,
-	STATUS_UNDERFLOW = 16,
-	STATUS_OVERFLOW = 32,
+	STATUS_OK          = 0,
+	STATUS_VOLTSPIKE   = 1,
+	STATUS_SAMPLING    = 2,
+	STATUS_PROCESSING  = 4,
+	STATUS_SIGNALLOST  = 8,
+	STATUS_LINESHORT   = 16,
+	STATUS_LINEBREACH  = 32,
 	STATUS_BUZZERFOUND = 64,
 };
 

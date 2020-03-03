@@ -18,8 +18,7 @@ uint32 PeriodCounterGet (void) { return period_counter; }
 static int32 period_freq;
 
 int32 PeriodSemaphoreFreqGet (void) {
-	const int32 val = (period_freq > 10)? period_freq : PERIOD_TIMER_FREQ;
-	return (val > 1000)? PERIOD_TIMER_FREQ : val;
+	return period_freq;
 }
 
 int32 PeriodSemaphoreFreqSet (const uint32 val) {
