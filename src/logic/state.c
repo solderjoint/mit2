@@ -107,37 +107,40 @@ int32 CrashCheckLineState (void) {
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
-static int32 nomsg_counter = 0;
+static int32 comm_noflag = 0;
 
 void StateSmolinCheck (void) {
+	// read message from buffer if any is received
 	if (CanMessageReceiverFlagGet()) {
+		GpioLedsSet(GPIO_LED2, GPIO_LED_ON);
 		SmolinProtocolProcessIncoming();
 		CanMessageReceiverFlagClear();
-		nomsg_counter = 0;
+		comm_noflag = 0;
 	} else {
-		const int32 freq = PeriodSemaphoreFreqGet();
-		if (nomsg_counter >= freq) {
+		if (comm_noflag > mil(1)) {
+			// error: communication channel lost
 			GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);
-		} else {
-			nomsg_counter++;
-		}
+		} else comm_noflag++;
 	}
 }
+/* **************************************************** */
 
-void StateVoltageCheck (void) {
-	ChecklineVoltageBufferRenew();   // call voltage buffer updating
+inline void StateVoltageCheck (void) {
+	// call voltage buffer updating
+	CheckLineVoltageBufferRenew();
 }
 
-void StateEndpointCheck (void) {
-	CheckLineEndpointSignalRenew();  // call linecheck endpoint updater
+inline void StateEndpointCheck (void) {
+	// call linecheck endpoint updater
+	CheckLineEndpointSignalRenew();
 }
 
-void StateVoltageNormalSet (void) {
+inline void StateVoltageNormalSet (void) {
 	// updates normal voltage level
-	if (!LineStatusGet()) CheckLineVoltageNormalUpdate();
+	if (LineStatusGet() == STATUS_OK) CheckLineVoltageNormalUpdate();
 }
 
-void StateRelaySet (void) {
+static void StateRelaySet (void) {
 	GpioTriggerSet();
 }
 

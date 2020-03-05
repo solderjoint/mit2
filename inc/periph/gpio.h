@@ -50,7 +50,7 @@ void GpioModuleCodenameInit (void);
 uint8 GpioModuleCodenameGet (void);
 
 void GpioLedsInit (void);
-void GpioLedsSet (uint8 pins, int8 val);
+void GpioLedsSet (uint8 mask, int8 val);
 int8 GpioLedsGet (const uint8 pins);
 uint8 GpioLedsPortGet (void);
 

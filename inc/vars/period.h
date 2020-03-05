@@ -23,8 +23,8 @@ int32 PeriodSemaphoreFreqSet (const uint32 val);
 int32 PeriodCommCheckGet (void);
 int32 PeriodCommCheckSet (const uint32 val);
 
-int32 PeriodLineEndpointCheckGet (void);
-int32 PeriodLineEndpointCheckSet (const uint32 val);
+int32 PeriodEndpointCheckGet (void);
+int32 PeriodEndpointCheckSet (const uint32 val);
 
 int32 PeriodLineVoltCheckGet (void);
 int32 PeriodLineVoltCheckSet (const uint32 val);
@@ -34,6 +34,9 @@ int32 PeriodLineVoltUpdateSet (const uint32 val);
 
 int32 PeriodLineStateUpdateGet (void);
 int32 PeriodLineStateUpdateSet (const uint32 val);
+
+int32 PeriodBootupDelayGet (void);
+int32 PeriodBootupDelaySet (const uint32 val);
 
 char PeriodConstantsInit (void);
 

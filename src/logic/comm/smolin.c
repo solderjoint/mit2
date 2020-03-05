@@ -5,6 +5,8 @@
 //#include "logic/data/longword.h"
 #include "logic/comm/mbus.h"
 
+#include "vars/canmessage.h"
+
 #include "util/print.h"
 #include "util/util.h"
 
@@ -27,40 +29,6 @@
 //	const int32 offy = y & ((CAN_MSGBUF_SIZEY - 1) & 0xFF);
 //	return table[offx][offy];  // return correct address
 //}
-
-/* **************************************************** *
- *                SMOLIN DATA PROCESSING
- * **************************************************** */
-//static void SmolinDataProcess (uint8 msg[8]) {
-//	xprintln("%u\t", HeaderReceiverGet());
-//}
-
-/* **************************************************** *
- *           SMOLIN PROTOCOL MAIN ENTRY POINT
- * **************************************************** */
-//int32 SmolinProtocolProcess
-//(const uint32 header, const uint32 length, uint8 msg[8]) {
-//	_check(length <= 8);
-
-//	HeaderSet(header);
-//	// check that we got our id
-////	const uint32 add_low = 0x20, add_high = 0x27;
-////	if (HeaderReceiverGet() == address)
-//	if (HeaderGet() >= 0) {
-//		SmolinDataProcess(msg);
-//	} else {
-//		// append to received table
-//	}
-//}
-
-/* **************************************************** *
- *            SMOLIN PROTOCOL ENTRY WRAPPERS
- * **************************************************** */
-//#include "periph/can.h"
-#include "periph/gpio.h"
-
-#include "vars/canmessage.h"
-#include "util/print.h"
 
 /* **************************************************** *
  *           SMOLIN INCOMING MESSAGE WRAPPERS
@@ -153,7 +121,6 @@ inline static void SmolinProtocolMbusSend (void) {
  *           SMOLIN PROTOCOL INCOMING HANDLER
  * **************************************************** */
 inline void SmolinProtocolProcessIncoming (void) {
-	GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);  // signal the start of processing
 	CanMessageReceive();  // update incoming message
 	InputHeaderSet (CanMessageReceiverIdGet());
 	// protect buffer from overwriting by copying it
@@ -167,7 +134,7 @@ inline void SmolinProtocolProcessIncoming (void) {
 
 	if (InputHeaderIdDestGet() == device_id) {
 		if (InputHeaderFastDataGet()) {
-			QuickInputProcess(input_buffer);
+//			QuickInputProcess(input_buffer);
 			QuickOutputProcess(output_buffer);
 			SmolinProtocolQuickSend();
 		} else if (InputHeaderModbusDataGet()) {
@@ -175,7 +142,6 @@ inline void SmolinProtocolProcessIncoming (void) {
 			SmolinProtocolMbusSend();
 		}
 	}
-	GpioLedsSet(GPIO_LED2, GPIO_LED_ON);  // signal the end of processing
 }
 
 /* **************************************************** *

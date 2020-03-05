@@ -10,18 +10,21 @@ static int32 fourierSamplingPasses;
 int32 FourierSamplingPassesGet (void) { return fourierSamplingPasses; }
 void FourierSamplingPassesSet (const int32 x) {
 	if ((x > 0) && (x <= 128)) fourierSamplingPasses = x;
+	else return FOURIER_SAMPLE_PASSES;
 }
 
 static int32 fourierSamplingBufLen;
 int32 FourierBufferLengthGet (void) { return fourierSamplingBufLen; }
 void FourierBufferLengthSet (const int32 x) {
 	if ((x > 0) && (x < 2048)) fourierSamplingBufLen = x;
+	else return FOURIER_SAMPLE_BUFLEN;
 }
 
 static int32 fourierSamplingRate;
 int32 FourierSamplingRateGet (void) { return fourierSamplingRate; }
 void FourierSamplingRateSet (const int32 x) {
 	if ((x > 0) && (x <= 128000)) fourierSamplingRate = x;
+	else return FOURIER_SAMPLE_RATE;
 }
 
 float FourierFreqResolutionGet (void) {

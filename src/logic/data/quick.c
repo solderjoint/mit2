@@ -34,10 +34,12 @@ int32 QuickOutputProcess (uint8 buf[8]) {
 	buf[1] = (uint8)RelayStatusGet();   // relay state
 
 	// return found (if any) buzzer numbers in the system
-	buf[2] = BuzzerDomainGetNumByFreq(FoundDomainGetByCounter(0));
-	buf[3] = BuzzerDomainGetNumByFreq(FoundDomainGetByCounter(1));
+	const int16 fcurr = FoundDomainGetByCounter(0);
+	const int16 fprev = FoundDomainGetByCounter(1);
+	buf[2] = (fcurr > 0)? BuzzerDomainGetNumByFreq(fcurr) : 0;
+	buf[3] = (fprev > 0)? BuzzerDomainGetNumByFreq(fprev) : 0;
 
-	const int32 vac = counter++;  // message counter value
+	const int32 vac = counter++;        // message counter value
 //	const int32 vac = 1000 * CheckLineVoltageMeanGet();
 	buf[4] = (uint8)(vac & 0xFF);       // (line volt_ac[0])
 	buf[5] = (uint8)((vac >> 8) & 0xFF);// (line volt_ac[1])

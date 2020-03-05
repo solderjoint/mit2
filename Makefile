@@ -1,4 +1,4 @@
-# ####################################################### #
+﻿# ####################################################### #
 TARGET     = mit
 # ####################################################### #
 MAKE      := remake
@@ -44,10 +44,14 @@ CINC      += -I$(INCDIR)/*/*
 CINC      += -I./newlib-1.18.0/newlib/libc/include
 
 # ####################################################### #
-#CFLAGS     = -funroll-loops -fstack-usage -Og -g -gdwarf-2
-CFLAGS     = -funroll-loops -fstack-usage -Os
-CFLAGS    += -fdata-sections -ffunction-sections -w
+#CFLAGS     = -funroll-loops -fstack-usage -Og -g -w -gdwarf-2
+CFLAGS     = -funroll-loops -fstack-usage -Os -w
 CFLAGS    += -fno-common -fverbose-asm -fmax-errors=16
+CFLAGS    += -fkeep-static-functions -fkeep-static-consts
+CFLAGS    += -fverbose-asm -fsection-anchors -fbounds-check
+CFLAGS    += -fdata-sections -ffunction-sections -fno-common
+CFLAGS    += -finit-local-zero -fstdarg-opt -fsigned-char
+CFLAGS    += -fmax-errors=10 -ftabstop=4 -finline-functions
 CFLAGS    += -W -Wall -Wextra -Wshadow -Wcast-align
 CFLAGS    += -Werror=implicit-function-declaration
 CFLAGS    += -mcpu=cortex-m4 -mlittle-endian -mthumb

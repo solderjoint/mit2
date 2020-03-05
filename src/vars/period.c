@@ -7,7 +7,7 @@
 /* **************************************************** *
  *              SEMAPHORE COUNTER WRAPPER
  * **************************************************** */
-static uint32 period_counter;
+static uint32 period_counter = 0;
 
 void PeriodCounterIncrement (void) { period_counter++; }
 uint32 PeriodCounterGet (void) { return period_counter; }
@@ -18,11 +18,12 @@ uint32 PeriodCounterGet (void) { return period_counter; }
 static int32 period_freq;
 
 int32 PeriodSemaphoreFreqGet (void) {
-	return period_freq;
+	const int32 x = period_freq;
+	return ((x < 10) || (x > 5000))? PERIOD_TIMER_FREQ : x;
 }
 
 int32 PeriodSemaphoreFreqSet (const uint32 val) {
-	const int32 rate = ((val < 10) || (val > 1000))
+	const int32 rate = ((val < 10) || (val > 5000))
 			? PERIOD_TIMER_FREQ : val;
 	period_freq = rate;
 	period_counter = 0; // clear counter
@@ -34,12 +35,12 @@ int32 PeriodSemaphoreFreqSet (const uint32 val) {
  * **************************************************** */
 static int32 endp_check;
 
-inline int32 PeriodLineEndpointCheckGet (void) {
+inline int32 PeriodEndpointCheckGet (void) {
 	const int32 x = endp_check;
 	return ((x < 1) || (x > 100))? PERIOD_CHECK_ENDPOINT : x;
 }
 
-int32 PeriodLineEndpointCheckSet (const uint32 val) {
+int32 PeriodEndpointCheckSet (const uint32 val) {
 	endp_check = ((val < 1) || (val > 100))? PERIOD_CHECK_ENDPOINT : val;
 	return endp_check;
 }
@@ -109,6 +110,23 @@ int32 PeriodCommCheckSet (const uint32 val) {
 }
 
 /* **************************************************** *
+ *         COMMUNICATION UPDATE PERIOD WRAPPER
+ * **************************************************** */
+static int32 boot_delay;
+
+inline int32 PeriodBootupDelayGet (void) {
+	const int32 val = boot_delay;
+	return ((val < 1) || (val > kil(100)))? PERIOD_BOOTUP_DELAY : val;
+}
+
+int32 PeriodBootupDelaySet (const uint32 val) {
+	const uint32 delay = ((val < 1) || (val > kil(100)))
+				? PERIOD_BOOTUP_DELAY : val;
+	boot_delay = delay;
+	return boot_delay;
+}
+
+/* **************************************************** *
  *            EXTERNAL DEFAULT VALUE SETTER
  * **************************************************** */
 char PeriodConstantsInit (void) {
@@ -117,4 +135,5 @@ char PeriodConstantsInit (void) {
 	comm_check = PERIOD_CHECK_COMM;
 	line_check = PERIOD_CHECK_STATE;
 	volt_update = PERIOD_UPDATE_VOLT;
+	boot_delay = PERIOD_BOOTUP_DELAY;
 }

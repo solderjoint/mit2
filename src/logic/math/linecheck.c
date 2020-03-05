@@ -39,7 +39,7 @@ void CheckLineEndpointSignalRenew (void) {
 static float lineVoltageBuffer[LINE_VOLTBUF_SIZE];
 
 float LineVoltageBufferPrevGet (void) { return lineVoltageBuffer[0]; }
-float CheckLineVoltageMeanGet (void) {
+inline float CheckLineVoltageMeanGet (void) {
 	// return a mean value of voltage buffer
 	float sum = 0.0f;
 	for (int32 i = 0; i < LINE_VOLTBUF_SIZE; i++)
@@ -56,7 +56,7 @@ void LineVoltageBufferSet (float val) {
 	/*if (val > 0.0f)*/ lineVoltageBuffer[0] = val;
 }
 
-void ChecklineVoltageBufferRenew (void) {
+inline void CheckLineVoltageBufferRenew (void) {
 	const uint16 adcraw = SpiExternalAdcGetNonBlocking();
 	const float mult = VoltageDCMultGet();
 	const float res = cast(float, adcraw) * mult;
@@ -78,7 +78,7 @@ int32 CheckEndpointSignalLoss (void) {
 }
 
 int32 CheckLineVoltageSpike (void) {
-	ChecklineVoltageBufferRenew();
+	CheckLineVoltageBufferRenew();
 
 	const float diff = VoltageSpikeGet();
 	const float norm = VoltageNormalGet();

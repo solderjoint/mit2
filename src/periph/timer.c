@@ -1,4 +1,4 @@
-
+﻿
 #include "periph/timer.h"
 
 #include <stdbool.h>
@@ -137,12 +137,14 @@ void TimerSamplingDestroy (void) {
  * **************************************************** */
 static void (*timerSemaphoreInterruptAttachment) (void) = NULL;
 
+//#include "periph/gpio.h"
 void TimerSemaphoreAttachInterrupt (void (*foo) (void)) {
 	timerSemaphoreInterruptAttachment = foo;
 }
 void TimerSemaphoreInterruptAttachmentCall (void) {
 	if ((*timerSemaphoreInterruptAttachment) != NULL)
 		timerSemaphoreInterruptAttachment();
+//	else GpioLedsSet(GPIO_LED3, GPIO_LED_XOR);
 }
 
 void TimerSemaphoreInterrupt (void) {

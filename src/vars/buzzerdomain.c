@@ -6,6 +6,8 @@
 
 #include "project.h"
 
+#include "vars/fourierconsts.h"
+
 /* **************************************************** *
  *         BUZZER DOMAIN FREQUENCY SEARCH VARS
  * **************************************************** */
@@ -23,12 +25,15 @@ int32 BuzzerDomainGetNumByFreq (const int32 freq) {
 	if (freq < BUZZER_FREQ_MIN) return 0/*-1*/;
 	if (freq > BUZZER_FREQ_MAX) return 0/*-2*/;
 
-	const int32 off = 20;
-	const int32 max = freq + off;
-	const int32 min = freq - off;
+	const int32 border = 1.65f * FourierFreqResolutionGet();
+	const int16 left = freq + border;
+	const int16 right = freq - border;
+	// search within left and right borders range
 	for (int32 i = 0; (i < BUZZER_BUFLEN); i++) {
-		const int32 comp = domain.freq[i];
-		if ((comp > min) && (comp < max)) return ((int32) domain.number[i]);
+		const int16 comp = domain.freq[i];
+		if ((comp > right) && (comp < left)) {
+			return ((int32) domain.number[i]);
+		}
 	}
 	return 0;
 }

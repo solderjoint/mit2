@@ -22,7 +22,7 @@ int32 CheckLineVoltageSpike (void);
 int32 CheckLineVoltageOverflow (void);
 
 void CheckLineEndpointSignalRenew (void);
-void ChecklineVoltageBufferRenew (void);
+void CheckLineVoltageBufferRenew (void);
 float CheckLineVoltageMeanGet (void);
 void CheckLineVoltageNormalUpdate (void);
 

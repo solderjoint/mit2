@@ -17,17 +17,17 @@ enum mutexEnum {
 	MUTEX_COMMCHECK,
 	MUTEX_VOLTUPDATE,
 	_MUTEX_MAXPOS    = 31,
-	_MUTEX_MAXNUM    = 0x7FFFFFFF, // removed 31st bit
 };
 
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 MutexInit (void);
+
 char MutexCheckPending(void);
 char MutexGet(enum mutexEnum var_pos);
-int32 MutexClear (enum mutexEnum var_pos);
 char MutexGetAndClear (enum mutexEnum var_pos);
+int32 MutexClear (enum mutexEnum var_pos);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

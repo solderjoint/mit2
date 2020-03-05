@@ -114,12 +114,7 @@ void GpioLedsInit (void) {
 	SysCtlDelay(100);
 }
 
-void GpioLedsSet (uint8 pins, int8 val) {
-	uint8 mask;
-	if (pins == 1) mask = GPIO_LED1;
-	else if (pins == 2) mask = GPIO_LED2;
-	else if (pins == 3) mask = GPIO_LED3;
-
+void GpioLedsSet (uint8 mask, int8 val) {
 	switch (val) {
 		case GPIO_LED_ON:
 			GPIOPinWrite(GPIO_PORTK_BASE, mask, LED_STATE_ON);
@@ -137,7 +132,7 @@ void GpioLedsSet (uint8 pins, int8 val) {
 }
 
 int8 GpioLedsGet (const uint8 pins) {
-	return (GPIOPinRead(GPIO_PORTK_BASE, pins) > 0);  // return 1:0
+	return (GPIOPinRead(GPIO_PORTK_BASE, pins) > 0);
 }
 
 uint8 GpioLedsPortGet (void) {

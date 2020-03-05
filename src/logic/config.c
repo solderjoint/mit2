@@ -56,7 +56,7 @@ static void periph_gpio (void) {
 }
 
 void TimerClockIntHandler (void) {
-	GpioLedsSet(1, -1); // xor the led
+	GpioLedsSet(GPIO_LED1, GPIO_LED_XOR);  // xor status led
 	WatchdogReset();
 }
 
@@ -79,22 +79,28 @@ static void vars_init (void) {
 }
 
 static void vars_logic (void) {
-	_delay_ms(100);  // 1 second of sleep to stabilize
 	BuzzerDomainInit();
 //	StateUpdateNormalVoltage();
 	LineStatusSet(STATUS_OK);
 	RelayStatusSet(RELAY_ON);
-	MutexInit();
 }
 
 static void vars_restore (void) {
 	// restore values from eeprom
 }
 
+static void vars_mutex (void) {
+	const int32 ms = PeriodBootupDelayGet();
+	_delay_ms(ms);
+	MutexInit();
+}
+
 int32 ConfigureVariables (void) {
 	vars_init();
 	vars_logic();
 	vars_restore();
+	vars_mutex();
+	// TODO: reinit changed variables
 }
 
 /* **************************************************** *
