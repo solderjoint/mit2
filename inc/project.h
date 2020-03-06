@@ -50,7 +50,7 @@ enum projectDefaultEnum {
 	VOLTAGE_SPIKE         = 3000,   // minimum voltage diff to crash [mV]
 	VOLTAGE_NORMAL        = 2000,   // normal conditions voltage [mV]
 	VOLTAGE_OVERFLOW      = 22500,  // overflow voltage value [mV]
-	VOLTAGE_UNDERFLOW     = 20,     // underflow voltage value [mV]
+	VOLTAGE_UNDERFLOW     = 50,     // underflow voltage value [mV]
 };
 
 //#define  VOLTAGE_DCMULT     (0.011718750f)  // convert 0..2048ADC to 0..24VDC

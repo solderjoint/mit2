@@ -43,8 +43,9 @@ static void periph_comm (void) {
 	SpiExternalAdcGetNonBlocking();
 
 	CanTransmissionInit(PeriphCanRateGet());
-	CanTransmissionAttachInterruptOnReceive(CanMessageReceiverFlagSet);
-	CanTransmissionAttachInterruptOnSend(CanMessageSenderFlagSet);
+	CanTransmissionAttachInterruptOnReceive(SmolinProtocolProcessIncoming);
+//	CanTransmissionAttachInterruptOnReceive(CanMessageReceiverFlagSet);
+//	CanTransmissionAttachInterruptOnSend(CanMessageSenderFlagSet);
 }
 
 static void periph_gpio (void) {
@@ -85,32 +86,46 @@ static void vars_logic (void) {
 	RelayStatusSet(RELAY_ON);
 }
 
+//#include "util/util.h"
+#include <stdlib.h>
+#include "logic/data/vartable.h"
+#include <locale.h>
+
 static void vars_restore (void) {
 	// restore values from eeprom
+	setlocale(LC_ALL,"C");
+//	const uint32 time = (uint32) atoi(VERSION);
+	const uint32 time = VarTableGet(VAR_FIRMWARE_REV0) \
+			+ (VarTableGet(VAR_FIRMWARE_REV1) << 16);
+	xprintln("time\t[%u]\t(%u)", time, atoi(VERSION)
+			/*VarTableGet(VAR_FIRMWARE_REV1) << 16 \
+			+ VarTableGet(VAR_FIRMWARE_REV0)*/ );
 }
 
 static void vars_mutex (void) {
+	const int32 old = PeriodLineStateUpdateGet();
+	PeriodLineStateUpdateSet(mil(1));  // infinite delay
+	MutexInit();
+
 	const int32 ms = PeriodBootupDelayGet();
 	_delay_ms(ms);
-	MutexInit();
-}
-
-int32 ConfigureVariables (void) {
-	vars_init();
-	vars_logic();
-	vars_restore();
-	vars_mutex();
-	// TODO: reinit changed variables
+	PeriodLineStateUpdateSet(old);
 }
 
 /* **************************************************** *
  *                INITIALIZATION SECTION
  * **************************************************** */
-int32 ConfigurePeripherals (void) {
+int32 Configure (void) {
 	periph_system();
 	periph_comm();
 	periph_gpio();
 	periph_other();
+
+	vars_init();
+	vars_logic();
+	vars_restore();
+	vars_mutex();
+	// TODO: reinit changed variables
 
 	return 0;
 }

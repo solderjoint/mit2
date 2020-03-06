@@ -97,32 +97,32 @@ int32 CrashCheckLineState (void) {
 		return LineStatusSet(STATUS_VOLTSPIKE);
 	}
 	// disabled since voltage can go as low as 50 mV
-//	else if (CheckLineVoltageOverflow() < 0) {
-//		xputs("err>line short\n");
-//		return LineStatusSet(STATUS_UNDERFLOW);
-//	}
+	else if (CheckLineVoltageOverflow() < 0) {
+		xputs("err>line short\n");
+		return LineStatusSet(STATUS_LINESHORT);
+	}
 	return 0;
 }
 
 /* **************************************************** *
  *               MAIN PROGRAM ENTRY POINT
  * **************************************************** */
-static int32 comm_noflag = 0;
+//static int32 comm_noflag = 0;
 
-void StateSmolinCheck (void) {
-	// read message from buffer if any is received
-	if (CanMessageReceiverFlagGet()) {
-		GpioLedsSet(GPIO_LED2, GPIO_LED_ON);
-		SmolinProtocolProcessIncoming();
-		CanMessageReceiverFlagClear();
-		comm_noflag = 0;
-	} else {
-		if (comm_noflag > mil(1)) {
-			// error: communication channel lost
-			GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);
-		} else comm_noflag++;
-	}
-}
+//void StateSmolinCheck (void) {
+//	// read message from buffer if any is received
+//	if (CanMessageReceiverFlagGet()) {
+//		GpioLedsSet(GPIO_LED2, GPIO_LED_ON);
+//		SmolinProtocolProcessIncoming();
+//		CanMessageReceiverFlagClear();
+//		comm_noflag = 0;
+//	} else {
+//		if (comm_noflag > mil(1)) {
+//			// error: communication channel lost
+//			GpioLedsSet(GPIO_LED2, GPIO_LED_OFF);
+//		} else comm_noflag++;
+//	}
+//}
 /* **************************************************** */
 
 inline void StateVoltageCheck (void) {

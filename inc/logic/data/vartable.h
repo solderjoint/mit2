@@ -40,6 +40,9 @@ enum mbusROVarTableEnum {
 	VAR_FOUNDBUF_NUM25,  VAR_FOUNDBUF_NUM26,  VAR_FOUNDBUF_NUM27,
 	VAR_FOUNDBUF_NUM28,  VAR_FOUNDBUF_NUM29,  VAR_FOUNDBUF_NUM33,
 	VAR_FOUNDBUF_NUM31,  VAR_FOUNDBUF_NUM32,
+
+	VAR_FIRMWARE_REV1    = 32767,
+	VAR_FIRMWARE_REV0,
 };
 
 /* **************************************************** */
@@ -101,8 +104,8 @@ enum mbusRWVarTableEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int32 ConfigVarTableGet (const int32 address);
-int32 ConfigVarTableSet (const int32 address, const int16 value);
+int32 VarTableGet (const int32 address);
+int32 VarTableSet (const int32 address, const int16 value);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

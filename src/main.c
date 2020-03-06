@@ -24,18 +24,15 @@
  * **************************************************** */
 #include "periph/gpio.h"
 int main(void) {
-	ConfigurePeripherals();
-	ConfigureVariables();
+	Configure();
 
 	while (1) {
 		if (MutexCheckPending() != 0) {
-			if (MutexGetAndClear(MUTEX_COMMCHECK)) StateSmolinCheck();
+//			if (MutexGetAndClear(MUTEX_COMMCHECK)) StateSmolinCheck();
 			if (MutexGetAndClear(MUTEX_VOLTCHECK)) StateVoltageCheck();
 			if (MutexGetAndClear(MUTEX_ENDPCHECK)) StateEndpointCheck();
 			if (MutexGetAndClear(MUTEX_STATECHECK)) StateLineCheck();
 			if (MutexGetAndClear(MUTEX_VOLTUPDATE)) StateVoltageNormalSet();
-		} else {
-			StateSmolinCheck();  // perform smolin protocol info update
 		}
 	}
 	return 0;

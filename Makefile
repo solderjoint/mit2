@@ -12,14 +12,15 @@ DUMP       = arm-none-eabi-objdump
 SIZE       = arm-none-eabi-size
 
 STACKUSAGE = cat $(find obj/ -iname *.su | tr '\n' ' ')
+TIMESTAMP  = $(shell date +%s)
 
 # ####################################################### #
 DEVICE     = PART_TM4C1231H6PZ
 BINDIR    := build
-INCDIR    ?= inc
-LIBDIR    ?= libs
+INCDIR    := inc
+LIBDIR    := libs
 OBJDIR    := obj
-SRCDIR    ?= src
+SRCDIR    := src
 
 # ####################################################### #
 ASRC       = $(shell find $(SRCDIR) -type f -name '*.asm')
@@ -44,7 +45,7 @@ CINC      += -I$(INCDIR)/*/*
 CINC      += -I./newlib-1.18.0/newlib/libc/include
 
 # ####################################################### #
-#CFLAGS     = -funroll-loops -fstack-usage -Og -g -w -gdwarf-2
+#CFLAGS     = -funroll-loops -fstack-usage -Og -g -gdwarf-2
 CFLAGS     = -funroll-loops -fstack-usage -Os -w
 CFLAGS    += -fno-common -fverbose-asm -fmax-errors=16
 CFLAGS    += -fkeep-static-functions -fkeep-static-consts
@@ -56,7 +57,8 @@ CFLAGS    += -W -Wall -Wextra -Wshadow -Wcast-align
 CFLAGS    += -Werror=implicit-function-declaration
 CFLAGS    += -mcpu=cortex-m4 -mlittle-endian -mthumb
 CFLAGS    += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-CFLAGS    += $(CINC)  -D $(DEVICE)
+#CFLAGS    += $(CINC)  -D $(DEVICE)  -DVERSION=\"123456789\"
+CFLAGS    += $(CINC)  -D $(DEVICE)  -DVERSION=\"$(TIMESTAMP)\"
 
 ASMFLAGS   = $(CFLAGS)
 

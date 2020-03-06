@@ -32,9 +32,9 @@ void _delay (int32 length) {
 }
 
 void _delay_ms (int32 length) {
-	const uint32 start = _time_ms();
-	uint32 current = _time_ms();
-	while ((current - start) <= length) current = _time_ms();
+	const uint32 start = kil(_time()) + _time_ms();
+	uint32 current = kil(_time()) + _time_ms();
+	while ((current - start) <= length) current = kil(_time()) + _time_ms();
 }
 
 void _delay_us (int32 length) {

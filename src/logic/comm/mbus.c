@@ -4,17 +4,18 @@
 #include <math.h>
 
 #include "logic/config.h"
+#include "logic/data/vartable.h"
 
 /* **************************************************** *
  *     MODICON BUS VARIABLES READER/WRITER WRAPPERS
  * **************************************************** */
 // TODO: create wrapper in config.c for variable handling
 static inline int32 mbus_read_reg (const int32 address) {
-	return ConfigVarTableGet (address);
+	return VarTableGet (address);
 }
 
 static inline int32 mbus_write_reg (const int32 address, const int32 value) {
-	return ConfigVarTableSet (address, (value & 0xFFFF));
+	return VarTableSet (address, (value & 0xFFFF));
 }
 
 /* **************************************************** *

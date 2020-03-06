@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Startup procedure wrapper for microcontroller
  *
  * Checks whether there is a stored value for each variable
@@ -26,10 +26,7 @@ enum configErrorEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
-int32 ConfigurePeripherals (void);
-int32 ConfigureVariables (void);
-int32 ConfigVarTableGet (const int32 address);
-int32 ConfigVarTableSet (const int32 address, const uint16 value);
+int32 Configure (void);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

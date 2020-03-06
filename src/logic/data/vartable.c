@@ -1,8 +1,10 @@
 ﻿
 #include "logic/data/vartable.h"
 
+#include <locale.h>
 #include <stddef.h> // for NULL reference
-#include <string.h>
+#include <stdlib.h>
+//#include <string.h>
 
 #include "logic/comm/mbus.h"
 
@@ -30,9 +32,9 @@
 #include "util/util.h"
 
 // CAUTION! A VERY FUCKING LONG SWITCH CASE LIST AHEAD!
-int32 ConfigVarTableGet (const int32 address) {
-	int32 err = 0, res = 0;
-	const uint16 offset = address & 0xFFFF;
+int32 VarTableGet (const int32 address) {
+	int32 err = 0, res = 0, temp;
+	const int32 offset = address & 0xFFFF;
 
 	switch (offset) {
 	/* **************************************************** */
@@ -62,6 +64,25 @@ int32 ConfigVarTableGet (const int32 address) {
 
 	case VAR_FOURIER_BUFSIZE: res = FourierBufferLengthGet(); break;
 	case VAR_FOURIER_FREQRES: res = kil(FourierFreqResolutionGet()); break;
+
+	case VAR_FIRMWARE_REV1:
+			setlocale(LC_ALL, "C");
+#ifdef VERSION
+			temp = atoi(VERSION);
+#else
+			temp = 1234;
+#endif
+			res = temp >> 16;
+			break;
+	case VAR_FIRMWARE_REV0:
+			setlocale(LC_ALL, "C");
+#ifdef VERSION
+			temp = atoi(VERSION);
+#else
+			temp = 4321;
+#endif
+			res = temp & 0xFFFF;
+			break;
 
 	/* **************************************************** */
 	case VAR_FOUNDBUF_SIZE: res = FoundDomainGetLength(); break;
@@ -201,7 +222,7 @@ int32 ConfigVarTableGet (const int32 address) {
 /* **************************************************** *
  *         MODICON BUS VARIABLES TABLE HANDLING
  * **************************************************** */
-int32 ConfigVarTableSet (const int32 address, const int16 value) {
+int32 VarTableSet (const int32 address, const int16 value) {
 	int32 res;
 	switch (address & 0xFFFF) {
 	case VAR_LINE_STATUS:
