@@ -14,6 +14,7 @@
 #include <tivaware/driverlib/pin_map.h>
 #include <tivaware/driverlib/sysctl.h>
 
+#include "periph/gpio.h"
 //#include "util/print.h"
 #include "util/util.h"
 
@@ -107,8 +108,20 @@ static void CanMessageSenderInit (void) {
 	CANMessageSet(CAN0_BASE, CAN_SEND_OBJ_ID, &send_struct, MSG_OBJ_TYPE_TX);
 }
 
+/* **************************************************** *
+ *         CAN MESSAGE LOCAL DEVICE ID WRAPPER
+ * **************************************************** */
+static int32 dev_id = 0;
+int32 CanMessageDeviceIdGet (void) { return dev_id & 0xFF; }
+void CanMessageDeviceIdSet (const int32 id) { dev_id = id & 0xFF; }
+
 /* **************************************************** */
 void CanMessageInit (void) {
+	// using hard '32' offset instead of hard-coded pins
+	const int32 pins = GpioModuleAdressGet () \
+			| (4 << 3) /*(GpioModuleCodenameGet () << 3)*/;
+
+	CanMessageDeviceIdSet(pins);
 	CanMessageReceiverInit();
 	CanMessageSenderInit();
 }

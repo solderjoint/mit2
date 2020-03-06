@@ -70,10 +70,10 @@ enum mbusRWVarTableEnum {
 	VAR_PERIOD_VOLTCHECK,
 	VAR_PERIOD_ENDPCHECK,
 
-	VAR_VOLTAC_MULT1     = 40300,
-	VAR_VOLTAC_MULT0,
-	VAR_VOLTDC_MULT1,
-	VAR_VOLTDC_MULT0,
+	VAR_VOLTAC_MAX     = 40300,
+	VAR_VOLTAC_ADCCOUNTS,
+	VAR_VOLTDC_MAX,
+	VAR_VOLTDC_ADCCOUNTS,
 	VAR_VOLT_SPIKE,
 	VAR_VOLT_NORMAL,
 	VAR_VOLT_LINEBREACH,
@@ -105,7 +105,7 @@ enum mbusRWVarTableEnum {
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
 int32 VarTableGet (const int32 address);
-int32 VarTableSet (const int32 address, const int16 value);
+int32 VarTableSet (const int32 address, const int32 value);
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

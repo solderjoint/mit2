@@ -22,6 +22,7 @@ enum mutexEnum {
 /* **************************************************** *
  *                 FUNCTION PROTOTYPES
  * **************************************************** */
+//void MutexExplicitlySet (enum mutexEnum var_pos);
 int32 MutexInit (void);
 
 char MutexCheckPending(void);

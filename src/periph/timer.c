@@ -22,6 +22,7 @@
  * **************************************************** */
 volatile static uint32 timerClockSeconds;
 
+void TimerClockSecondsSet (const uint32 x) { timerClockSeconds = x; }
 void TimerClockSecondsReset (void) { timerClockSeconds = 0; }
 void TimerClockSecondsIncrement (void) { timerClockSeconds++; }
 

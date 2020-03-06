@@ -128,13 +128,10 @@ inline void SmolinProtocolProcessIncoming (void) {
 	const int32 size = CanMessageReceiverSizeGet() % 9;  // <= 8
 	for (int i = 0; i < size; i++) input_buffer[i] = ptr[i];
 
-	// using hard '32' offset instead of hard-coded pins
-	const int32 device_id = GpioModuleAdressGet () \
-			| (8 * 4) /*(GpioModuleCodenameGet () << 3)*/;
-
-	if (InputHeaderIdDestGet() == device_id) {
+	const int32 dev_id = CanMessageDeviceIdGet();
+	if (InputHeaderIdDestGet() == dev_id) {
 		if (InputHeaderFastDataGet()) {
-//			QuickInputProcess(input_buffer);
+//			if (size > 0) QuickInputProcess(input_buffer);
 			QuickOutputProcess(output_buffer);
 			SmolinProtocolQuickSend();
 		} else if (InputHeaderModbusDataGet()) {

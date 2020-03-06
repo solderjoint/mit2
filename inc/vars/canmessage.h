@@ -17,6 +17,9 @@ enum _var_canEnum {
  * **************************************************** */
 void CanMessageInit (void);
 
+int32 CanMessageDeviceIdGet (void);
+void CanMessageDeviceIdSet (const int32 id);
+
 void CanMessageReceive(void);
 uint8* CanMessageReceiverBufferGet (void);
 int32 CanMessageReceiverSizeGet (void);
@@ -25,15 +28,6 @@ int32 CanMessageReceiverIdGet (void);
 void CanMessageSend (void);
 void CanMessageSenderBufferSet(const uint8 buffer[CAN_MSGBUF_LEN]);
 void CanMessageSenderIdSet (const int32 id);
-
-/* **************************************************** */
-char CanMessageReceiverFlagGet (void);
-void CanMessageReceiverFlagSet (void);
-void CanMessageReceiverFlagClear (void);
-
-char CanMessageSenderFlagGet (void);
-void CanMessageSenderFlagSet (void);
-void CanMessageSenderFlagClear (void) ;
 
 /* **************************************************** *
  *              END OF HEADER DECLARATION

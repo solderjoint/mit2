@@ -4,6 +4,7 @@
 #include "logic/state.h"
 #include "logic/comm/smolin.h"
 #include "logic/data/db.h"
+#include "logic/data/vartable.h"
 
 #include "periph/can.h"
 #include "periph/gpio.h"
@@ -86,20 +87,12 @@ static void vars_logic (void) {
 	RelayStatusSet(RELAY_ON);
 }
 
-//#include "util/util.h"
-#include <stdlib.h>
-#include "logic/data/vartable.h"
-#include <locale.h>
-
 static void vars_restore (void) {
 	// restore values from eeprom
-	setlocale(LC_ALL,"C");
-//	const uint32 time = (uint32) atoi(VERSION);
-	const uint32 time = VarTableGet(VAR_FIRMWARE_REV0) \
-			+ (VarTableGet(VAR_FIRMWARE_REV1) << 16);
-	xprintln("time\t[%u]\t(%u)", time, atoi(VERSION)
-			/*VarTableGet(VAR_FIRMWARE_REV1) << 16 \
-			+ VarTableGet(VAR_FIRMWARE_REV0)*/ );
+	const int32 offset = VAR_READWRITE_OFFSET;
+	for (int32 i = offset; i < (offset + kil(10)); i++) {
+
+	}
 }
 
 static void vars_mutex (void) {

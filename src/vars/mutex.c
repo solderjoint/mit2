@@ -46,6 +46,10 @@ static void _mutex_handler (void) {
 /* **************************************************** *
  *                GLOBAL MUTEX WRAPPER
  * **************************************************** */
+void MutexExplicitlySet (enum mutexEnum var_pos) {
+	mutex_buf |= (1 << var_pos) & 0x7FFFFFFF;
+}
+
 int32 MutexInit (void) {
 	mutex_buf = ((int32) 0);  // clear mutex buf variable
 	TimerSemaphoreAttachInterrupt(_mutex_handler);

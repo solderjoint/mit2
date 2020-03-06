@@ -23,9 +23,10 @@ int32 PeriodSemaphoreFreqGet (void) {
 }
 
 int32 PeriodSemaphoreFreqSet (const uint32 val) {
-	const int32 rate = ((val < 10) || (val > 5000))
+	const int32 rate = ((val < 100) || (val > 5000))
 			? PERIOD_TIMER_FREQ : val;
 	period_freq = rate;
+	TimerSemaphoreInit(rate);
 	period_counter = 0; // clear counter
 	return period_freq;
 }

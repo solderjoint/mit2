@@ -1,4 +1,4 @@
-
+﻿
 #ifndef __TIMER_H
 #define __TIMER_H
 
@@ -14,6 +14,8 @@
  * **************************************************** */
 void TimerClockInit (void);
 void TimerClockAttachInterrupt (void (*foo) (void));
+
+void TimerClockSecondsSet (const uint32 x);
 uint32 TimerClockSecondsGet (void);
 uint32 TimerClockMicrosGet (void);
 uint32 TimerClockMillisGet (void);
